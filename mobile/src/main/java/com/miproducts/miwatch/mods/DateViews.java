@@ -204,8 +204,8 @@ public class DateViews extends View {
     }
 
     public float getX(){
-        log("get X = " + ((int) x - (width / 2) - svView.getX()));
-        return (x - (width/2)) - svView.getX();
+        log("get X = " + (svView.getCanvasX()- x));
+        return (int)(svView.getCanvasX()- x);
     }
     public float getY(){
         return y - svView.getY();
