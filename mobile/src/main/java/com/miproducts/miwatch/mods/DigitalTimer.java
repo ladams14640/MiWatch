@@ -26,7 +26,8 @@ public class DigitalTimer extends View {
     // 2 and 1/2 of the size
     private float digitalRectWidth = (2 * digitalSize) + (digitalSize/2);
     private float digitalRectLHeight = digitalSize;
-    private float yCenterOfRect = digitalRectWidth/2;
+    // heuristically came to this
+    private float yCenterOfRect = (digitalSize/2)+(int)(digitalSize * .20);
     private int currentColor;
 
     TextView tvDigitalTime;
@@ -54,21 +55,22 @@ public class DigitalTimer extends View {
         tvDigitalTime.setTextSize(24);
         resetRectPosition();
     }
-    // TODO have to create the getX and getY for all views to get an accurate X and Y position.
     public float getX(){
-        log("get X = " + xTime);
-        return xTime;
+        log("get X = " + (xTime));
+        log("get X, after surface view = " + (int)(svView.getCanvasX()-xTime));
+        //TODO !!HERE!! so this seems to be the rule we need to get the accurate change.
+        // so i set up a number now lets carry this over to the rest of the other Views.
+        return (int)(svView.getCanvasX()-xTime);
     }
     public float getY(){
-        return yTime;
+        return yTime - svView.getY();
     }
-
     private void resetRectPosition(){
         selectRect = new Rect(
-                (int)xTime,
+                (int)(xTime),
                 (int)yTime-(int)yCenterOfRect,
                 (int)xTime+(int)digitalRectWidth,
-                (int)yTime+(int)digitalRectLHeight);
+                (int)yTime);
     }
 
     private void initPaint() {
@@ -77,7 +79,7 @@ public class DigitalTimer extends View {
         mTimePaint.setTextSize(digitalSize);
         mTimePaint.setColor(getResources().getColor(R.color.digital_time_blue));
         mTimePaint.setAntiAlias(true);
-        mTimePaint.setTextAlign(Paint.Align.LEFT);
+       // mTimePaint.setTextAlign(Paint.Align.LEFT);
 
         // rect paint
         timeRectPaint = new Paint();
@@ -230,7 +232,7 @@ public class DigitalTimer extends View {
     private void refreshValues() {
         digitalRectWidth = (2 * digitalSize) + (digitalSize/2);
         digitalRectLHeight = digitalSize;
-        yCenterOfRect = digitalRectWidth/2;
+        yCenterOfRect = (digitalSize/2)+(int)(digitalSize * .20);
         initPaint();
         selectPaint();
     }

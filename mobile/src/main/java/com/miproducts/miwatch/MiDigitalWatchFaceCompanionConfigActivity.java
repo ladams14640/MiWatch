@@ -116,7 +116,9 @@ GoogleApiClient.OnConnectionFailedListener {
 
 
 
-
+    public float getSurfaceX(){
+        return svView.getCanvasX();
+    }
 
 
 

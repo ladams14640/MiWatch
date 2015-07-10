@@ -29,6 +29,7 @@ public class SurfaceThread extends Thread{
         }
     }
 
+
     @Override
     public void run(){
         while(isRunning){

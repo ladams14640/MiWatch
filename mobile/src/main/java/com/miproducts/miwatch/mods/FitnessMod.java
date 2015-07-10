@@ -189,11 +189,11 @@ public class FitnessMod extends View {
 
 
     public float getX(){
-        log("get X = " + x);
-        return x;
+        log("get X = " + (int)(x- svView.getX()));
+        return x- svView.getX();
     }
     public float getY(){
-        return y;
+        return y- svView.getY();
     }
 
 

@@ -90,7 +90,7 @@ public class WatchFaceMenu  {
                             handleEventRetrieval(dataMap);
                             //Requires a new thread to avoid blocking the UI
                             new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
-
+                            log("surface starts at " + mActivity.getSurfaceX());
                         }
                     }
 

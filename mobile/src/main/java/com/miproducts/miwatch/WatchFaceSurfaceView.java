@@ -212,6 +212,9 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
 
 
+    public float getCanvasX(){
+        return  getCanvasWidth() - getX();
+    }
 
 
     public WatchFaceSurfaceView(Context context, AttributeSet attrs) {

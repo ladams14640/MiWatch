@@ -193,11 +193,11 @@ public class EventMod extends View {
 
 
     public float getX(){
-        log("get X = " + xText);
-        return xText;
+        log("get X = " + ((int)xText- svWatchView.getX()));
+        return xText - svWatchView.getX();
     }
     public float getY(){
-        return yText;
+        return yText - svWatchView.getY();
     }
 
 

@@ -53,4 +53,5 @@ public class SettingsManager {
 
 
     public static final String DIGITAL_TIME_X = "DIGITAL_TIME_X";
+   // public
 }

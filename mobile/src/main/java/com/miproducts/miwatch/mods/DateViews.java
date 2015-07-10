@@ -42,6 +42,7 @@ public class DateViews extends View {
     public int getSize(){
         return textSize;
     }
+
     public DateViews(Context context, WatchFaceSurfaceView svView) {
         super(context);
         this.svView = svView;
@@ -123,7 +124,7 @@ public class DateViews extends View {
     private void setRectangle(){
         mSelectRect = new Rect(
                 x - (width/2),
-                y - height,
+                y - (height/2),
                 x + (width/2),
                 y+ (height/2));
     }
@@ -203,11 +204,11 @@ public class DateViews extends View {
     }
 
     public float getX(){
-        log("get X = " + x);
-        return x;
+        log("get X = " + ((int) x - (width / 2) - svView.getX()));
+        return (x - (width/2)) - svView.getX();
     }
     public float getY(){
-        return y;
+        return y - svView.getY();
     }
 
 
