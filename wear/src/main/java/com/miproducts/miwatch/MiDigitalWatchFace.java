@@ -82,8 +82,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         return new Engine();
     }
 
-    public class Engine extends CanvasWatchFaceService.Engine
-            implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
+    public class Engine extends CanvasWatchFaceService.Engine {
         static final int MSG_UPDATE_TIME = 0;
 
         @Override
@@ -198,11 +197,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .build());
 
-            mGoogleApiClient = new GoogleApiClient.Builder(MiDigitalWatchFace.this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Wearable.API)
-                    .build();
+
 
 
             resources = MiDigitalWatchFace.this.getResources();
@@ -307,7 +302,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
-
+                if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
                 registerReceiver();
 
                 // Update time zone in case it changed while we weren't visible.
@@ -317,6 +314,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                     mHudView.initEventSyncTask();
                 }
             } else {
+                if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.disconnect();
+                }
                 unregisterReceiver();
                 removeHudView();
             }
@@ -453,45 +453,6 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             Log.d("MiDgitalWatchFace", s);
         }
 
-        @Override
-        public void onConnected(Bundle bundle) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "onConnected: " + bundle);
-
-            }
-                Wearable.DataApi.addListener(mGoogleApiClient, this);
-            // updateConfigDataItemAndUiOnStartup();
-
-        }
-
-        @Override
-        public void onConnectionSuspended(int i) {
-            Log.d(TAG, "onConnectionSuspended: " + i);
-
-        }
-
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            Log.d(TAG, "onConnectionFailed: " + connectionResult);
-
-        }
-
-        @Override
-        public void onDataChanged(DataEventBuffer dataEventBuffer) {
-            for (DataEvent event : dataEventBuffer) {
-                if (event.getType() == DataEvent.TYPE_CHANGED) {
-                    // DataItem changed
-                    DataItem item = event.getDataItem();
-                    if (item.getUri().getPath().compareTo("/count") == 0) {
-                        DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                        updateCount(dataMap.getInt(COUNT_KEY));
-                    }
-                } else if (event.getType() == DataEvent.TYPE_DELETED) {
-                    // DataItem deleted
-
-                }
-            }
-        }
 
         private void updateCount(int y) {
             log("grabbed this update: " + y);

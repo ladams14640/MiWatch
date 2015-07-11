@@ -42,6 +42,7 @@ private static final String TAG = "DigitalListenerService";
     private static final String WEARABLE_DATA_PATH = "/wearable_data";
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
+        log("onDataChanged");
         SettingsManager sm = new SettingsManager(getApplicationContext());
 
         DataMap dataMap;
@@ -52,7 +53,7 @@ private static final String TAG = "DigitalListenerService";
                 String path = event.getDataItem().getUri().getPath();
                 if (path.equals(WEARABLE_DATA_PATH)) {}
                 dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                Log.d("myTag", "DataMap received on watch: " + dataMap);
+                Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
             }
             //TODO WORKING@!!!
             // TODO testing to see if we even come close to the same numbers.

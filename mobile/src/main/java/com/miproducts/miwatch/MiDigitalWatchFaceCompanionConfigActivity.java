@@ -86,6 +86,15 @@ GoogleApiClient.OnConnectionFailedListener {
         pauseSurfaceViewThread();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+        stopSurfaceViewThread();
+    }
+
     private void pauseSurfaceViewThread() {
         if(svView != null){
             svView.pauseThread();

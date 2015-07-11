@@ -41,11 +41,25 @@ public class Consts {
      *
      */
     public static final String DIGITAL_TIMER_API = "DIGITAL_TIME";
+    public static final String DIGITAL_TIMER_API_COLOR = "DIGITAL_TIME_API_COLOR";
+
     public static final String EVENT_API = "EVENT_API";
+    public static final String EVENT_API_COLOR = "EVENT_API_COLOR";
+
     public static final String FITNESS_API = "FITNESS_API";
+    public static final String FITNESS_API_COLOR = "FITNESS_API_COLOR";
+
+    public static final String DEGREE_API_COLOR = "DEGREE_API_COLOR";
     public static final String DEGREE_API = "DEGREE_API";
+
     public static final String DATE_API = "DATE_API";
+    public static final String DATE_API_COLOR = "DATE_API_COLOR";
+
+    public static final String ALARM_API_COLOR = "ALARM_API_COLOR";
     public static final String ALARM_API = "ALARM_API";
+
+
+
   //  public static final String
   //  public static final String
   //  public static final String

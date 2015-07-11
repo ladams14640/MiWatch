@@ -104,6 +104,7 @@ public class WatchFaceMenu  {
 
 
     private void handleDigitalTimeRetrieval(DataMap dataMap) {
+        // get location
         Point digitPoint = mActivity.getViewsPosition(Consts.DIGITAL_TIMER);
         List<Integer> digitalPointsArray = new ArrayList<Integer>();
         digitalPointsArray.add(digitPoint.x);
@@ -112,6 +113,12 @@ public class WatchFaceMenu  {
         for(int i = 0; i < digitalPointsArray.size(); i++){
             log("digitalPointsArray we got from the getViewsPosition is = " + digitalPointsArray.get(i));
         }
+        //TODO grab a color
+        // get color
+        int colorChoice = mActivity.getSelectedViewsColor(Consts.DIGITAL_TIMER);
+        dataMap.putInt(Consts.DIGITAL_TIMER_API_COLOR, colorChoice);
+
+        // Pack the values
         dataMap.putIntegerArrayList(Consts.DIGITAL_TIMER_API,
                 (ArrayList<Integer>) digitalPointsArray);
     }

@@ -61,4 +61,8 @@ public class SurfaceThread extends Thread{
     public boolean isRunning(){
         return isRunning;
     }
+
+    public void stopThread() {
+        isRunning = false;
+    }
 }

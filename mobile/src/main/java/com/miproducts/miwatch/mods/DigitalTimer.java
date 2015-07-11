@@ -56,11 +56,11 @@ public class DigitalTimer extends View {
         resetRectPosition();
     }
     public float getX(){
-        log("get X = " + (xTime));
-        log("get X, after surface view = " + (int)(svView.getCanvasX()-xTime));
+        //log("get X = " + (xTime));
+       // log("get X, after surface view = " + (int)(svView.getCanvasX()-xTime));
         //TODO !!HERE!! so this seems to be the rule we need to get the accurate change.
         // so i set up a number now lets carry this over to the rest of the other Views.
-        return (int)(svView.getCanvasX()-xTime);
+        return xTime;
     }
     public float getY(){
         return yTime - svView.getY();
