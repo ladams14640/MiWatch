@@ -105,12 +105,12 @@ public class DegreeMod extends View {
         }
 
         // we are now dragging and lets move this shit.
-        log("touch is inside");
+        //"touch is inside");
         // touch has come in
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                log("down");
+                //log("down");
                 //x = (int)(event.getX()-(width/2));
                 //y = (int) (event.getY()-(height/2));
                 svView.setSelection(Consts.DEGREE, true);
@@ -123,8 +123,8 @@ public class DegreeMod extends View {
 
             case MotionEvent.ACTION_MOVE:
                 // no adjustments if we are animating
-                log("moving");
-                log("moving the text view");
+                //log("moving");
+                //log("moving the text view");
                 x = (int)(event.getX()-(width/2));
                 y = (int) (event.getY()-(height/2));
                 setRectangle();
@@ -160,7 +160,7 @@ public class DegreeMod extends View {
 
 
     public void changeSize(int newSize) {
-        log("changed Size to " + newSize);
+        //log("changed Size to " + newSize);
         textSize = newSize;
         refreshValues();
         //refresh rectangle

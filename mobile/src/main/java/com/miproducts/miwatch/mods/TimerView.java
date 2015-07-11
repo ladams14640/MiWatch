@@ -62,7 +62,7 @@ public class TimerView extends View {
 
     public TimerView(Context context, WatchFaceSurfaceView svView) {
         super(context);
-        log("init");
+      //  log("init");
         this.mContext = context;
         this.svView = svView;
         bTimer = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_timer_white);
@@ -130,12 +130,12 @@ public class TimerView extends View {
         }
 
         // we are now dragging and lets move this shit.
-        log("touch is inside");
+        //log("touch is inside");
         // touch has come in
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                log("down");
+                //log("down");
                // x = (int)(event.getX()-(width/2));
               //  y = (int) (event.getY()-(height/2));
                 svView.setSelection(Consts.ALARM_TIMER, true);
@@ -148,8 +148,8 @@ public class TimerView extends View {
 
             case MotionEvent.ACTION_MOVE:
                 // no adjustments if we are animating
-                log("moving");
-                log("moving the text view");
+                //log("moving");
+                //log("moving the text view");
                 x = (int)(event.getX()-(width/2));
                 y = (int) (event.getY()-(height/2));
                 repositionRect();
@@ -186,7 +186,7 @@ public class TimerView extends View {
         Log.d("TimerMod", s);
     }
     public void changeSize(int newSize) {
-        log("changed Size to " + newSize);
+        //log("changed Size to " + newSize);
         width = newSize;
         height = newSize;
         refreshValues();

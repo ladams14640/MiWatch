@@ -56,15 +56,15 @@ public class DigitalTimer extends View {
         resetRectPosition();
     }
     public float getX(){
-        //log("get X = " + (xTime));
+        log("get X = " + (xTime));
        // log("get X, after surface view = " + (int)(svView.getCanvasX()-xTime));
-        //TODO !!HERE!! so this seems to be the rule we need to get the accurate change.
-        // so i set up a number now lets carry this over to the rest of the other Views.
         return xTime;
     }
     public float getY(){
-        return yTime - svView.getY();
+        log("get Y = " + yTime);
+        return yTime;
     }
+
     private void resetRectPosition(){
         selectRect = new Rect(
                 (int)(xTime),
@@ -119,11 +119,11 @@ public class DigitalTimer extends View {
             }
         }
 
-        log("touch is inside");
+       // log("touch is inside");
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                log("down");
+               // log("down");
                 //xTime = event.getX()-digitalRectWidth/2;
                 //yTime = event.getY()-digitalRectLHeight/2;
                 svView.setSelection(Consts.DIGITAL_TIMER, true);
@@ -134,8 +134,8 @@ public class DigitalTimer extends View {
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                log("moving");
-                log("moving the text Mod");
+                //log("moving");
+                //log("moving the text Mod");
                 xTime = event.getX()-digitalRectWidth/2;
 
                 yTime = event.getY()-digitalRectLHeight/2;
@@ -221,7 +221,7 @@ public class DigitalTimer extends View {
 
 
     public void changeSize(int newSize) {
-        log("changed Size to " + newSize);
+        //log("changed Size to " + newSize);
         digitalSize = newSize;
         refreshValues();
         //refresh rectangle

@@ -69,12 +69,12 @@ public class DateViews extends View {
         }
 
         // we are now dragging and lets move this shit.
-        log("touch is inside");
+       // log("touch is inside");
         // touch has come in
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                log("down");
+                //log("down");
                 //x = (int)(event.getX()-(width/2));
                 //y = (int) (event.getY()-(height/2));
 
@@ -87,9 +87,9 @@ public class DateViews extends View {
 
             case MotionEvent.ACTION_MOVE:
                 // no adjustments if we are animating
-                log("moving");
-                log("moving the text view");
-                log("moving the text view");
+                //log("moving");
+                //log("moving the text view");
+                //log("moving the text view");
                 x = (int)(event.getX()-(width/2));
                 y = (int) (event.getY()-(height/2));
                 setRectangle();

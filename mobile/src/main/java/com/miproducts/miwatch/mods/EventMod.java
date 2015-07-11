@@ -104,12 +104,12 @@ public class EventMod extends View {
         }
 
         // we are now dragging and lets move this shit.
-        log("touch is inside");
+        //log("touch is inside");
         // touch has come in
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                log("down");
+                //log("down");
                 //xText = event.getX()-digitalRectWidth/2;
                 //yText = event.getY()-digitalRectLHeight/2;
                 svWatchView.setSelection(Consts.EVENT, true);
@@ -122,8 +122,8 @@ public class EventMod extends View {
 
             case MotionEvent.ACTION_MOVE:
                 // no adjustments if we are animating
-                log("moving");
-                log("moving the text view");
+                //log("moving");
+                //log("moving the text view");
                 xText = event.getX()-digitalRectWidth/2;
                 yText = event.getY()-digitalRectLHeight/2;
                 repositionRect();
@@ -170,7 +170,7 @@ public class EventMod extends View {
 
 
     public void changeSize(int newSize) {
-        log("changed Size to " + newSize);
+        //log("changed Size to " + newSize);
         textSize = newSize;
         refreshValues();
         //refresh rectangle

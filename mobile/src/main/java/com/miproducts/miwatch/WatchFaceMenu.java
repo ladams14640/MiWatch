@@ -81,7 +81,7 @@ public class WatchFaceMenu  {
 
                             //TODO 1.2 this is where we will be setting up our positions, color, and the
                             //TODO 2.2 rest.
-
+                            // send out all the user's choices to the node.
                             handleDigitalTimeRetrieval(dataMap); // stores DigitalTime positions
                             handleDateRetrieval(dataMap);
                             handleAlarmRetrieval(dataMap);

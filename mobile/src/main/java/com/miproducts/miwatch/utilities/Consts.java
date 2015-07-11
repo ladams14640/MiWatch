@@ -38,13 +38,19 @@ public class Consts {
 
     /**
      * Use these as keys to track position and color of each view to transfer to wearable
+     * KEYS for serializing data
      *
      */
-    public static final String DIGITAL_TIMER_API = "DIGITAL_TIME";
-    public static final String DIGITAL_TIMER_API_COLOR = "DIGITAL_TIME_API_COLOR";
+    public static final String DIGITAL_TIMER_POS_API = "DIGITAL_TIME"; // x,y array of the digital time
+    public static final String DIGITAL_TIMER_COLOR_API = "DIGITAL_TIME_API_COLOR"; // color of time
+    public static final String DIGITAL_SIZE_API = "DIGITAL_SIZE_API"; // size of time
+    public static final String DIGITAL_VISIBLE_API = "DIGITAL_VISIBLE_API"; // visibility of time
 
+    //TODO finish these 4 constants across the rest of the package Items.
     public static final String EVENT_API = "EVENT_API";
-    public static final String EVENT_API_COLOR = "EVENT_API_COLOR";
+    public static final String EVENT_COLOR_API = "EVENT_API_COLOR";
+
+
 
     public static final String FITNESS_API = "FITNESS_API";
     public static final String FITNESS_API_COLOR = "FITNESS_API_COLOR";
