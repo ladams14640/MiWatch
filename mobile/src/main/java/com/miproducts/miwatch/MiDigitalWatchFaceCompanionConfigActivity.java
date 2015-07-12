@@ -193,6 +193,18 @@ GoogleApiClient.OnConnectionFailedListener {
         return svView.getColorOfView(selectedView);
     }
 
+    public boolean getViewsVisibility(int digitalVisibleApi) {
+        svView.getVisibilityOfView(digitalVisibleApi);
+        return false;
+    }
+
+
+
+
+
+
+
+
     private void log(String s) {
         Log.d(TAG, s);
         //init();
@@ -229,4 +241,6 @@ GoogleApiClient.OnConnectionFailedListener {
 
 
     private static final String DATA_ACTIVITY_KEY = "com.miproducts.miwatch";
+
+
 }

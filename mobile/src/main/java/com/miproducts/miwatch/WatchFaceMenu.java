@@ -104,23 +104,32 @@ public class WatchFaceMenu  {
 
 
     private void handleDigitalTimeRetrieval(DataMap dataMap) {
-        // get location
+        // get location for the position pack
         Point digitPoint = mActivity.getViewsPosition(Consts.DIGITAL_TIMER);
         List<Integer> digitalPointsArray = new ArrayList<Integer>();
         digitalPointsArray.add(digitPoint.x);
         digitalPointsArray.add(digitPoint.y);
 
+        // for troubleshooting
         for(int i = 0; i < digitalPointsArray.size(); i++){
             log("digitalPointsArray we got from the getViewsPosition is = " + digitalPointsArray.get(i));
         }
-        //TODO grab a color
-        // get color
-        int colorChoice = mActivity.getSelectedViewsColor(Consts.DIGITAL_TIMER);
-        dataMap.putInt(Consts.DIGITAL_TIMER_API_COLOR, colorChoice);
 
-        // Pack the values
-        dataMap.putIntegerArrayList(Consts.DIGITAL_TIMER_API,
+        //TODO grab a color
+
+        // Pack color color values
+        int colorChoice = mActivity.getSelectedViewsColor(Consts.DIGITAL_TIMER);
+        dataMap.putInt(Consts.DIGITAL_TIMER_COLOR_API, colorChoice);
+
+        // Pack the position values
+        dataMap.putIntegerArrayList(Consts.DIGITAL_TIMER_POS_API,
                 (ArrayList<Integer>) digitalPointsArray);
+
+        // Pack the visibility
+        boolean visible = mActivity.getViewsVisibility(Consts.DIGITAL_TIMER);
+        // Pack the size
+
+
     }
 
     private void handleDateRetrieval(DataMap dataMap) {
@@ -132,7 +141,7 @@ public class WatchFaceMenu  {
         for(int i = 0; i < DatePointsArray.size(); i++){
             log("DATE we got from the getViewsPosition is = " + DatePointsArray.get(i));
         }
-        dataMap.putIntegerArrayList(Consts.DATE_API,
+        dataMap.putIntegerArrayList(Consts.DATE_POS_API,
                 (ArrayList<Integer>) DatePointsArray);
 
     }
@@ -147,7 +156,7 @@ public class WatchFaceMenu  {
         for(int i = 0; i < FitnessPointsArray.size(); i++){
             log("Fitness we got from the getViewsPosition is = " + FitnessPointsArray.get(i));
         }
-        dataMap.putIntegerArrayList(Consts.FITNESS_API,
+        dataMap.putIntegerArrayList(Consts.FITNESS_POS_API,
                 (ArrayList<Integer>) FitnessPointsArray);
 
     }
@@ -161,7 +170,7 @@ public class WatchFaceMenu  {
         for(int i = 0; i < EventPointsArray.size(); i++){
             log("Event we got from the getViewsPosition is = " + EventPointsArray.get(i));
         }
-        dataMap.putIntegerArrayList(Consts.EVENT_API,
+        dataMap.putIntegerArrayList(Consts.EVENT_POS_API,
                 (ArrayList<Integer>) EventPointsArray);
 
     }
@@ -175,7 +184,7 @@ public class WatchFaceMenu  {
         for(int i = 0; i < TimerPointsArray.size(); i++){
             log("Alarm we got from the getViewsPosition is = " + TimerPointsArray.get(i));
         }
-        dataMap.putIntegerArrayList(Consts.ALARM_API,
+        dataMap.putIntegerArrayList(Consts.ALARM_POS_API,
                 (ArrayList<Integer>) TimerPointsArray);
 
     }
@@ -189,7 +198,7 @@ public class WatchFaceMenu  {
         for(int i = 0; i < DegreePointsArray.size(); i++){
             log("Degree we got from the getViewsPosition is = " + DegreePointsArray.get(i));
         }
-        dataMap.putIntegerArrayList(Consts.DEGREE_API,
+        dataMap.putIntegerArrayList(Consts.DEGREE_POS_API,
                 (ArrayList<Integer>) DegreePointsArray);
 
     }
@@ -257,6 +266,7 @@ public class WatchFaceMenu  {
     private void switchValues(int viewNumber) {
         etSize.setText(Integer.toString((int) mActivity.getSizeOfView(viewNumber)));
         ibColor.setBackgroundColor(mActivity.getSelectedViewsColor(viewNumber));
+        cbVisible.setChecked(mActivity.getViewsVisibility(viewNumber));
         //TODO get the visibility property of the view
         //TODO we should check if the dateView had been selected and display additional options
         //TODO - maybe how it is displayed and more control over the dayOfWeek or dayOfMonth since

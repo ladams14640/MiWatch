@@ -26,6 +26,7 @@ public class DegreeMod extends View {
     private int textSize = 75;
     private int width = textSize;
     private int height = textSize + 25;
+    private boolean isVisible = false;
 
     public int getSize(){
         return textSize;
@@ -176,7 +177,7 @@ public class DegreeMod extends View {
     }
 
     public float getX(){
-        log("get X = " + (int)(svView.getCanvasX()-x));
+        log("get X = " + (int) (svView.getCanvasX() - x));
         return (int)(svView.getCanvasX()-x);
     }
     public float getY(){
@@ -204,5 +205,8 @@ public class DegreeMod extends View {
 
     public int getColor() {
         return currentColor;
+    }
+    public boolean getViewsVisibility() {
+        return isVisible;
     }
 }

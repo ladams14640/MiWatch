@@ -38,6 +38,8 @@ public class DateViews extends View {
 
     private Rect mSelectRect;
     private int currentColor;
+    private boolean isVisible = false;
+
 
     public int getSize(){
         return textSize;
@@ -204,7 +206,7 @@ public class DateViews extends View {
     }
 
     public float getX(){
-        log("get X = " + (svView.getCanvasX()- x));
+        log("get X = " + (svView.getCanvasX() - x));
         return (int)(svView.getCanvasX()- x);
     }
     public float getY(){
@@ -214,5 +216,9 @@ public class DateViews extends View {
 
     public int getColor() {
         return currentColor;
+    }
+
+    public boolean getViewsVisibility() {
+        return isVisible;
     }
 }

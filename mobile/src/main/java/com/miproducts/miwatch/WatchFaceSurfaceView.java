@@ -25,6 +25,7 @@ import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.mods.FitnessMod;
 import com.miproducts.miwatch.mods.TimerView;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.GetViewProperties;
 
 /**
  * Created by larry on 7/2/15.
@@ -44,6 +45,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     private DateViews mDateViews;
     private TimerView mTimerView;
 
+    private GetViewProperties mGetProperties;
 
     private int currentlySelectedView = Consts.NONE;
 
@@ -59,19 +61,25 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     }
 
     private void init() {
-        log("init");
+       // log("init");
         stThread = new SurfaceThread(this);
 
         setOnTouchListener(this);
         surfaceHolder = getHolder();
 
         initMods();
-
+        mGetProperties = new GetViewProperties(
+                    mDigitalTimer,
+                    mEventMod,
+                    mFitnessMod,
+                    mDegreeMod,
+                    mDateViews,
+                    mTimerView);
 
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                log("surfaecHolder callback surface created");
+              //  log("surfaecHolder callback surface created");
                 if (!stThread.isRunning()) {
                     stThread.setRunning(true);
                     stThread.start();
@@ -121,7 +129,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        log("touched me.");
+       // log("touched me.");
         // we are dragging
         if(isViewDragging){
             // we have selected something, handle the movement according.
@@ -181,7 +189,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
 
     public void stopThread() {
-        log("surface destroyed");
+       // log("surface destroyed");
         boolean retry = true;
         stThread.setRunning(false);
         while (retry) {
@@ -194,26 +202,26 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     }
 
     public void startThread() {
-        log("start thread");
+       // log("start thread");
         stThread.setRunning(true);
         stThread.start();
     }
     public void unpauseThread() {
-        log("unpaused thread");
+     //   log("unpaused thread");
         stThread.setPaused(false);
 
     }
 
 
     public void pauseThread(){
-        log("pauseThread");
+      //  log("pauseThread");
         stThread.setPaused(true);
     }
 
 
 
     public float getCanvasX(){
-        log("getCanvasX = " + ((int)getCanvasWidth() - getX()));
+     //   log("getCanvasX = " + ((int) getCanvasWidth() - getX()));
         return getCanvasWidth() - getX();
     }
 
@@ -257,6 +265,8 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         }
     }
 
+
+
     /**
      * Tell us if we are dragging a view or if one is just selected.
      * @param b
@@ -265,102 +275,13 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         isViewDragging = b;
     }
 
-    public float getSizeOfView(int selectedView) {
-        switch(selectedView) {
-            case Consts.DIGITAL_TIMER:
-                return mDigitalTimer.getSize();
-            case Consts.FITNESS:
-                return mFitnessMod.getSize();
-            case Consts.EVENT:
-                return mEventMod.getSize();
-            case Consts.DATE:
-                return mDateViews.getSize();
-            case Consts.ALARM_TIMER:
-                return mTimerView.getSize();
-            case Consts.DEGREE:
-                return mDegreeMod.getSize();
-        }
-        return 0;
-    }
+    // action on view
+    public void changeViewSize(int newSize, int selectedView){ mGetProperties.changeViewSize(newSize, selectedView);}
 
-    /**
-     * Tell the appropriate view to change it's size
-     * @param newSize - new size for the view
-     * @param selectedView - the view that we want to manipulate.
-     */
-    public void changeViewSize(int newSize, int selectedView) {
-        log("changeViewSize, new size = " + newSize);
-        switch(selectedView) {
-            case Consts.NONE:
-                break;
-            case Consts.DIGITAL_TIMER:
-                 mDigitalTimer.changeSize(newSize);
-            break;
-            case Consts.FITNESS:
-               mFitnessMod.changeSize(newSize);
-            break;
-            case Consts.EVENT:
-              mEventMod.changeSize(newSize);
-            break;
-            case Consts.DATE:
-              mDateViews.changeSize(newSize);
-            break;
-            case Consts.ALARM_TIMER:
-              mTimerView.changeSize(newSize);
-            break;
-            case Consts.DEGREE:
-              mDegreeMod.changeSize(newSize);
-            break;
-        }
-    }
-
-    public int getColorOfView(int selectedView){
-        switch(selectedView) {
-            case Consts.NONE:
-                break;
-            case Consts.DIGITAL_TIMER:
-                return mDigitalTimer.getColor();
-            case Consts.FITNESS:
-                return mFitnessMod.getColor();
-            case Consts.EVENT:
-                return mEventMod.getColor();
-            case Consts.DATE:
-                return mDateViews.getColor();
-            case Consts.ALARM_TIMER:
-                return mTimerView.getColor();
-            case Consts.DEGREE:
-                return mDegreeMod.getColor();
-            default:
-                return 0;
-        }
-        return 0;
-    }
-
-    public Point getPositionOfView(int selectedView){
-        Point pointOfLocation = new Point();
-        switch(selectedView){
-            case Consts.NONE:
-                break;
-            case Consts.DIGITAL_TIMER:
-                pointOfLocation.set((int) mDigitalTimer.getX(), (int) mDigitalTimer.getY());
-                break;
-            case Consts.FITNESS:
-                pointOfLocation.set((int) mFitnessMod.getX(), (int) mFitnessMod.getY());
-                break;
-            case Consts.EVENT:
-                pointOfLocation.set((int) mEventMod.getX(), (int) mEventMod.getY());
-                break;
-            case Consts.DATE:
-                pointOfLocation.set((int) mDateViews.getX(), (int) mDateViews.getY());
-                break;
-            case Consts.ALARM_TIMER:
-                pointOfLocation.set((int) mTimerView.getX(), (int) mTimerView.getY());
-                break;
-            case Consts.DEGREE:
-                pointOfLocation.set((int)mDegreeMod.getX(),(int) mDegreeMod.getY());
-                break;
-        }
-        return pointOfLocation;
-    }
+    // Get Properties from the individual Views
+    public boolean getVisibilityOfView(int selectedView) {return mGetProperties.getVisibilityOfView(selectedView);}
+    public Point getPositionOfView(int selectedView){return mGetProperties.getPositionOfView(selectedView);}
+    public int getColorOfView(int selectedView){return mGetProperties.getColorOfView(selectedView);}
+    public float getSizeOfView(int selectedView) { return mGetProperties.getSizeOfView(selectedView);}
 
 }

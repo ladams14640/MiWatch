@@ -35,6 +35,7 @@ public class EventMod extends View {
     String mEventInfo = "testing";
     String mEventTitle = "title";
     private int currentColor;
+    private boolean isVisible = false;
 
     public float getSize(){
         return textSize;
@@ -193,7 +194,7 @@ public class EventMod extends View {
 
 
     public float getX(){
-        log("get X = " + ((int)(svWatchView.getCanvasX()-xText)));
+        log("get X = " + ((int) (svWatchView.getCanvasX() - xText)));
         return (int)(svWatchView.getCanvasX()-xText);
     }
     public float getY(){
@@ -225,5 +226,9 @@ public class EventMod extends View {
 
     public int getColor() {
         return currentColor;
+    }
+
+    public boolean getViewsVisibility() {
+        return isVisible;
     }
 }

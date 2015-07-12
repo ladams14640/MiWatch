@@ -7,7 +7,7 @@ import android.provider.CalendarContract;
  */
 public class Consts {
 
-
+    // represents the Degree Symbol
     public static final char DEGREE_SIGN = 0x00B0;
 
     // Heuristic
@@ -41,28 +41,37 @@ public class Consts {
      * KEYS for serializing data
      *
      */
-    public static final String DIGITAL_TIMER_POS_API = "DIGITAL_TIME"; // x,y array of the digital time
-    public static final String DIGITAL_TIMER_COLOR_API = "DIGITAL_TIME_API_COLOR"; // color of time
+    public static final String DIGITAL_TIMER_POS_API = "DIGITAL_TIMER_POS_API"; // x,y array of the digital time
+    public static final String DIGITAL_TIMER_COLOR_API = "DIGITAL_TIMER_COLOR_API"; // color of time
     public static final String DIGITAL_SIZE_API = "DIGITAL_SIZE_API"; // size of time
     public static final String DIGITAL_VISIBLE_API = "DIGITAL_VISIBLE_API"; // visibility of time
 
-    //TODO finish these 4 constants across the rest of the package Items.
-    public static final String EVENT_API = "EVENT_API";
-    public static final String EVENT_COLOR_API = "EVENT_API_COLOR";
+    public static final String EVENT_POS_API = "EVENT_POS_API";
+    public static final String EVENT_COLOR_API = "EVENT_COLOR_API";
+    public static final String EVENT_SIZE_API = "EVENT_SIZE_API";
+    public static final String EVENT_VISIBLE_API = "EVENT_VISIBLE_API";
 
 
+    public static final String FITNESS_POS_API = "FITNESS_POS_API";
+    public static final String FITNESS_COLOR_API = "FITNESS_COLOR_API";
+    public static final String FITNESS_SIZE_API = "FITNESS_SIZE_API";
+    public static final String FITNESS_VISIBLE_API = "FITNESS_VISIBLE_API";
 
-    public static final String FITNESS_API = "FITNESS_API";
-    public static final String FITNESS_API_COLOR = "FITNESS_API_COLOR";
+    public static final String DEGREE_POS_API = "DEGREE_POS_API";
+    public static final String DEGREE_COLOR_API = "DEGREE_COLOR_API";
+    public static final String DEGREE_SIZE_API = "DEGREE_SIZE_API";
+    public static final String DEGREE_VISIBLE_API = "DEGREE_VISIBLE_API";
 
-    public static final String DEGREE_API_COLOR = "DEGREE_API_COLOR";
-    public static final String DEGREE_API = "DEGREE_API";
+    public static final String DATE_POS_API = "DATE_POS_API";
+    public static final String DATE_COLOR_API = "DATE_COLOR_API";
+    public static final String DATE_SIZE_API = "DATE_SIZE_API";
+    public static final String DATE_VISIBLE_API = "DATE_VISIBLE_API";
 
-    public static final String DATE_API = "DATE_API";
-    public static final String DATE_API_COLOR = "DATE_API_COLOR";
 
-    public static final String ALARM_API_COLOR = "ALARM_API_COLOR";
-    public static final String ALARM_API = "ALARM_API";
+    public static final String ALARM_COLOR_API = "ALARM_COLOR_API";
+    public static final String ALARM_POS_API = "ALARM_POS_API";
+    public static final String ALARM_SIZE_API = "ALARM_SIZE_API";
+    public static final String ALARM_VISIBLE_API = "ALARM_VISIBLE_API";
 
 
 

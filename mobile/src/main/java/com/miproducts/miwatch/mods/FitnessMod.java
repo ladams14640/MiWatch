@@ -33,6 +33,7 @@ public class FitnessMod extends View {
     private Paint mPaint;
     private Paint pRect;
     private int currentColor;
+    private boolean isVisible = false;
 
 
     public float getSize(){
@@ -197,4 +198,7 @@ public class FitnessMod extends View {
     }
 
 
+    public boolean getViewsVisibility() {
+        return isVisible;
+    }
 }
