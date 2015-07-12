@@ -177,11 +177,11 @@ public class DegreeMod extends View {
     }
 
     public float getX(){
-        log("get X = " + (int) (svView.getCanvasX() - x));
-        return (int)(svView.getCanvasX()-x);
+        log("get X = " + (x));
+        return (x);
     }
     public float getY(){
-        return y - svView.getY();
+        return y;
     }
 
 

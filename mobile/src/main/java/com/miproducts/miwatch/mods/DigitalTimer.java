@@ -57,7 +57,6 @@ public class DigitalTimer extends View {
     }
     public float getX(){
         log("get X = " + (xTime));
-       // log("get X, after surface view = " + (int)(svView.getCanvasX()-xTime));
         return xTime;
     }
     public float getY(){

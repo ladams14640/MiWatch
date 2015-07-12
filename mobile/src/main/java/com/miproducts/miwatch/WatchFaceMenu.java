@@ -18,6 +18,7 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.MenuPackageUtility;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,15 +37,16 @@ public class WatchFaceMenu  {
 
     private int selectedView;
     MiDigitalWatchFaceCompanionConfigActivity mActivity;
+    MenuPackageUtility mMenuPackageUtility;
 
     public WatchFaceMenu(MiDigitalWatchFaceCompanionConfigActivity miDigitalWatchFaceCompanionConfigActivity){
         mActivity = miDigitalWatchFaceCompanionConfigActivity;
         etSize = (EditText) mActivity.findViewById(R.id.etSize);
         cbVisible = (CheckBox) mActivity.findViewById(R.id.cbVisibile);
         tvSelectedView = (TextView) mActivity.findViewById(R.id.tvSelectedMod);
-
+        mMenuPackageUtility = new MenuPackageUtility(mActivity);
         initEtSize();
-       initIbColor();
+        initIbColor();
     }
 
     private void initIbColor() {
@@ -57,18 +59,18 @@ public class WatchFaceMenu  {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // wasnt up button wasnt the enter key
-                if(event.getAction() != KeyEvent.ACTION_UP)
+                if (event.getAction() != KeyEvent.ACTION_UP)
                     return false;
-                if(event.getKeyCode() != KeyEvent.KEYCODE_ENTER)
+                if (event.getKeyCode() != KeyEvent.KEYCODE_ENTER)
                     return false;
 
 
-                if(event.getAction() == KeyEvent.ACTION_UP){
-                    if(event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                         //TODO link this to setting a size
                         // TODO but first we need some kind of uniformed system.
                         log("enter pressed");
-                        if(etSize.getText().toString() != ""){
+                        if (etSize.getText().toString() != "") {
                             int newValue = Integer.parseInt(etSize.getText().toString());
                             mActivity.ChangeViewSize(newValue, selectedView);
 
@@ -81,16 +83,13 @@ public class WatchFaceMenu  {
 
                             //TODO 1.2 this is where we will be setting up our positions, color, and the
                             //TODO 2.2 rest.
-                            // send out all the user's choices to the node.
-                            handleDigitalTimeRetrieval(dataMap); // stores DigitalTime positions
-                            handleDateRetrieval(dataMap);
-                            handleAlarmRetrieval(dataMap);
-                            handleDegreeRetrieval(dataMap);
-                            handleFitnessRetrieval(dataMap);
-                            handleEventRetrieval(dataMap);
+                            // send out all the user's choices to the node. To be picked up by the watch on it's node.
+                            mMenuPackageUtility.handleAllPackaging(dataMap);
+
+
                             //Requires a new thread to avoid blocking the UI
                             new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
-                            log("surface starts at " + mActivity.getSurfaceX());
+                            //log("surface starts at " + mActivity.getSurfaceX());
                         }
                     }
 
@@ -101,107 +100,6 @@ public class WatchFaceMenu  {
         });
     }
 
-
-
-    private void handleDigitalTimeRetrieval(DataMap dataMap) {
-        // get location for the position pack
-        Point digitPoint = mActivity.getViewsPosition(Consts.DIGITAL_TIMER);
-        List<Integer> digitalPointsArray = new ArrayList<Integer>();
-        digitalPointsArray.add(digitPoint.x);
-        digitalPointsArray.add(digitPoint.y);
-
-        // for troubleshooting
-        for(int i = 0; i < digitalPointsArray.size(); i++){
-            log("digitalPointsArray we got from the getViewsPosition is = " + digitalPointsArray.get(i));
-        }
-
-        //TODO grab a color
-
-        // Pack color color values
-        int colorChoice = mActivity.getSelectedViewsColor(Consts.DIGITAL_TIMER);
-        dataMap.putInt(Consts.DIGITAL_TIMER_COLOR_API, colorChoice);
-
-        // Pack the position values
-        dataMap.putIntegerArrayList(Consts.DIGITAL_TIMER_POS_API,
-                (ArrayList<Integer>) digitalPointsArray);
-
-        // Pack the visibility
-        boolean visible = mActivity.getViewsVisibility(Consts.DIGITAL_TIMER);
-        // Pack the size
-
-
-    }
-
-    private void handleDateRetrieval(DataMap dataMap) {
-        Point point = mActivity.getViewsPosition(Consts.DATE);
-        List<Integer> DatePointsArray = new ArrayList<Integer>();
-        DatePointsArray.add(point.x);
-        DatePointsArray.add(point.y);
-
-        for(int i = 0; i < DatePointsArray.size(); i++){
-            log("DATE we got from the getViewsPosition is = " + DatePointsArray.get(i));
-        }
-        dataMap.putIntegerArrayList(Consts.DATE_POS_API,
-                (ArrayList<Integer>) DatePointsArray);
-
-    }
-
-
-    private void handleFitnessRetrieval(DataMap dataMap) {
-        Point point = mActivity.getViewsPosition(Consts.FITNESS);
-        List<Integer> FitnessPointsArray = new ArrayList<Integer>();
-        FitnessPointsArray.add(point.x);
-        FitnessPointsArray.add(point.y);
-
-        for(int i = 0; i < FitnessPointsArray.size(); i++){
-            log("Fitness we got from the getViewsPosition is = " + FitnessPointsArray.get(i));
-        }
-        dataMap.putIntegerArrayList(Consts.FITNESS_POS_API,
-                (ArrayList<Integer>) FitnessPointsArray);
-
-    }
-
-    private void handleEventRetrieval(DataMap dataMap) {
-        Point point = mActivity.getViewsPosition(Consts.EVENT);
-        List<Integer> EventPointsArray = new ArrayList<Integer>();
-        EventPointsArray.add(point.x);
-        EventPointsArray.add(point.y);
-
-        for(int i = 0; i < EventPointsArray.size(); i++){
-            log("Event we got from the getViewsPosition is = " + EventPointsArray.get(i));
-        }
-        dataMap.putIntegerArrayList(Consts.EVENT_POS_API,
-                (ArrayList<Integer>) EventPointsArray);
-
-    }
-
-    private void handleAlarmRetrieval(DataMap dataMap) {
-        Point point = mActivity.getViewsPosition(Consts.ALARM_TIMER);
-        List<Integer> TimerPointsArray = new ArrayList<Integer>();
-        TimerPointsArray.add(point.x);
-        TimerPointsArray.add(point.y);
-
-        for(int i = 0; i < TimerPointsArray.size(); i++){
-            log("Alarm we got from the getViewsPosition is = " + TimerPointsArray.get(i));
-        }
-        dataMap.putIntegerArrayList(Consts.ALARM_POS_API,
-                (ArrayList<Integer>) TimerPointsArray);
-
-    }
-
-    private void handleDegreeRetrieval(DataMap dataMap) {
-        Point point = mActivity.getViewsPosition(Consts.DEGREE);
-        List<Integer> DegreePointsArray = new ArrayList<Integer>();
-        DegreePointsArray.add(point.x);
-        DegreePointsArray.add(point.y);
-
-        for(int i = 0; i < DegreePointsArray.size(); i++){
-            log("Degree we got from the getViewsPosition is = " + DegreePointsArray.get(i));
-        }
-        dataMap.putIntegerArrayList(Consts.DEGREE_POS_API,
-                (ArrayList<Integer>) DegreePointsArray);
-
-    }
 
 
 
