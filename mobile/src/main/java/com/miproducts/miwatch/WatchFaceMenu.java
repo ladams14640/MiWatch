@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -30,23 +31,38 @@ import java.util.List;
 public class WatchFaceMenu  {
     private static final String TAG = "WatchFaceMenu";
 
+    // Menu Stuff
     private EditText etSize;
     private ImageButton ibColor;
     private CheckBox cbVisible;
     private TextView tvSelectedView;
 
+    // currently selected view
     private int selectedView;
+
+    // Need the activity to set changes to the individual children contained in WatchFaceSurfaceView
     MiDigitalWatchFaceCompanionConfigActivity mActivity;
+
+    // Mack Daddy Handler
     MenuPackageUtility mMenuPackageUtility;
 
     public WatchFaceMenu(MiDigitalWatchFaceCompanionConfigActivity miDigitalWatchFaceCompanionConfigActivity){
         mActivity = miDigitalWatchFaceCompanionConfigActivity;
-        etSize = (EditText) mActivity.findViewById(R.id.etSize);
-        cbVisible = (CheckBox) mActivity.findViewById(R.id.cbVisibile);
         tvSelectedView = (TextView) mActivity.findViewById(R.id.tvSelectedMod);
         mMenuPackageUtility = new MenuPackageUtility(mActivity);
         initEtSize();
         initIbColor();
+        initCbVisible();
+    }
+
+    private void initCbVisible() {
+        cbVisible = (CheckBox) mActivity.findViewById(R.id.cbVisibile);
+        cbVisible.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mActivity.setViewsVisible(selectedView, isChecked);
+            }
+        });
     }
 
     private void initIbColor() {
@@ -54,7 +70,14 @@ public class WatchFaceMenu  {
         //TODO button for color dialog.
     }
 
+
     private void initEtSize() {
+        etSize = (EditText) mActivity.findViewById(R.id.etSize);
+        /**
+         * We do TWO things here!
+         * 1. Set the new size for the view (applies user's choice in size to the selected view.
+         * 2. sends all of the data to the Node for the wearable(only if the data actually has changed).
+         */
         etSize.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -67,28 +90,21 @@ public class WatchFaceMenu  {
 
                 if (event.getAction() == KeyEvent.ACTION_UP) {
                     if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                        //TODO link this to setting a size
-                        // TODO but first we need some kind of uniformed system.
-                        log("enter pressed");
+
+                        // log("enter pressed");
                         if (etSize.getText().toString() != "") {
+
                             int newValue = Integer.parseInt(etSize.getText().toString());
                             mActivity.ChangeViewSize(newValue, selectedView);
-
-                            // Create a data map and put data in it
-
-                            String WEARABLE_DATA_PATH = "/wearable_data";
 
                             // Create a DataMap object and send it to the data layer
                             DataMap dataMap = new DataMap();
 
-                            //TODO 1.2 this is where we will be setting up our positions, color, and the
-                            //TODO 2.2 rest.
                             // send out all the user's choices to the node. To be picked up by the watch on it's node.
                             mMenuPackageUtility.handleAllPackaging(dataMap);
 
-
                             //Requires a new thread to avoid blocking the UI
-                            new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
+                            new SendToDataLayerThread(Consts.WEARABLE_DATA_PATH, dataMap).start();
                             //log("surface starts at " + mActivity.getSurfaceX());
                         }
                     }
@@ -165,10 +181,6 @@ public class WatchFaceMenu  {
         etSize.setText(Integer.toString((int) mActivity.getSizeOfView(viewNumber)));
         ibColor.setBackgroundColor(mActivity.getSelectedViewsColor(viewNumber));
         cbVisible.setChecked(mActivity.getViewsVisibility(viewNumber));
-        //TODO get the visibility property of the view
-        //TODO we should check if the dateView had been selected and display additional options
-        //TODO - maybe how it is displayed and more control over the dayOfWeek or dayOfMonth since
-        //TODO - we are trying to control only one of those atm.
     }
 
     class SendToDataLayerThread extends Thread {

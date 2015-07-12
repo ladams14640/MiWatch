@@ -59,10 +59,13 @@ public class MenuPackageUtility {
 
         // Pack the visibility
         boolean visible = mActivity.getViewsVisibility(Consts.DIGITAL_TIMER);
+        dataMap.putBoolean(Consts.DIGITAL_VISIBLE_API, visible);
         // Pack the size
-
+        int size = mActivity.getViewsSize(Consts.DIGITAL_TIMER);
+        dataMap.putInt(Consts.DIGITAL_SIZE_API, size);
 
     }
+    //TODO Stoped here, need to package more sizes for the rest of the Mods. 
 
     public void handleDatePackage(DataMap dataMap) {
         Point point = mActivity.getViewsPosition(Consts.DATE);
@@ -79,6 +82,7 @@ public class MenuPackageUtility {
         /*Pack positions*/
         dataMap.putIntegerArrayList(Consts.DATE_POS_API,
                 (ArrayList<Integer>) DatePointsArray);
+
         /* Pack color color values */
         int colorChoice = mActivity.getSelectedViewsColor(Consts.DATE);
         dataMap.putInt(Consts.DATE_COLOR_API, colorChoice);
@@ -114,6 +118,7 @@ public class MenuPackageUtility {
          //   log("Event we got from the getViewsPosition is = " + EventPointsArray.get(i));
         //}
 
+        /*Pack positions*/
         dataMap.putIntegerArrayList(Consts.EVENT_POS_API,
                 (ArrayList<Integer>) EventPointsArray);
 
@@ -129,11 +134,17 @@ public class MenuPackageUtility {
         TimerPointsArray.add(point.x);
         TimerPointsArray.add(point.y);
 
-        for(int i = 0; i < TimerPointsArray.size(); i++){
-            log("Alarm we got from the getViewsPosition is = " + TimerPointsArray.get(i));
-        }
+        //for(int i = 0; i < TimerPointsArray.size(); i++){
+         //   log("Alarm we got from the getViewsPosition is = " + TimerPointsArray.get(i));
+        //}
+
+        /*Pack positions*/
         dataMap.putIntegerArrayList(Consts.ALARM_POS_API,
                 (ArrayList<Integer>) TimerPointsArray);
+
+        /* Pack color color values */
+        int colorChoice = mActivity.getSelectedViewsColor(Consts.ALARM_TIMER);
+        dataMap.putInt(Consts.ALARM_COLOR_API, colorChoice);
 
     }
 
@@ -146,8 +157,14 @@ public class MenuPackageUtility {
         for(int i = 0; i < DegreePointsArray.size(); i++){
             log("Degree we got from the getViewsPosition is = " + DegreePointsArray.get(i));
         }
+
+        /*Pack positions*/
         dataMap.putIntegerArrayList(Consts.DEGREE_POS_API,
                 (ArrayList<Integer>) DegreePointsArray);
+
+        /* Pack color color values */
+        int colorChoice = mActivity.getSelectedViewsColor(Consts.DEGREE);
+        dataMap.putInt(Consts.DEGREE_COLOR_API, colorChoice);
 
     }
 

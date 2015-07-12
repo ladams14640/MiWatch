@@ -54,7 +54,7 @@ public class TimerView extends View {
     private boolean isSelected = false;
     private WatchFaceSurfaceView svView;
     private int currentColor;
-    private boolean isVisible = false;
+    private boolean isVisible = true;
 
     public int getSize(){
         return width;
@@ -206,7 +206,9 @@ public class TimerView extends View {
     public int getColor() {
         return currentColor;
     }
-
+    public void setVisibility(boolean visible){
+        isVisible = visible;
+    }
     public float getX(){
         log("get X = " + x);
         return (x);

@@ -32,10 +32,10 @@ public class EventMod extends View {
     private float xText, yText;
     private float textSize = 40;
     private float displayedTextSize = textSize*2;
-    String mEventInfo = "testing";
-    String mEventTitle = "title";
+    String mEventInfo = "";
+    String mEventTitle = "";
     private int currentColor;
-    private boolean isVisible = false;
+    private boolean isVisible = true;
 
     public float getSize(){
         return textSize;
@@ -157,9 +157,6 @@ public class EventMod extends View {
 
     }
 
-
-
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
@@ -186,13 +183,6 @@ public class EventMod extends View {
         selectPaint();
     }
 
-
-
-
-
-
-
-
     public float getX(){
         log("get X = " + xText);
         return xText;
@@ -202,11 +192,9 @@ public class EventMod extends View {
         return yText;
     }
 
-
-
-
-
-
+    public void setVisibility(boolean visible){
+        isVisible = visible;
+    }
 
     public void log(String s){
         Log.d("EventMod", s);

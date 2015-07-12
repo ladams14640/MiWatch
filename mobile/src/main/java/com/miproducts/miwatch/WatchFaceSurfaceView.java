@@ -79,7 +79,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-              //  log("surfaecHolder callback surface created");
+                //  log("surfaecHolder callback surface created");
                 if (!stThread.isRunning()) {
                     stThread.setRunning(true);
                     stThread.start();
@@ -277,11 +277,11 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
     // action on view
     public void changeViewSize(int newSize, int selectedView){ mGetProperties.changeViewSize(newSize, selectedView);}
+    public void setViewsVisibility(int selectedView, boolean isChecked) { mGetProperties.changeViewsVisibility(selectedView, isChecked); }
 
     // Get Properties from the individual Views
     public boolean getVisibilityOfView(int selectedView) {return mGetProperties.getVisibilityOfView(selectedView);}
     public Point getPositionOfView(int selectedView){return mGetProperties.getPositionOfView(selectedView);}
     public int getColorOfView(int selectedView){return mGetProperties.getColorOfView(selectedView);}
     public float getSizeOfView(int selectedView) { return mGetProperties.getSizeOfView(selectedView);}
-
 }

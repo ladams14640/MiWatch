@@ -38,6 +38,9 @@ public class DigitalTimer extends View {
     private WatchFaceSurfaceView svView;
 
     private Context mContext;
+    private boolean isVisible = true;
+
+
     public float getSize(){
         return digitalSize;
     }
@@ -54,6 +57,9 @@ public class DigitalTimer extends View {
 
         tvDigitalTime.setTextSize(24);
         resetRectPosition();
+    }
+    public void setVisibility(boolean visible){
+        isVisible = visible;
     }
     public float getX(){
         log("get X = " + (xTime));

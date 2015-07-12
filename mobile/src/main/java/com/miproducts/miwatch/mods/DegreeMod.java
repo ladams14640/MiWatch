@@ -26,7 +26,7 @@ public class DegreeMod extends View {
     private int textSize = 75;
     private int width = textSize;
     private int height = textSize + 25;
-    private boolean isVisible = false;
+    private boolean isVisible = true;
 
     public int getSize(){
         return textSize;
@@ -175,7 +175,9 @@ public class DegreeMod extends View {
         initPaint();
         selectPaint();
     }
-
+    public void setVisibility(boolean visible){
+        isVisible = visible;
+    }
     public float getX(){
         log("get X = " + (x));
         return (x);

@@ -193,12 +193,26 @@ GoogleApiClient.OnConnectionFailedListener {
         return svView.getColorOfView(selectedView);
     }
 
-    public boolean getViewsVisibility(int digitalVisibleApi) {
-        svView.getVisibilityOfView(digitalVisibleApi);
-        return false;
+    /**
+     * Called by WatchFaceMenu
+     * @param selectedView - Constant rep of view
+     * @return
+     */
+    public boolean getViewsVisibility(int selectedView) {
+        return svView.getVisibilityOfView(selectedView);
     }
 
-
+    /**
+     * Called by WatchFaceMenu
+     * @param selectedView - Constant reference to the view
+     * @return
+     */
+    public int getViewsSize(int selectedView) {
+        return (int) svView.getSizeOfView(selectedView);
+    }
+    public void setViewsVisible(int selectedView, boolean isChecked) {
+        svView.setViewsVisibility(selectedView, isChecked);
+    }
 
 
 
@@ -241,6 +255,7 @@ GoogleApiClient.OnConnectionFailedListener {
 
 
     private static final String DATA_ACTIVITY_KEY = "com.miproducts.miwatch";
+
 
 
 }

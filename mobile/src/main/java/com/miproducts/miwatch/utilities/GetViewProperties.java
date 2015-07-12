@@ -155,6 +155,32 @@ public class GetViewProperties {
         }
     }
 
+    public void changeViewsVisibility(int selectedView, boolean isChecked) {
+        log("CHANGE_VISIBILITY: change View: " + selectedView + " visibility to: " + isChecked);
+        switch(selectedView) {
+            case Consts.NONE:
+                break;
+            case Consts.DIGITAL_TIMER:
+                mDigitalTimer.setVisibility(isChecked);
+                break;
+            case Consts.FITNESS:
+                mFitnessMod.setVisibility(isChecked);
+                break;
+            case Consts.EVENT:
+                mEventMod.setVisibility(isChecked);
+                break;
+            case Consts.DATE:
+                mDateViews.setVisibility(isChecked);
+                break;
+            case Consts.ALARM_TIMER:
+                mTimerView.setVisibility(isChecked);
+                break;
+            case Consts.DEGREE:
+                mDegreeMod.setVisibility(isChecked);
+                break;
+        }
+    }
+
 
 
 
@@ -169,9 +195,6 @@ public class GetViewProperties {
 
 
 private void log(String s){    Log.d("GetViewProperties", s);}
-
-
-
 
 
 }

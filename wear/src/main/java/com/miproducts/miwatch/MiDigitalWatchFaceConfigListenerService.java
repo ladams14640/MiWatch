@@ -55,10 +55,6 @@ private static final String TAG = "DigitalListenerService";
                 dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                 Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
             }
-            //TODO WORKING@!!!
-            // TODO testing to see if we even come close to the same numbers.
-            log("the position of X for the digitalTime in Mi Watch Face is = "
-                    + sm.getIntFromPreferences(SettingsManager.DIGITAL_TIME_X));
 
         }
         }

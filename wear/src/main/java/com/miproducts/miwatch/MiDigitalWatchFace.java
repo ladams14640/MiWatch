@@ -222,7 +222,6 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             // Time
             xPositionForTime = (getWallpaperDesiredMinimumWidth() / 2) - (getWallpaperDesiredMinimumWidth() / 10);
 
-            //TODO how do we access the WatchFaceService to get the location of the DigitalTimer's xPosition
             SettingsManager sm = new SettingsManager(mContext);
             sm.writeToPreferences(SettingsManager.DIGITAL_TIME_X, (int)xPositionForTime);
 

@@ -38,7 +38,7 @@ public class DateViews extends View {
 
     private Rect mSelectRect;
     private int currentColor;
-    private boolean isVisible = false;
+    private boolean isVisible = true;
 
 
     public int getSize(){
@@ -204,7 +204,9 @@ public class DateViews extends View {
         pDateOfMonth.setTextSize(textSize);
         selectPaint();
     }
-
+    public void setVisibility(boolean visible){
+        isVisible = visible;
+    }
     public float getX(){
         log("get X = " + x);
         return  x;

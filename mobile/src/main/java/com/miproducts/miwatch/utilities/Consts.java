@@ -35,12 +35,14 @@ public class Consts {
     public static final int DATE = 5;
     public static final int ALARM_TIMER = 6;
 
-
+    // Path for serializing data.
     /**
-     * Use these as keys to track position and color of each view to transfer to wearable
-     * KEYS for serializing data
+     *
+     * PATH and KEYS for serializing Property data.
      *
      */
+    public final static String WEARABLE_DATA_PATH = "/wearable_data";
+
     public static final String DIGITAL_TIMER_POS_API = "DIGITAL_TIMER_POS_API"; // x,y array of the digital time
     public static final String DIGITAL_TIMER_COLOR_API = "DIGITAL_TIMER_COLOR_API"; // color of time
     public static final String DIGITAL_SIZE_API = "DIGITAL_SIZE_API"; // size of time
