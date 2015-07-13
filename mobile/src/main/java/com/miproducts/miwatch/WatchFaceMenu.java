@@ -103,13 +103,15 @@ public class WatchFaceMenu  {
                             // TODO need to do this atm, we set it to true by watch, false by this
                             // TODO this way we can see changes and  track changes for testing
                             // TODO will need a solution for reseting the value back to false.
+
+                            //TODO no need to set that now - we are
                             // temp to reset for testing
-                            dataMap.putBoolean("DEGREE_REFRESH", false);
+                            //dataMap.putBoolean("DEGREE_REFRESH", false);
                             // send out all the user's choices to the node. To be picked up by the watch on it's node.
                             mMenuPackageUtility.handleAllPackaging(dataMap);
 
                             //Requires a new thread to avoid blocking the UI
-                            new SendToDataLayerThread(Consts.WEARABLE_DATA_PATH, dataMap).start();
+                            new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
                             //log("surface starts at " + mActivity.getSurfaceX());
                         }
                     }
@@ -122,8 +124,14 @@ public class WatchFaceMenu  {
     }
 
 
-
-
+    /**
+     * Called by MainCompanionActivity
+     * @param dataMap
+     */
+    public void sendOutDataToWearable(DataMap dataMap){
+        //Requires a new thread to avoid blocking the UI
+        new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
+    }
 
 
     private static final String COUNT_KEY = "com.miproducts.miwatch";

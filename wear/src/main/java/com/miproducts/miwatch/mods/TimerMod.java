@@ -57,7 +57,7 @@ public class TimerMod extends View{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawBitmap(bResizedTimer, x, y, null);
+        canvas.drawBitmap(bTimer, x, y, null);
     }
 
     public TimerMod(Context context, AttributeSet attrs) {

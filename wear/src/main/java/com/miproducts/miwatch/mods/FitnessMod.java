@@ -60,7 +60,7 @@ public class FitnessMod extends View {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawBitmap(bResizeFitness, x, y, mPaint);
+        canvas.drawBitmap(bFitness, x, y, mPaint);
 
     }
 

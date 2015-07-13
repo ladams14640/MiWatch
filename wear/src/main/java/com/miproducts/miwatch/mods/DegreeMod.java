@@ -23,6 +23,7 @@ import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.hud.HudView;
 import com.miproducts.miwatch.utilities.BitmapConverter;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,10 @@ public class DegreeMod extends View {
 
     Paint mPaint1;
     private HudView mHudView;
+    private String temp = "72";
+
+    private SettingsManager sm;
+
 
     public DegreeMod(Context context, HudView mHudView) {
         super(context);
@@ -68,6 +73,13 @@ public class DegreeMod extends View {
         mPaint1.setAntiAlias(true);
         mPaint1.setTextSize(textSize);
         mPaint1.setColor(getResources().getColor(R.color.green));
+
+        // set the current temperature - not sure if this will work.
+        sm = new SettingsManager(mContext);
+        int numTemp = sm.getIntFromPreferences(Consts.DEGREE_REFRESH);
+        if(numTemp != 0)
+            temp = Integer.toString(numTemp);
+
     }
 
     @Override
@@ -76,7 +88,7 @@ public class DegreeMod extends View {
 
 
         //canvas.drawRect(locationRect,mPaint1);
-        canvas.drawText("72"+ Consts.DEGREE,x-halfTextSize,y-30,mPaint);
+        canvas.drawText(temp+ Consts.DEGREE,x-halfTextSize,y-30,mPaint);
 
     }
 
@@ -118,6 +130,9 @@ public class DegreeMod extends View {
     }
 
 
-
-
+    public void resetTemp() {
+        int numTemp = sm.getIntFromPreferences(Consts.DEGREE_REFRESH);
+        if(numTemp != 0)
+            temp = Integer.toString(numTemp);
+    }
 }

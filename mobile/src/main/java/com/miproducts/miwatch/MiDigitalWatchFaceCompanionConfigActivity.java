@@ -2,8 +2,12 @@ package com.miproducts.miwatch;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,12 +30,13 @@ import com.miproducts.miwatch.utilities.Consts;
  * Created by larry on 7/2/15.
  */
 public class MiDigitalWatchFaceCompanionConfigActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
-GoogleApiClient.OnConnectionFailedListener {
+GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
     private static final String TAG = "ConfigActivity";
 
     private GoogleApiClient mGoogleApiClient;
     private WatchFaceSurfaceView svView;
     private WatchFaceMenu svMenu;
+    private BroadcastReceiver brDegree;
 
 
 
@@ -48,6 +53,19 @@ GoogleApiClient.OnConnectionFailedListener {
                 .addApi(Wearable.API)
                 .build();
 
+
+        brDegree = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                log("Temperature is = " + intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0));
+                int temp = intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0);
+                DataMap dataMap = new DataMap();
+                // going to continue using the broadcast KEY, it is unique after in DataApi.
+                dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, temp);
+                // send off to wearable - listener over there will be listening.
+                svMenu.sendOutDataToWearable(dataMap);
+            }
+        };
     }
 
     private void initLayout() {
@@ -59,8 +77,13 @@ GoogleApiClient.OnConnectionFailedListener {
     protected void onStart() {
         super.onStart();
         if(mGoogleApiClient != null && !mGoogleApiClient.isConnected())mGoogleApiClient.connect();
-
+        initReceivers();
         unpauseSurfaceViewThread();
+    }
+
+    private void initReceivers() {
+
+        registerReceiver(brDegree, new IntentFilter(Consts.BROADCAST_DEGREE));
     }
 
     private void unpauseSurfaceViewThread() {
@@ -81,6 +104,7 @@ GoogleApiClient.OnConnectionFailedListener {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        unregisterReceiver(brDegree);
         stopSurfaceViewThread();
     }
 
@@ -260,4 +284,29 @@ GoogleApiClient.OnConnectionFailedListener {
 
     private static final String DATA_ACTIVITY_KEY = "com.miproducts.miwatch";
 
+    @Override
+    public void onDataChanged(DataEventBuffer events) {
+        DataMap dataMap;
+        for (DataEvent event : events) {
+            dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+            log("DataMap received on watch: " + dataMap);
+            // Check the data type
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                log("DataMap received on watch: " + dataMap);
+                // Check the data path
+                String path = event.getDataItem().getUri().getPath();
+                if (path.equals(Consts.PHONE_TO_WEARABLE_PATH)) {
+                    log("From Phone");
+                }
+                /*
+                if(path.equals(Consts.WEARABLE_TO_PHONE_PATH)){
+                    log("From Wearable");
+                    //TODO lets go fetch the weather change.
+                }*/
+
+            }
+
+        }
+    }
 }

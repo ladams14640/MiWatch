@@ -195,6 +195,9 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
         if(isEvents){
             mEventMod.justAdded();
         }
+        if(isDegree){
+            mDegreeMod.resetTemp();
+        }
     }
     public boolean isEventModActive(){
         return isEvents;

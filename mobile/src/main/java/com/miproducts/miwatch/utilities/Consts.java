@@ -41,7 +41,8 @@ public class Consts {
      * PATH and KEYS for serializing Property data.
      *
      */
-    public final static String WEARABLE_DATA_PATH = "/wearable_data";
+    public final static String PHONE_TO_WEARABLE_PATH = "/wearable_data"; // path from phone to watch
+    public final static String WEARABLE_TO_PHONE_PATH = "/wearable_to_phone"; // from watch to phone
 
     public static final String DIGITAL_TIMER_POS_API = "DIGITAL_TIMER_POS_API"; // x,y array of the digital time
     public static final String DIGITAL_TIMER_COLOR_API = "DIGITAL_TIMER_COLOR_API"; // color of time
@@ -75,7 +76,14 @@ public class Consts {
     public static final String ALARM_SIZE_API = "ALARM_SIZE_API";
     public static final String ALARM_VISIBLE_API = "ALARM_VISIBLE_API";
 
+    public static final String DEGREE_REFRESH = "DEGREE_REFRESH";
 
+
+    public static final String PHONE_TO_WEARABLE_DEGREE = "PHONE_TO_WEARABLE_DEGREE";
+
+
+    public static final String BROADCAST_DEGREE = "com.miproducts.miwatch.DEGREE";
+    public static final String KEY_BROADCAST_DEGREE = "KEY_BROADCAST_DEGREE";
 
   //  public static final String
   //  public static final String

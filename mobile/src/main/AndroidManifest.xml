@@ -17,9 +17,9 @@
     <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-
-
-
+    <!-- Internet Permissions -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -52,6 +52,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Listen for configListenerService telling us the new temperature -->
+            <intent-filter>
+                <action android:name="com.miproducts.miwatch.DEGREE" />
+            </intent-filter>
 
             <intent-filter>
                 <action android:name="com.miproducts.miwatch.CONFIG_DIGITAL" />

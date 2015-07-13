@@ -12,6 +12,7 @@ import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
 /**
@@ -51,13 +52,19 @@ private static final String TAG = "DigitalListenerService";
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 // Check the data path
                 String path = event.getDataItem().getUri().getPath();
-                if (path.equals(WEARABLE_DATA_PATH)) {}
+                if (path.equals(Consts.PHONE_TO_WEARABLE_PATH)) {}
                 dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
                 Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
+                //TODO WILL CAUSE ISSUES IF TEMP IS 0 I am sure. - actualyl will just fill in 0
+                if(dataMap.getInt(Consts.KEY_BROADCAST_DEGREE,0) != 0){
+                    sm.writeToPreferences(Consts.DEGREE_REFRESH, dataMap.getInt(Consts.KEY_BROADCAST_DEGREE, 0));
+                }
             }
 
         }
         }
+
+
     private void updateCount(int y) {
         log("grabbed this update: " + y);
     }

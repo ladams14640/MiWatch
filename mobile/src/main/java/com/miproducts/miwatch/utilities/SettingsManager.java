@@ -1,15 +1,12 @@
 package com.miproducts.miwatch.utilities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 /**
  * Created by larry on 7/13/15.
  */
 
-import android.content.SharedPreferences;
-import android.content.Context;
-
-/**
- * Created by larry on 7/8/15.
- */
 public class SettingsManager {
     public final static String SHARED_PREFERENCES_NAME = "GOOGLEAPICLIENT_PREFERENCE";
     private SharedPreferences mPrefs;

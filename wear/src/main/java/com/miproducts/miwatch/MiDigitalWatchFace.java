@@ -483,7 +483,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         public void refreshDegrees(DataMap dataMap) {
             log("sending to Thread now ");
             //Requires a new thread to avoid blocking the UI
-            new SendToDataLayerThread("/wearable_to_phone", dataMap).start();
+            new SendToDataLayerThread(Consts.WEARABLE_TO_PHONE_PATH, dataMap).start();
         }
 
         @Override
