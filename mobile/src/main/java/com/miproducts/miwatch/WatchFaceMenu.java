@@ -1,5 +1,6 @@
 package com.miproducts.miwatch;
-
+//TODO - Pull code from Watch Face Template Master in
+//TODO - C:\Programming Stuff\android projects\Watch Face open weather testings.
 import android.graphics.Point;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -99,7 +100,11 @@ public class WatchFaceMenu  {
 
                             // Create a DataMap object and send it to the data layer
                             DataMap dataMap = new DataMap();
-
+                            // TODO need to do this atm, we set it to true by watch, false by this
+                            // TODO this way we can see changes and  track changes for testing
+                            // TODO will need a solution for reseting the value back to false.
+                            // temp to reset for testing
+                            dataMap.putBoolean("DEGREE_REFRESH", false);
                             // send out all the user's choices to the node. To be picked up by the watch on it's node.
                             mMenuPackageUtility.handleAllPackaging(dataMap);
 
@@ -203,10 +208,10 @@ public class WatchFaceMenu  {
                 PutDataRequest request = putDMR.asPutDataRequest();
                 DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mActivity.getApiClient(),request).await();
                 if (result.getStatus().isSuccess()) {
-                    Log.v("myTag", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
+                    Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
                 } else {
                     // Log an error
-                    Log.v("myTag", "ERROR: failed to send DataMap");
+                    Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
                 }
             }
         }

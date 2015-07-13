@@ -14,10 +14,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
+import com.miproducts.miwatch.utilities.Consts;
 
 /**
  * Created by larry on 7/2/15.
@@ -55,7 +58,8 @@ GoogleApiClient.OnConnectionFailedListener {
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        if(mGoogleApiClient != null && !mGoogleApiClient.isConnected())mGoogleApiClient.connect();
+
         unpauseSurfaceViewThread();
     }
 
@@ -255,7 +259,5 @@ GoogleApiClient.OnConnectionFailedListener {
 
 
     private static final String DATA_ACTIVITY_KEY = "com.miproducts.miwatch";
-
-
 
 }

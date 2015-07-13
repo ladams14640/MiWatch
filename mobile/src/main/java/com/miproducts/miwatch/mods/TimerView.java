@@ -213,7 +213,9 @@ public class TimerView extends View {
         log("get X = " + x);
         return (x);
     }
+
     public float getY(){
+        log("get Y = " + y);
         return y;
     }
 

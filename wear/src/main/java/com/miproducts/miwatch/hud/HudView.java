@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.wearable.DataMap;
 import com.miproducts.miwatch.MiDigitalWatchFace;
 import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.container.Event;
@@ -87,7 +88,7 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
             mFitnessMod = new FitnessMod(mContext);
         }
         if(isDegree){
-            mDegreeMod = new DegreeMod(mContext);
+            mDegreeMod = new DegreeMod(mContext, this);
         }
         if(isEvents){
             mEventMod = new EventMod(mContext, this);
@@ -217,5 +218,14 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
     }
     public void addEvents(List<Event> mEvents) {
         this.mEvents = mEvents;
+    }
+
+    /**
+     * Called by DegreeMod, will refresh their stuff.
+     * @param dataMap - just a true statement value to tell a node to get degrees.
+     */
+    public void refreshDegrees(DataMap dataMap) {
+        log("refreshDegrees dataMap: " + dataMap);
+        mEngine.refreshDegrees(dataMap);
     }
 }

@@ -52,6 +52,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+
             <intent-filter>
                 <action android:name="com.miproducts.miwatch.CONFIG_DIGITAL" />
                 <category android:name="com.miproducts.miwatch.category.COMPANION_CONFIGURATION" />
@@ -59,6 +60,24 @@
             </intent-filter>
 
         </activity>
+
+
+    <service android:name=".ConfigListenerService">
+
+        <intent-filter>
+            <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+        </intent-filter>
+
+        <intent-filter>
+            <!--The value has to match the value of service’s meta-data-->
+            <action android:name="com.mycompany.wearable.watchface.CONFIG" />
+            <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+
+    </service>
+
+
 
 
         <meta-data

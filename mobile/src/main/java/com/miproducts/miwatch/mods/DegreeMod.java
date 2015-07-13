@@ -183,6 +183,7 @@ public class DegreeMod extends View {
         return (x);
     }
     public float getY(){
+        log("get Y = " + (y));
         return y;
     }
 

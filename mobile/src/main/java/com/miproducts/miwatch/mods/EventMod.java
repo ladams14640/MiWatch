@@ -32,8 +32,8 @@ public class EventMod extends View {
     private float xText, yText;
     private float textSize = 40;
     private float displayedTextSize = textSize*2;
-    String mEventInfo = "";
-    String mEventTitle = "";
+    String mEventInfo = "Info stuff";
+    String mEventTitle = "Title stuff";
     private int currentColor;
     private boolean isVisible = true;
 
@@ -188,7 +188,7 @@ public class EventMod extends View {
         return xText;
     }
     public float getY(){
-
+        log("get Y = " + yText);
         return yText;
     }
 

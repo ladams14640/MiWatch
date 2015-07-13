@@ -41,8 +41,8 @@ public class FitnessMod extends View {
         locationRect = new Rect(x, y,x+width, y+height);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setFilterBitmap(true);
-        mPaint.setDither(true);;
+        mPaint.setFilterBitmap(false);
+        mPaint.setDither(true);
 
     }
 

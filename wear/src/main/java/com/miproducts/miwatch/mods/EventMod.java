@@ -61,9 +61,9 @@ public class EventMod extends View {
     private boolean isAnimating = false;
 
 
-    String mEventInfo = "testing";
-    String mEventTitle = "title";
-    String mEventDesc = "Desc";
+    String mEventInfo = "";
+    String mEventTitle = "";
+    String mEventDesc = "";
 
     private int eventIndex;
     private boolean isTaskRunning = false;

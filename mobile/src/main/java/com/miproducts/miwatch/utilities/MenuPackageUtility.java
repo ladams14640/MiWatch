@@ -65,7 +65,7 @@ public class MenuPackageUtility {
         dataMap.putInt(Consts.DIGITAL_SIZE_API, size);
 
     }
-    //TODO Stoped here, need to package more sizes for the rest of the Mods. 
+    //TODO Stoped here, need to package more sizes for the rest of the Mods.
 
     public void handleDatePackage(DataMap dataMap) {
         Point point = mActivity.getViewsPosition(Consts.DATE);
@@ -86,6 +86,12 @@ public class MenuPackageUtility {
         /* Pack color color values */
         int colorChoice = mActivity.getSelectedViewsColor(Consts.DATE);
         dataMap.putInt(Consts.DATE_COLOR_API, colorChoice);
+
+        // Pack the size
+        int size = mActivity.getViewsSize(Consts.DATE);
+        dataMap.putInt(Consts.DATE_SIZE_API, size);
+
+
     }
 
 
@@ -106,6 +112,10 @@ public class MenuPackageUtility {
         /* Pack color color values */
         int colorChoice = mActivity.getSelectedViewsColor(Consts.FITNESS);
         dataMap.putInt(Consts.FITNESS_COLOR_API, colorChoice);
+
+        // Pack the size
+        int size = mActivity.getViewsSize(Consts.FITNESS);
+        dataMap.putInt(Consts.FITNESS_SIZE_API, size);
     }
 
     public void handleEventPackage(DataMap dataMap) {
@@ -125,6 +135,10 @@ public class MenuPackageUtility {
         /* Pack color color values */
         int colorChoice = mActivity.getSelectedViewsColor(Consts.EVENT);
         dataMap.putInt(Consts.EVENT_COLOR_API, colorChoice);
+
+        // Pack the size
+        int size = mActivity.getViewsSize(Consts.EVENT);
+        dataMap.putInt(Consts.EVENT_SIZE_API, size);
 
     }
 
@@ -146,6 +160,10 @@ public class MenuPackageUtility {
         int colorChoice = mActivity.getSelectedViewsColor(Consts.ALARM_TIMER);
         dataMap.putInt(Consts.ALARM_COLOR_API, colorChoice);
 
+        // Pack the size
+        int size = mActivity.getViewsSize(Consts.ALARM_TIMER);
+        dataMap.putInt(Consts.ALARM_SIZE_API, size);
+
     }
 
     public void handleDegreePackage(DataMap dataMap) {
@@ -165,6 +183,10 @@ public class MenuPackageUtility {
         /* Pack color color values */
         int colorChoice = mActivity.getSelectedViewsColor(Consts.DEGREE);
         dataMap.putInt(Consts.DEGREE_COLOR_API, colorChoice);
+
+        // Pack the size
+        int size = mActivity.getViewsSize(Consts.DEGREE);
+        dataMap.putInt(Consts.DEGREE_SIZE_API, size);
 
     }
 

@@ -212,8 +212,8 @@ public class DateViews extends View {
         return  x;
     }
     public float getY(){
-
-        return y - svView.getY();
+        log("get Y =  " + y);
+        return y;
     }
 
 
