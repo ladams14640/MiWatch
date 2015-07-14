@@ -197,10 +197,17 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
         if(isEvents){
             mEventMod.justAdded();
         }
+
         if(isDegree){
             mDegreeMod.resetTemp();
         }
     }
+    public void resetTemp(){
+        if(isDegree){
+            mDegreeMod.resetTemp();
+        }
+    }
+
     public boolean isEventModActive(){
         return isEvents;
     }
@@ -232,5 +239,11 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
     public void refreshDegrees(DataMap dataMap) {
         log("refreshDegrees dataMap: " + dataMap);
         mEngine.refreshDegrees(dataMap);
+    }
+
+    public void cancelRefreshDegree() {
+        if(isDegree){
+            mDegreeMod.cancelDisplayRefresh();
+        }
     }
 }

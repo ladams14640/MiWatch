@@ -118,5 +118,6 @@ public class Consts {
     public static final String DEGREE_REFRESH = "DEGREE_REFRESH";
 
     public static final String BROADCAST_DEGREE = "com.miproducts.miwatch.DEGREE";
+
     public static final String KEY_BROADCAST_DEGREE = "KEY_BROADCAST_DEGREE";
 }

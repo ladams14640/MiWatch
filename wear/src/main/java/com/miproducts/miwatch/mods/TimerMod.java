@@ -44,13 +44,13 @@ public class TimerMod extends View{
 
         x = mContext.getWallpaperDesiredMinimumWidth()/20;
 
-        y = mContext.getWallpaperDesiredMinimumWidth()-20;
+        y = mContext.getWallpaperDesiredMinimumHeight()-height;
 
         bResizedTimer = BitmapConverter.getResizedBitmap(bTimer, width, height);
         locationRect = new Rect(x, y,x+width, y+height);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setFilterBitmap(true);
+        mPaint.setFilterBitmap(false);
         mPaint.setDither(true);;
     }
 
@@ -58,7 +58,7 @@ public class TimerMod extends View{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawBitmap(bTimer, x, y, null);
+        canvas.drawBitmap(bResizedTimer, x, y, null);
     }
 
     public TimerMod(Context context, AttributeSet attrs) {

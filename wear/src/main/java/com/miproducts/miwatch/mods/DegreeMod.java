@@ -50,6 +50,7 @@ public class DegreeMod extends View {
     private String temp = "72";
 
     private SettingsManager sm;
+    private boolean refresh = true;
 
 
     public DegreeMod(Context context, HudView mHudView) {
@@ -107,6 +108,7 @@ public class DegreeMod extends View {
     }
 
     private void refreshDegrees(DataMap dataMap) {
+        refresh = true;
         bRefresh = !bRefresh;
         /*Pack true to refresh degrees */
         dataMap.putBoolean(Consts.DEGREE_REFRESH,
@@ -129,10 +131,22 @@ public class DegreeMod extends View {
         Log.d("DegreeMod", s);
     }
 
-
+    /**
+     *
+     * Called by HudView to refresh
+     * we were crtashing when we tried to update and the hud wasn't displayed, the method below reset
+     * coupled wirth the boolean Allows us to avboid that.
+     */
     public void resetTemp() {
-        int numTemp = sm.getIntFromPreferences(Consts.DEGREE_REFRESH);
-        if(numTemp != 0)
-            temp = Integer.toString(numTemp);
+        if(refresh == true){
+            int numTemp = sm.getIntFromPreferences(Consts.DEGREE_REFRESH);
+            if(numTemp != 0)
+                temp = Integer.toString(numTemp);
+            invalidate();
+        }
+    }
+
+    public void cancelDisplayRefresh() {
+        refresh = false;
     }
 }

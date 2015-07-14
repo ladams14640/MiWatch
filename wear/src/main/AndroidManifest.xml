@@ -52,6 +52,12 @@
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
 
+            <!-- Listen for broadcast from ConfigListener, when it gets back data from companionListener-->
+            <intent-filter>
+                <action android:name="com.miproducts.miwatch.DEGREE" />
+            </intent-filter>
+
+
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />

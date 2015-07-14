@@ -133,6 +133,17 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             }
         };
 
+        final BroadcastReceiver brDegreeRefresh = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (isHudDisplaying && !isPeakCardPeaking) {
+                    log("refreshing Degrees from MiDigitalWatchfaceBroadcast");
+                    mHudView.resetTemp();
+                }
+            }
+        };
+
+
         private Context mContext;
         private Resources resources;
         boolean mRegisteredTimeZoneReceiver = false;
@@ -342,6 +353,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                 return;
             }
             log("Hud View removed");
+            mHudView.cancelRefreshDegree();
             mWindowManager.removeView(mHudView);
             isHudDisplaying = false;
 
@@ -355,6 +367,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             mRegisteredTimeZoneReceiver = true;
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
             MiDigitalWatchFace.this.registerReceiver(mTimeZoneReceiver, filter);
+
+            IntentFilter filter2 = new IntentFilter(Consts.BROADCAST_DEGREE);
+            MiDigitalWatchFace.this.registerReceiver(brDegreeRefresh, filter2);
         }
 
         private void unregisterReceiver() {
@@ -363,6 +378,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             }
             mRegisteredTimeZoneReceiver = false;
             MiDigitalWatchFace.this.unregisterReceiver(mTimeZoneReceiver);
+
+            MiDigitalWatchFace.this.unregisterReceiver(brDegreeRefresh);
+
         }
 
         @Override

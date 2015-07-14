@@ -35,10 +35,10 @@ public class FitnessMod extends ImageView {
         mContext = context;
         bFitness = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_fitness_white);
 
-        x = mContext.getWallpaperDesiredMinimumWidth() -(width/2);
-        y = mContext.getWallpaperDesiredMinimumWidth()-(height/2);
+        x = mContext.getWallpaperDesiredMinimumWidth() - width;
+        y = mContext.getWallpaperDesiredMinimumWidth() - height;
 
-        //bResizeFitness = BitmapConverter.getResizedBitmap(bFitness, width, height);
+        bResizeFitness = BitmapConverter.getResizedBitmap(bFitness, width, height);
         locationRect = new Rect(x, y,x+width, y+height);
         mPaint = new Paint();
 
@@ -46,7 +46,7 @@ public class FitnessMod extends ImageView {
         mPaint.setAntiAlias(false);
         mPaint.setFilterBitmap(false);
         mPaint.setDither(true);
-
+        //setImageBitmap(bResizeFitness);
     }
 
 
@@ -62,7 +62,7 @@ public class FitnessMod extends ImageView {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bFitness, x, y, mPaint);
+        canvas.drawBitmap(bResizeFitness, x, y, mPaint);
         super.draw(canvas);
 
     }
