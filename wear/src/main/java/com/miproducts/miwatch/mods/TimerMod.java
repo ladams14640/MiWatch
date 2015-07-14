@@ -35,14 +35,20 @@ public class TimerMod extends View{
     private int width = 100;
     private int height = 100;
     private int x, y;
+    private HudView mHudView;
 
-    public TimerMod(Context context) {
+    public TimerMod(Context context, HudView hudView) {
         super(context);
         log("init");
         this.mContext = context;
-        bTimer = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_timer_white);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
 
-        x = mContext.getWallpaperDesiredMinimumWidth()/20;
+        bTimer = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_timer_white,options);
+        this.mHudView = hudView;
+
+        if(!mHudView.isRound()) x = mContext.getWallpaperDesiredMinimumWidth()/20;
+        else x = mContext.getWallpaperDesiredMinimumWidth()/8;
 
         y = mContext.getWallpaperDesiredMinimumHeight()-height;
 
@@ -59,18 +65,6 @@ public class TimerMod extends View{
     public void draw(Canvas canvas) {
         super.draw(canvas);
         canvas.drawBitmap(bResizedTimer, x, y, null);
-    }
-
-    public TimerMod(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public TimerMod(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    public TimerMod(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     public boolean touchInside(float x, float y){

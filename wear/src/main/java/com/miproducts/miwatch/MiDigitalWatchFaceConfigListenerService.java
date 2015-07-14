@@ -58,13 +58,17 @@ private static final String TAG = "DigitalListenerService";
                 Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
                 //TODO WILL CAUSE ISSUES IF TEMP IS 0 I am sure. - actualyl will just fill in 0
                 if(dataMap.getInt(Consts.KEY_BROADCAST_DEGREE,0) != 0){
-
+                    log("value was not 0");
                     // save the new temperature
                     sm.writeToPreferences(Consts.DEGREE_REFRESH, dataMap.getInt(Consts.KEY_BROADCAST_DEGREE, 0));
 
-                    // tell degrees to update if available (otherwise update next time we come back)
+                    // tell degrees to update if available (otherwise update next time we come
+                    // back) - tell WatchFaceService Really who will inform degrees
                     Intent intentTellDegreeToRefresh = new Intent(Consts.BROADCAST_DEGREE);
+                    intentTellDegreeToRefresh.putExtra(Consts.KEY_BROADCAST_DEGREE, 0);
                     sendBroadcast(intentTellDegreeToRefresh);
+                }else {
+                    log("value came back as 0");
                 }
             }
 

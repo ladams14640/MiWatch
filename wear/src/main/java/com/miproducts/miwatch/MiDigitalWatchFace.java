@@ -80,6 +80,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
      * displayed in interactive mode.
      */
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
+    // whether we are on a round device or not for positions. (matters for the mods it seems)
+    private boolean isRound = false;
 
     @Override
     public Engine onCreateEngine() {
@@ -228,7 +230,6 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             setPositionForWatchfaceObjects();
             setPaintForWatchFaceObjects(resources);
             setCalendar();
-            createHud();
 
 
         }
@@ -280,7 +281,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         }
 
         private void createHud() {
-            mHudView = new HudView(getApplicationContext(), this);
+            mHudView = new HudView(getApplicationContext(), isRound, this);
             mHudView.setParams();
             addHudView();
         }
@@ -361,6 +362,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         }
 
         private void registerReceiver() {
+            IntentFilter filter2 = new IntentFilter(Consts.BROADCAST_DEGREE);
+            MiDigitalWatchFace.this.registerReceiver(brDegreeRefresh, filter2);
+
             if (mRegisteredTimeZoneReceiver) {
                 return;
             }
@@ -368,18 +372,17 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
             MiDigitalWatchFace.this.registerReceiver(mTimeZoneReceiver, filter);
 
-            IntentFilter filter2 = new IntentFilter(Consts.BROADCAST_DEGREE);
-            MiDigitalWatchFace.this.registerReceiver(brDegreeRefresh, filter2);
         }
 
         private void unregisterReceiver() {
+            MiDigitalWatchFace.this.unregisterReceiver(brDegreeRefresh);
+
             if (!mRegisteredTimeZoneReceiver) {
                 return;
             }
             mRegisteredTimeZoneReceiver = false;
             MiDigitalWatchFace.this.unregisterReceiver(mTimeZoneReceiver);
 
-            MiDigitalWatchFace.this.unregisterReceiver(brDegreeRefresh);
 
         }
 
@@ -390,7 +393,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             Resources resources = MiDigitalWatchFace.this.getResources();
 
 
-            boolean isRound = insets.isRound();
+
+            isRound = insets.isRound();
 
             float mDigitalTimeSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
@@ -403,6 +407,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             mDigitalDayOfMonthPaint.setTextAlign(Paint.Align.CENTER);
             mDigitalDayOfWeekPaint.setTextSize(mDigitalDayOfWeekSize);
             mDigitalDayOfWeekPaint.setTextAlign(Paint.Align.CENTER);
+            createHud();
+
         }
 
         @Override

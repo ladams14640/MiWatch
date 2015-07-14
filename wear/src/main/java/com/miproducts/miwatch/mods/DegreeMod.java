@@ -58,8 +58,9 @@ public class DegreeMod extends View {
 
         this.mContext = context;
         this.mHudView = mHudView;
+        if(!mHudView.isRound())x = mContext.getWallpaperDesiredMinimumWidth()/2;
+        else x = mContext.getWallpaperDesiredMinimumWidth()/2 - (halfTextSize/2);
 
-        x = mContext.getWallpaperDesiredMinimumWidth()/2;
         y = mContext.getWallpaperDesiredMinimumWidth();
         locationRect = new Rect(x-halfTextSize, y-height,x+width, y);
         mPaint = new Paint();

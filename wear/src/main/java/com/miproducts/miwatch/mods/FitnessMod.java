@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.miproducts.miwatch.R;
+import com.miproducts.miwatch.hud.HudView;
 import com.miproducts.miwatch.utilities.BitmapConverter;
 import com.miproducts.miwatch.utilities.ConverterUtil;
 
@@ -29,13 +30,23 @@ public class FitnessMod extends ImageView {
     private int height = 100;
     private int x, y;
     private Paint mPaint;
+    private HudView mHudView;
 
-    public FitnessMod(Context context) {
+
+    public FitnessMod(Context context, HudView hudView) {
         super(context);
         mContext = context;
-        bFitness = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_fitness_white);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        bFitness = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_fitness_white,options);
 
-        x = mContext.getWallpaperDesiredMinimumWidth() - width;
+
+
+        this.mHudView = hudView;
+
+        if(!mHudView.isRound()) x = mContext.getWallpaperDesiredMinimumWidth() - width;
+        else x = mContext.getWallpaperDesiredMinimumWidth() - (int)(width * 1.40);
+
         y = mContext.getWallpaperDesiredMinimumWidth() - height;
 
         bResizeFitness = BitmapConverter.getResizedBitmap(bFitness, width, height);
@@ -54,7 +65,9 @@ public class FitnessMod extends ImageView {
         if(!locationRect.contains((int)x,(int)y)) return false;
         else {
             log("touch is inside");
-            Intent i = mContext.getPackageManager().getLaunchIntentForPackage("com.asus.wellness");
+           // Intent i = mContext.getPackageManager().getLaunchIntentForPackage("com.asus.wellness");
+            Intent i = mContext.getPackageManager().getLaunchIntentForPackage("com.google.android.apps.fitness");
+
             mContext.startActivity(i);
             return true;
         }
@@ -62,23 +75,10 @@ public class FitnessMod extends ImageView {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bResizeFitness, x, y, mPaint);
+        canvas.drawBitmap(bResizeFitness, x, y, null);
         super.draw(canvas);
 
     }
-
-    public FitnessMod(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public FitnessMod(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    public FitnessMod(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
 
 
     public void log(String s){

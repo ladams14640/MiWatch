@@ -78,8 +78,8 @@ public class EventMod extends View {
         this.mContext = context;
         this.mHudView = mHud;
         x = mContext.getWallpaperDesiredMinimumWidth()/10;
-        width = mContext.getWallpaperDesiredMinimumWidth()-50;
         y = (int)mHudView.getTopOfHud()+10;
+        width = mContext.getWallpaperDesiredMinimumWidth()-50;
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.width = width;
@@ -127,10 +127,10 @@ public class EventMod extends View {
             switch(event.getAction()){
                 case MotionEvent.ACTION_DOWN:
                     log("down");
-                    xDown = event.getX();
-                    
-                    //TODO temporary to test sending data,
-                    sendConfigurationChange();
+                    // no need to move view if animating.
+                    if(!isAnimating)
+                        xDown = event.getX();
+
                     return true;
 
                 case MotionEvent.ACTION_MOVE:
@@ -182,6 +182,7 @@ public class EventMod extends View {
             if(xText < CALENDAR_SWIPE_THRESHOLD ){
                 Log.d("Threshold", "met");
                 animateChangeInEvent();
+                return;
 
             } else {
                 //TODO make a setup for going the other way too. that way we can grab events forward and backwards
@@ -189,12 +190,20 @@ public class EventMod extends View {
                 isDragging = false;
                 xDown = 0;
                 xMove = 0;
+
+                x = mContext.getWallpaperDesiredMinimumWidth()/10;
+                y = (int)mHudView.getTopOfHud()+10;
                 xText= x;
 
                 mHudView.invalidate();
+                return;
             }
 
         }
+        x = mContext.getWallpaperDesiredMinimumWidth()/10;
+        y = (int)mHudView.getTopOfHud()+10;
+        xText= x;
+
 
     }
 
@@ -204,7 +213,7 @@ public class EventMod extends View {
         log("Event Index we are using is " + mEventIndex);
         // It will take 1000ms for the animator to go from the width of the canvas to the
         // original position.
-        animator.setDuration(1000);
+        animator.setDuration(500); // .5 second
         isAnimating = true;
         // Callback that executes on animation steps.
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

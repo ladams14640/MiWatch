@@ -71,7 +71,7 @@ public class WatchFaceMenu  {
         //TODO button for color dialog.
     }
 
-
+    private boolean oscillate = false;
     private void initEtSize() {
         etSize = (EditText) mActivity.findViewById(R.id.etSize);
         /**
@@ -106,7 +106,9 @@ public class WatchFaceMenu  {
 
                             //TODO no need to set that now - we are
                             // temp to reset for testing
-                            //dataMap.putBoolean("DEGREE_REFRESH", false);
+                            oscillate = !oscillate;
+                            dataMap.putBoolean("DUMMY TO MAKE SURE ITS ALWAYS FRESH", oscillate);
+
                             // send out all the user's choices to the node. To be picked up by the watch on it's node.
                             mMenuPackageUtility.handleAllPackaging(dataMap);
 

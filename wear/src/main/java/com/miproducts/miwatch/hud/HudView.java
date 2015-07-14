@@ -49,16 +49,13 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
     DegreeMod mDegreeMod;
     EventMod mEventMod;
     private List<Event> mEvents;
+    private boolean isRound = false;
 
     public HudView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
     }
 
-    public HudView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        mContext = context;
-    }
 
     public HudView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -66,7 +63,7 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
 
     }
 
-    public HudView(Context context, MiDigitalWatchFace.Engine engine) {
+    public HudView(Context context, boolean isRound, MiDigitalWatchFace.Engine engine) {
         super(context);
         mContext = context;
         setOnTouchListener(this);
@@ -75,17 +72,18 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
         h = mEngine.getHeight();
         mRect= new Rect((int)x,(int)y,(int)w,(int)h);
 
+        this.isRound = isRound;
 
         mTestPaint = new Paint();
         mTestPaint.setColor(getResources().getColor(R.color.digital_time_blue));
         mTestPaint.setAlpha(100);
-
+        // if the screen is round than we need these values further over
         mEvents = new ArrayList<Event>();
         if(isTimer){
-            mTimerMod = new TimerMod(mContext);
+            mTimerMod = new TimerMod(mContext,this);
         }
         if(isFitness){
-            mFitnessMod = new FitnessMod(mContext);
+            mFitnessMod = new FitnessMod(mContext,this);
         }
         if(isDegree){
             mDegreeMod = new DegreeMod(mContext, this);
@@ -94,7 +92,9 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
             mEventMod = new EventMod(mContext, this);
         }
     }
-
+    public boolean isRound(){
+        return isRound;
+    }
     // since we will be manually calling it, no need to have a onDraw, just call draw from MiDigital-
     // WatchFace
     @Override
