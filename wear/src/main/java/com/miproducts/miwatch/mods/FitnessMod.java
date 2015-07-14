@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.utilities.BitmapConverter;
@@ -18,7 +19,7 @@ import com.miproducts.miwatch.utilities.ConverterUtil;
 /**
  * Created by larry on 6/29/15.
  */
-public class FitnessMod extends View {
+public class FitnessMod extends ImageView {
     private Context mContext;
     private Bitmap bFitness;
     private Bitmap bResizeFitness;
@@ -34,13 +35,15 @@ public class FitnessMod extends View {
         mContext = context;
         bFitness = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_fitness_white);
 
-        x = mContext.getWallpaperDesiredMinimumWidth() - width;
-        y = mContext.getWallpaperDesiredMinimumWidth()-height;
+        x = mContext.getWallpaperDesiredMinimumWidth() -(width/2);
+        y = mContext.getWallpaperDesiredMinimumWidth()-(height/2);
 
-        bResizeFitness = BitmapConverter.getResizedBitmap(bFitness, width, height);
+        //bResizeFitness = BitmapConverter.getResizedBitmap(bFitness, width, height);
         locationRect = new Rect(x, y,x+width, y+height);
         mPaint = new Paint();
-        mPaint.setAntiAlias(true);
+
+        // Settings
+        mPaint.setAntiAlias(false);
         mPaint.setFilterBitmap(false);
         mPaint.setDither(true);
 
@@ -59,8 +62,8 @@ public class FitnessMod extends View {
 
     @Override
     public void draw(Canvas canvas) {
-        super.draw(canvas);
         canvas.drawBitmap(bFitness, x, y, mPaint);
+        super.draw(canvas);
 
     }
 

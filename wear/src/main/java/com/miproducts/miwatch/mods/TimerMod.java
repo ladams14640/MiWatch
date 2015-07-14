@@ -43,7 +43,8 @@ public class TimerMod extends View{
         bTimer = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_timer_white);
 
         x = mContext.getWallpaperDesiredMinimumWidth()/20;
-        y = mContext.getWallpaperDesiredMinimumWidth()-height;
+
+        y = mContext.getWallpaperDesiredMinimumWidth()-20;
 
         bResizedTimer = BitmapConverter.getResizedBitmap(bTimer, width, height);
         locationRect = new Rect(x, y,x+width, y+height);

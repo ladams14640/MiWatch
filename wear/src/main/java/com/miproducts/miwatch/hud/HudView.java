@@ -103,10 +103,12 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
         //log("Draw");
 
         //canvas.drawRect(x, y, w, h, mTestPaint);
-        mTimerMod.draw(canvas);
-        mFitnessMod.draw(canvas);
-        mDegreeMod.draw(canvas);
         mEventMod.draw(canvas);
+        mDegreeMod.draw(canvas);
+
+        //canvas.scale(2,2); // 2 views below use images and seems to temp fix
+        mFitnessMod.draw(canvas);
+        mTimerMod.draw(canvas);
     }
 
 
