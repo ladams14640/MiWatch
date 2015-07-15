@@ -29,8 +29,7 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by larry on 7/2/15.
  */
-public class MiDigitalWatchFaceCompanionConfigActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
-GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
+public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private static final String TAG = "ConfigActivity";
 
     private GoogleApiClient mGoogleApiClient;
@@ -48,8 +47,6 @@ GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
         initLayout();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
                 .build();
 
@@ -76,26 +73,19 @@ GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
     @Override
     protected void onStart() {
         super.onStart();
-        if(mGoogleApiClient != null && !mGoogleApiClient.isConnected())mGoogleApiClient.connect();
+
+        if(mGoogleApiClient != null && !mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
+        }
+
         initReceivers();
-        unpauseSurfaceViewThread();
+        svView.threadRun(true);
     }
+
 
     private void initReceivers() {
 
         registerReceiver(brDegree, new IntentFilter(Consts.BROADCAST_DEGREE));
-    }
-
-    private void unpauseSurfaceViewThread() {
-        if(svView != null){
-            svView.unpauseThread();
-        }
-    }
-
-    private void startSurfaceViewThread() {
-        if(svView != null){
-            svView.startThread();
-        }
     }
 
     @Override
@@ -105,13 +95,12 @@ GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
             mGoogleApiClient.disconnect();
         }
         unregisterReceiver(brDegree);
-        stopSurfaceViewThread();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        pauseSurfaceViewThread();
+        svView.threadRun(false);
     }
 
     @Override
@@ -120,21 +109,11 @@ GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        stopSurfaceViewThread();
-    }
-
-    private void pauseSurfaceViewThread() {
-        if(svView != null){
-            svView.pauseThread();
-        }
-    }
-
-    private void stopSurfaceViewThread(){
-        if(svView != null){
-            svView.stopThread();
-        }
 
     }
+
+
+
 
     private void displayNoConnectedDeviceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -255,58 +234,5 @@ GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
     protected void onResume() {
         super.onResume();
         mGoogleApiClient.connect();
-    }
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        log("Google onConnected: " + connectionHint);
-
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        log("Google onConnectionSuspended: " + cause);
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed: " + connectionResult);
-        if (connectionResult.getErrorCode() == ConnectionResult.API_UNAVAILABLE) {
-            // The Wearable API is unavailable
-            Log.d(TAG, "onConnection failed, API wasn't available.");
-        }
-
-    }
-
-
-
-
-    private static final String DATA_ACTIVITY_KEY = "com.miproducts.miwatch";
-
-    @Override
-    public void onDataChanged(DataEventBuffer events) {
-        DataMap dataMap;
-        for (DataEvent event : events) {
-            dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-            log("DataMap received on watch: " + dataMap);
-            // Check the data type
-            if (event.getType() == DataEvent.TYPE_CHANGED) {
-                dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                log("DataMap received on watch: " + dataMap);
-                // Check the data path
-                String path = event.getDataItem().getUri().getPath();
-                if (path.equals(Consts.PHONE_TO_WEARABLE_PATH)) {
-                    log("From Phone");
-                }
-                /*
-                if(path.equals(Consts.WEARABLE_TO_PHONE_PATH)){
-                    log("From Wearable");
-                    //TODO lets go fetch the weather change.
-                }*/
-
-            }
-
-        }
     }
 }

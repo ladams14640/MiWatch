@@ -62,6 +62,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
     private void init() {
        // log("init");
+
         stThread = new SurfaceThread(this);
 
         setOnTouchListener(this);
@@ -79,25 +80,42 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
+                stThread.passHolder(holder);
                 //  log("surfaecHolder callback surface created");
-                if (!stThread.isRunning()) {
-                    stThread.setRunning(true);
-                    stThread.start();
-                }
+                //stThread.setRunning(true);
+                //stThread.start(); // handle this inside the thread now.
+
             }
 
+            /**
+             * Everytime This surfaceChange happens it's after the screen pops up and is visible it seems.
+             * So whether from scratch or from unpause this method is called only when surface becomes visible.
+             * Does not get called when it hides.
+             * @param holder
+             * @param format
+             * @param width
+             * @param height
+             */
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                log("changed");
+                // incase we come back from a paused state.
+                //if (isShowing)
 
+                //stThread.passHolder(holder);
+
+                stThread.setRunning(true);
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                stopThread();
+                stThread.setRunning(false);
             }
         });
 
     }
+
+
     public float getCanvasWidth(){
         return width;
     }
@@ -117,14 +135,16 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     }
 
     protected void drawSomething(Canvas canvas) {
-            canvas.drawColor(Color.BLACK);
+            if(canvas != null) {
+                canvas.drawColor(Color.BLACK);
+                mDigitalTimer.draw(canvas);
+                mEventMod.draw(canvas);
+                mFitnessMod.draw(canvas);
+                mDegreeMod.draw(canvas);
+                mDateViews.draw(canvas);
+                mTimerView.draw(canvas);
+            }
 
-            mDigitalTimer.draw(canvas);
-            mEventMod.draw(canvas);
-            mFitnessMod.draw(canvas);
-            mDegreeMod.draw(canvas);
-            mDateViews.draw(canvas);
-            mTimerView.draw(canvas);
     }
 
     @Override
@@ -186,38 +206,6 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         mDateViews.unselectPaint();
         mTimerView.unselectPaint();
     }
-
-
-    public void stopThread() {
-       // log("surface destroyed");
-        boolean retry = true;
-        stThread.setRunning(false);
-        while (retry) {
-            try {
-                stThread.join();
-                retry = false;
-            } catch (InterruptedException e) {
-            }
-        }
-    }
-
-    public void startThread() {
-       // log("start thread");
-        stThread.setRunning(true);
-        stThread.start();
-    }
-    public void unpauseThread() {
-     //   log("unpaused thread");
-        stThread.setPaused(false);
-
-    }
-
-
-    public void pauseThread(){
-      //  log("pauseThread");
-        stThread.setPaused(true);
-    }
-
 
 
     public float getCanvasX(){
@@ -284,4 +272,12 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     public Point getPositionOfView(int selectedView){return mGetProperties.getPositionOfView(selectedView);}
     public int getColorOfView(int selectedView){return mGetProperties.getColorOfView(selectedView);}
     public float getSizeOfView(int selectedView) { return mGetProperties.getSizeOfView(selectedView);}
+
+
+    //TODO will this fix it? Thread igivng me trouble when i pause the damn application.
+    public void threadRun(boolean b) {
+        stThread.setRunning(b);
+    }
+
+
 }

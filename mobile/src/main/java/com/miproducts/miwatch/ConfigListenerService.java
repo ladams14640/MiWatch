@@ -1,5 +1,8 @@
 package com.miproducts.miwatch;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,33 +30,23 @@ public class ConfigListenerService extends WearableListenerService
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
 
     private static final String TAG = "DigitalListenerService";
-
-
-    GoogleApiClient mGoogleApi;
+    private static final int PENDING_INTENT_ID = 2;
 
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected: " + bundle);
-        // need to build this up to send to datalayer, when app isnt actively showing on phone.
-        mGoogleApi = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
-        mGoogleApi.connect();
+
     }
 
     @Override
     public void onConnectionSuspended(int cause) {
         Log.d(TAG, "onConnectionSuspended: " + cause);
-        mGoogleApi.disconnect();
 
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.d(TAG, "onConnectionFailed: " + result);
-        mGoogleApi.disconnect();
 
     }
 
@@ -61,26 +54,10 @@ public class ConfigListenerService extends WearableListenerService
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         log("onDataChanged");
-        //SettingsManager sm = new SettingsManager(getApplicationContext());
-
+        mGoogleApi = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .build();
             getTemp();
-
-            /*
-        DataMap dataMap;
-        for (DataEvent event : dataEventBuffer) {
-            // Check the data type
-            if (event.getType() == DataEvent.TYPE_CHANGED) {
-                dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
-                log("DataMap received on watch: " + dataMap);
-                log("From Wearable");
-                Log.d(TAG, "Is it true? :" + dataMap.getBoolean(Consts.DEGREE_REFRESH));
-                    //TODO so wierd I cant have methods here for some reason.
-
-            }
-
-        }
-*/
-
     }
 
     private void getTemp() {
@@ -131,6 +108,29 @@ public class ConfigListenerService extends WearableListenerService
              tempInFah = ConverterUtil.convertCelsiusToFahrenheit(tempInCels);
             Log.d(TAG, "Fahrenheit = " + tempInFah);
 
+
+           // TODO if I can make a AlarmManager that wakes up the CompanionConfigActivity then we can
+            // TODO remove all of this down to end of function, because we will handle it this way.
+            /*
+            // lets wake up Companion
+            Intent intent = new Intent(getApplicationContext(), MiDigitalWatchFaceCompanionConfigActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    getApplicationContext(),
+                    PENDING_INTENT_ID,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT);
+
+            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500, pendingIntent); // half a sec
+            */
+            // TODO if I can make a AlarmManager that wakes up the CompanionConfigActivity then we can
+            // TODO remove all of this down to end of function, because we will handle it this way.
+
+
+
+            /**/
             // send out to the dataLayer
             DataMap dataMap = new DataMap();
             // going to continue using the broadcast KEY, it is unique after in DataApi.
@@ -152,7 +152,9 @@ public class ConfigListenerService extends WearableListenerService
 
     }
 
-
+    GoogleApiClient mGoogleApi = new GoogleApiClient.Builder(this)
+            .addApi(Wearable.API)
+            .build();
 
     class SendToDataLayerThread extends Thread {
         String path;
@@ -162,23 +164,30 @@ public class ConfigListenerService extends WearableListenerService
         SendToDataLayerThread(String p, DataMap data) {
             path = p;
             dataMap = data;
+
         }
 
         public void run() {
-            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApi).await();
-            for (Node node : nodes.getNodes()) {
+            if (mGoogleApi != null) {
+                log("mGoogle != null!");
 
-                // Construct a DataRequest and send over the data layer
-                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
-                putDMR.getDataMap().putAll(dataMap);
-                PutDataRequest request = putDMR.asPutDataRequest();
-                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApi,request).await();
-                if (result.getStatus().isSuccess()) {
-                    Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
-                } else {
-                    // Log an error
-                    Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApi).await();
+                for (Node node : nodes.getNodes()) {
+
+                    // Construct a DataRequest and send over the data layer
+                    PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                    putDMR.getDataMap().putAll(dataMap);
+                    PutDataRequest request = putDMR.asPutDataRequest();
+                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApi, request).await();
+                    if (result.getStatus().isSuccess()) {
+                        Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
+                    } else {
+                        // Log an error
+                        Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
+                    }
                 }
+            }else {
+                log("mGoogle == null!");
             }
         }
     }

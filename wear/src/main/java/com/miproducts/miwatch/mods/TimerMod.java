@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -52,19 +53,39 @@ public class TimerMod extends View{
 
         y = mContext.getWallpaperDesiredMinimumHeight()-height;
 
-        bResizedTimer = BitmapConverter.getResizedBitmap(bTimer, width, height);
         locationRect = new Rect(x, y,x+width, y+height);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setFilterBitmap(false);
-        mPaint.setDither(true);;
+        mPaint.setDither(true);
+
+        //TODO testing this filter, havent seen if it works 7/15/15. will check out tonight.
+        mPaint.setFlags(Paint.FILTER_BITMAP_FLAG);
+
+        bResizedTimer = BitmapConverter.getResizedBitmap(bTimer, width, height);
+
+/*
+        bResizedTimer = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        float ratioX = width / (float) bTimer.getWidth();
+        float ratioY = height / (float) bTimer.getHeight();
+        float middleX = width / 2.0f;
+        float middleY = height / 2.0f;
+
+        Matrix scaleMatrix = new Matrix();
+        scaleMatrix.setScale(ratioX, ratioY, middleX, middleY);
+
+        Canvas canvas = new Canvas(bResizedTimer);
+        canvas.setMatrix(scaleMatrix);
+        canvas.drawBitmap(bTimer, middleX - bTimer.getWidth() / 2, middleY - bTimer.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG))
+   */
     }
 
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawBitmap(bResizedTimer, x, y, null);
+        canvas.drawBitmap(bResizedTimer, x, y, mPaint);
     }
 
     public boolean touchInside(float x, float y){
