@@ -31,6 +31,8 @@ public class ConfigListenerService extends WearableListenerService
 
     private static final String TAG = "DigitalListenerService";
     private static final int PENDING_INTENT_ID = 2;
+    private GoogleApiClient mGoogleApi;
+
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -152,9 +154,7 @@ public class ConfigListenerService extends WearableListenerService
 
     }
 
-    GoogleApiClient mGoogleApi = new GoogleApiClient.Builder(this)
-            .addApi(Wearable.API)
-            .build();
+
 
     class SendToDataLayerThread extends Thread {
         String path;
