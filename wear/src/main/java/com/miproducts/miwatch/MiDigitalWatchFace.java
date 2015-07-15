@@ -280,8 +280,12 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
         }
 
-        private void createHud() {
-            mHudView = new HudView(getApplicationContext(), isRound, this);
+        /**
+         * Tell us if this is a round device or a square.
+         * @param round
+         */
+        private void createHud(boolean round) {
+            mHudView = new HudView(getApplicationContext(), round, this);
             mHudView.setParams();
             addHudView();
         }
@@ -407,7 +411,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             mDigitalDayOfMonthPaint.setTextAlign(Paint.Align.CENTER);
             mDigitalDayOfWeekPaint.setTextSize(mDigitalDayOfWeekSize);
             mDigitalDayOfWeekPaint.setTextAlign(Paint.Align.CENTER);
-            createHud();
+            createHud(insets.isRound());
 
         }
 
