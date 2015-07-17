@@ -15,16 +15,19 @@ public class Consts {
     public final static int canvasHeight = 600;
 
     // TIME
-    public static final int xTimePosition = 365;
+    public static final int xTimePosition = canvasWidth/2;
     public static final int yTimePosition = 142;
-
+    public static final int sizeDigitalTime = 100;
     // EVENT
     public static final int xEventPosition = 57;
-    public static final int yEventPosition = 192;
+    public static final int yEventPosition = (int) (canvasHeight * (.4));
+
+    // HUD
+    public static final int yHudPosition = (int) (canvasHeight * (.3));
 
     // DateViews
     public static final int xDatePosition = 100;
-
+    public static final int yDatePositions = 120;
 
     /** For selection purposes */
     public static final int NONE = 0;

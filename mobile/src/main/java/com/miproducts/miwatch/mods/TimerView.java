@@ -98,7 +98,7 @@ public class TimerView extends Mods implements CustomizedMods{
     public void draw(Canvas canvas) {
         super.draw(canvas);
         canvas.drawBitmap(bResizedTimer, x, y, null);
-        canvas.drawRect(locationRect, mPaint);
+        //canvas.drawRect(locationRect, mPaint);
     }
 
     public TimerView(Context context, AttributeSet attrs) {
@@ -115,10 +115,10 @@ public class TimerView extends Mods implements CustomizedMods{
 
     private void repositionRect() {
         locationRect = new Rect(
-                (int) x,
-                (int)y,
-                (int)x + (int)width,
-                (int)y + (int)height);
+                (int) x + (int)(width*.25),
+                (int)y+ (int)(height*.25),
+                (int)x + (width - (int)(width*.25)),
+                (int)y + (height - (int)(height*.25)));
     }
 
     // finger location while moving.
@@ -134,6 +134,8 @@ public class TimerView extends Mods implements CustomizedMods{
                 isDragging = true;
             }
         }
+
+
 
         // we are now dragging and lets move this shit.
         //log("touch is inside");
@@ -157,7 +159,10 @@ public class TimerView extends Mods implements CustomizedMods{
                 //log("moving");
                 //log("moving the text view");
                 x = (int)(event.getX()-(width/2));
-                y = (int) (event.getY()-(height/2));
+                // Make sure the View doesn't leave the hud's perimeter.
+                if((int) (event.getY()-(height/2)) > Consts.yHudPosition){
+                    y = (int) (event.getY()-(height/2));
+                }
                 repositionRect();
                 return true;
             // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE

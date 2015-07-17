@@ -57,13 +57,13 @@ public class DegreeMod extends Mods implements CustomizedMods{
         initPaint();
 
     }
-
+    // came to this heuristically, took a bit to wrap the text just right.
     private void setRectangle() {
         locationRect = new Rect(
-                x-(width/2),
-                y-height,
-                x+ (width + (width/2)),
-                y+(height/2));
+                x,
+                y-(height/2),
+                x+ (width),
+                y+(height/6));
     }
 
     private void initPaint() {
@@ -86,7 +86,7 @@ public class DegreeMod extends Mods implements CustomizedMods{
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        canvas.drawRect(locationRect, mPaint1);
+        //canvas.drawRect(locationRect, mPaint1);
         // place in center
         canvas.drawText("72"+ Consts.DEGREE_SIGN, x, y, mPaint);
     }
@@ -131,7 +131,10 @@ public class DegreeMod extends Mods implements CustomizedMods{
                 //log("moving");
                 //log("moving the text view");
                 x = (int)(event.getX()-(width/2));
-                y = (int) (event.getY()-(height/2));
+                // Make sure the View doesn't leave the hud's perimeter.
+                if((int) (event.getY()-(height/2)) > Consts.yHudPosition){
+                    y = (int) (event.getY()-(height/2));
+                }
                 setRectangle();
                 return true;
             // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE

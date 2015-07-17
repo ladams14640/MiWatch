@@ -76,10 +76,10 @@ public class FitnessMod extends Mods implements CustomizedMods {
 
     private void repositionRect() {
         locationRect = new Rect(
-                (int) x,
-                (int)y,
-                (int)x + (int)width,
-                (int)y + (int)height);
+                (int) x + (int)(width*.25),
+                (int)y+ (int)(height*.25),
+                (int)x + (width - (int)(width*.25)),
+                (int)y + (height - (int)(height*.25)));
     }
 
 
@@ -90,7 +90,7 @@ public class FitnessMod extends Mods implements CustomizedMods {
     public boolean touchInside(MotionEvent event){
         // if we are dragging no need to check if we are within the square, just drag it.
         if(!isDragging) {
-            if (!locationRect.contains((int) event.getX(), (int) event.getY())) {
+            if (!locationRect.contains((int) event.getX(), (int) event.getY()))  {
                 isDragging = false;
                 return false;
             } else {
@@ -98,40 +98,33 @@ public class FitnessMod extends Mods implements CustomizedMods {
             }
         }
 
-        // we are now dragging and lets move this shit.
-        //log("touch is inside");
-        // touch has come in
 
+        // touch has been let through
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                //log("down");
-               // x = (int)(event.getX()-(width/2));
-              //  y = (int) (event.getY()-(height/2));
                 svView.setSelection(Consts.FITNESS, true);
                 svView.viewIsDragging(true);
 
                 selectPaint();
                 repositionRect();
                 return true;
-
+            // we are now dragging and lets move this view.
             case MotionEvent.ACTION_MOVE:
-                // no adjustments if we are animating
-                //log("moving");
-                //log("moving the text view");
                 x = (int)(event.getX()-(width/2));
-                y = (int) (event.getY()-(height/2));
+
+                // make sure we do not go beyond the hud.
+                if((int) (event.getY()-(height/2)) > Consts.yHudPosition){
+                    y = (int) (event.getY()-(height/2));
+                }
                 repositionRect();
                 svView.viewIsDragging(true);
                 return true;
-            // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE
             case MotionEvent.ACTION_UP:
                 isDragging = false;
                 log("xPosition = " + x);
                 log("yPosition = " + y);
                 svView.viewIsDragging(false);
                 svView.setSelection(ID, false);
-                //svView.setSelection(svView.FITNESS, false);
-                //unselectPaint();
                 repositionRect();
                 yMove = 0;
                 xMove = 0;
@@ -154,7 +147,7 @@ public class FitnessMod extends Mods implements CustomizedMods {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawRect(locationRect, pRect);
+        //canvas.drawRect(locationRect, pRect);
         canvas.drawBitmap(bResizeFitness, x, y, mPaint);
 
     }

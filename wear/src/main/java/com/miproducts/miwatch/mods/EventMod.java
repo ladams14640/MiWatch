@@ -179,12 +179,21 @@ public class EventMod extends View {
         log("finger off and I was dragging = " + isDragging);
         if(isDragging){
             isDragging = false;
+            // View was dragged far enough to animate into the next Event.
             if(xText < CALENDAR_SWIPE_THRESHOLD ){
                 Log.d("Threshold", "met");
-                animateChangeInEvent();
+                animateChangeInEvent(true);
                 return;
 
-            } else {
+            }
+            // finger went far enough to go backwards
+            else if(xText > mHudView.getWidth()/2){
+                log("next Event backwards.");
+                animateChangeInEvent(false);
+            }
+
+
+            else {
                 //TODO make a setup for going the other way too. that way we can grab events forward and backwards
                 Log.d("threshold", "not met");
                 isDragging = false;
@@ -207,9 +216,27 @@ public class EventMod extends View {
 
     }
 
-    private void animateChangeInEvent() {
+    /**
+     *
+     * @param nextForwardEvent - tell us if we are going forward with next event, or backwards with previous event.
+     */
+    private void animateChangeInEvent(final boolean nextForwardEvent) {
+        float destination = 0;
+        float from = 0;
+        //TODO #1 test this out.
+        // so we are getting next Event and moving the view from right to left.
+        if(nextForwardEvent){
+            destination = x;
+            from = mContext.getWallpaperDesiredMinimumWidth();
+        }
+        // get previous Event and move the view from left to right.
+        else {
+            from = x;
+            destination = mContext.getWallpaperDesiredMinimumWidth()-100;
+        }
 
-        ValueAnimator animator = ValueAnimator.ofFloat(mContext.getWallpaperDesiredMinimumWidth(), x);
+        ValueAnimator animator = ValueAnimator.ofFloat(from, destination);
+
         log("Event Index we are using is " + mEventIndex);
         // It will take 1000ms for the animator to go from the width of the canvas to the
         // original position.
@@ -223,6 +250,8 @@ public class EventMod extends View {
                 float value = ((Float) (animation.getAnimatedValue())).floatValue();
                 //Log.d("ValueAnimator", "value=" + value);
                 if(!alreadySetEvent) {
+                   //TODO this is where i would dump this conditional - if(nextForwardEvent)
+                    // dont want to do this more than once.
                     alreadySetEvent = true;
                     log("current Event Size = " + mHudView.getEventSize());
                     if (mHudView.getEventSize() > eventIndex + 1) {

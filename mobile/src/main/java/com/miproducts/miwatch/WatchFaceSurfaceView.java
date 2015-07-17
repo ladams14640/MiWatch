@@ -23,6 +23,7 @@ import com.miproducts.miwatch.mods.DegreeMod;
 import com.miproducts.miwatch.mods.DigitalTimer;
 import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.mods.FitnessMod;
+import com.miproducts.miwatch.mods.HudView;
 import com.miproducts.miwatch.mods.Mods;
 import com.miproducts.miwatch.mods.TimerView;
 import com.miproducts.miwatch.utilities.Consts;
@@ -45,6 +46,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     private DegreeMod mDegreeMod;
     private DateViews mDateViews;
     private TimerView mTimerView;
+    private HudView mHudView;
 
     private GetViewProperties mGetProperties;
 
@@ -71,6 +73,8 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         surfaceHolder =  getHolder();
 
         initMods();
+
+        // go push the properties of each view over.
         mGetProperties = new GetViewProperties(
                     mDigitalTimer,
                     mEventMod,
@@ -108,8 +112,9 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     public float getCanvasWidth(){
         return width;
     }
-
-
+    public float getCanvasHeight(){
+        return height;
+    }
     private void initMods() {
         mDigitalTimer = new DigitalTimer(getContext(), this);
         mEventMod = new EventMod(getContext(), this);
@@ -117,6 +122,8 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         mDegreeMod = new DegreeMod(getContext(), this);
         mDateViews = new DateViews(getContext(), this);
         mTimerView = new TimerView(getContext(), this);
+        mHudView = new HudView(getContext(), this);
+
 
         lViews[0] = mDigitalTimer;
         lViews[1] = mEventMod;
@@ -125,11 +132,19 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         lViews[4] = mDateViews;
         lViews[5] = mTimerView;
 
+
+
     }
 
     protected void drawSomething(Canvas canvas) {
             if(canvas != null) {
+                // background
                 canvas.drawColor(Color.BLACK);
+
+                // Hud
+                mHudView.draw(canvas);
+
+                // Mods
                 for(int i = 0; i < lViews.length; i++){
                     lViews[i].draw(canvas);
                 }
@@ -191,7 +206,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     private void resetViewsButCurrent(int selection) {
         for(int i = 0; i < lViews.length; i++){
             if(lViews[i].getId() != selection){
-                log("View with ID was not the selected one.: " + lViews[i].getId());
+                //log("View with ID was not the selected one.: " + lViews[i].getId());
                 lViews[i].unSelectPaint();
             }
         }
@@ -265,8 +280,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     public int getColorOfView(int selectedView){return mGetProperties.getColorOfView(selectedView);}
     public float getSizeOfView(int selectedView) { return mGetProperties.getSizeOfView(selectedView);}
 
-
-    //TODO will this fix it? Thread igivng me trouble when i pause the damn application.
+    // pause thread from the MainCompanionActivity
     public void threadRun(boolean b) {
         stThread.setRunning(b);
     }

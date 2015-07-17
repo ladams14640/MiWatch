@@ -1,6 +1,5 @@
 package com.miproducts.miwatch;
-//TODO - Pull code from Watch Face Template Master in
-//TODO - C:\Programming Stuff\android projects\Watch Face open weather testings.
+
 import android.graphics.Point;
 import android.util.Log;
 import android.view.KeyEvent;

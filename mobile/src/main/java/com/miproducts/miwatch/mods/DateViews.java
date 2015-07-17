@@ -60,6 +60,18 @@ public class DateViews extends Mods implements CustomizedMods{
         setRectangle();
     }
 
+    private void initPositions() {
+        x = Consts.xDatePosition;
+        y = Consts.yDatePositions;
+    }
+
+    private void setRectangle(){
+        mSelectRect = new Rect(
+                x - (width/2),
+                y - (height/2),
+                x + (width/2),
+                y+ (height/2));
+    }
 
 
     // finger location while moving.
@@ -69,7 +81,7 @@ public class DateViews extends Mods implements CustomizedMods{
     public boolean touchInside(MotionEvent event){
         // if we are dragging no need to check if we are within the square, just drag it.
         if(!isDragging) {
-            if (!mSelectRect.contains((int) event.getX(), (int) event.getY())) {
+            if (!mSelectRect.contains((int) event.getX(), (int) event.getY())){
                 isDragging = false;
                 return false;
             } else {
@@ -78,15 +90,8 @@ public class DateViews extends Mods implements CustomizedMods{
         }
 
         // we are now dragging and lets move this shit.
-       // log("touch is inside");
-        // touch has come in
-
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                //log("down");
-                //x = (int)(event.getX()-(width/2));
-                //y = (int) (event.getY()-(height/2));
-
                 svView.setSelection(Consts.DATE, true);
                 svView.viewIsDragging(true);
                 selectPaint();
@@ -95,20 +100,17 @@ public class DateViews extends Mods implements CustomizedMods{
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                // no adjustments if we are animating
-                //log("moving");
-                //log("moving the text view");
-                //log("moving the text view");
-                x = (int)(event.getX()-(width/2));
-                y = (int) (event.getY()-(height/2));
+                 x = (int)(event.getX()-(width/2));
+                // make sure we do not go over the hud - 6 is a heuristic number I came to.
+                if((int) (event.getY()-(height/6)) < Consts.yHudPosition){
+                    y = (int) (event.getY()-(height/2));
+                }
                 setRectangle();
                 return true;
+
             // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE
             case MotionEvent.ACTION_UP:
                 isDragging = false;
-                // unselected
-                //unselectPaint();
-                //svView.setSelection(svView.DATE, false);
                 svView.viewIsDragging(false);
 
                 log("xPosition = " + x);
@@ -122,18 +124,6 @@ public class DateViews extends Mods implements CustomizedMods{
 
     }
 
-    private void initPositions() {
-        x = Consts.xDatePosition;
-        y = Consts.yTimePosition;
-    }
-
-    private void setRectangle(){
-        mSelectRect = new Rect(
-                x - (width/2),
-                y - (height/2),
-                x + (width/2),
-                y+ (height/2));
-    }
 
     private void initPaint() {
         Resources resources = getResources();
@@ -163,7 +153,7 @@ public class DateViews extends Mods implements CustomizedMods{
         super.draw(canvas);
         canvas.drawText(dateOfWeek, x, y, pDateOfWeek);
         canvas.drawText(dateOfMonth, x, y + textSize, pDateOfMonth);
-        canvas.drawRect(mSelectRect, pRect);
+       // canvas.drawRect(mSelectRect, pRect);
 
 
 

@@ -31,7 +31,6 @@ public class EventMod extends Mods implements CustomizedMods{
     private WatchFaceSurfaceView svWatchView;
     private float xText, yText;
     private int textSize = 40;
-    private float displayedTextSize = textSize*2;
     String mEventInfo = "Info stuff";
     String mEventTitle = "Title stuff";
     private int currentColor;
@@ -41,16 +40,16 @@ public class EventMod extends Mods implements CustomizedMods{
         return textSize;
     }
 
-    private float digitalRectWidth = 8 * textSize;
-    private float digitalRectLHeight = (float) 1.5* displayedTextSize;
-    private float yCenterOfRect = digitalRectLHeight/2;
+    private float digitalRectWidth = ((textSize*4));
+    private float digitalRectLHeight = (float) ((textSize*2));
+
 
     public EventMod(Context context, WatchFaceSurfaceView svWatchView) {
         super(context, svWatchView);
         this.mContext = context;
         this.svWatchView = svWatchView;
 
-        yText = Consts.yEventPosition;
+        yText = Consts.yEventPosition + textSize;
         xText = Consts.xEventPosition;
 
         repositionRect();
@@ -61,7 +60,7 @@ public class EventMod extends Mods implements CustomizedMods{
     private void repositionRect() {
         locationRect = new Rect(
                 (int) xText,
-                (int)yText -(int)(digitalRectLHeight/2),
+                (int)yText -(int)(digitalRectLHeight/4),
                 (int)xText + (int)digitalRectWidth,
                 (int)yText + (int)digitalRectLHeight);
     }
@@ -69,7 +68,7 @@ public class EventMod extends Mods implements CustomizedMods{
     private void initPaint() {
         mTimePaint = new Paint();
         mTimePaint.setTextSize(textSize);
-        mTimePaint.setColor(getResources().getColor(R.color.digital_time_blue));
+        mTimePaint.setColor(getResources().getColor(R.color.white));
         mTimePaint.setAntiAlias(true);
         mTimePaint.setTextAlign(Paint.Align.LEFT);
 
@@ -78,7 +77,7 @@ public class EventMod extends Mods implements CustomizedMods{
         mPaintRect.setColor(getResources().getColor(android.R.color.holo_blue_light));
         mPaintRect.setStyle(Paint.Style.STROKE);
 
-        currentColor = getResources().getColor(R.color.digital_time_blue);
+        currentColor = mTimePaint.getColor();
 
     }
 
@@ -111,9 +110,7 @@ public class EventMod extends Mods implements CustomizedMods{
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                //log("down");
-                //xText = event.getX()-digitalRectWidth/2;
-                //yText = event.getY()-digitalRectLHeight/2;
+
                 svWatchView.setSelection(Consts.EVENT, true);
                 svWatchView.viewIsDragging(true);
 
@@ -123,11 +120,12 @@ public class EventMod extends Mods implements CustomizedMods{
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                // no adjustments if we are animating
-                //log("moving");
-                //log("moving the text view");
+
                 xText = event.getX()-digitalRectWidth/2;
-                yText = event.getY()-digitalRectLHeight/2;
+                // Make sure the View doesn't leave the hud's perimeter. - heuristic values
+                if((int) (event.getY()-(int)(digitalRectLHeight)) > Consts.yHudPosition){
+                    yText = event.getY()-digitalRectLHeight/2;
+                }
                 repositionRect();
                 return true;
             // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE
@@ -179,8 +177,8 @@ public class EventMod extends Mods implements CustomizedMods{
     }
 
     private void refreshValues() {
-        digitalRectWidth = 8 * textSize;
-        digitalRectLHeight = (float) 1.5* displayedTextSize;
+        digitalRectWidth = (textSize*4);
+        digitalRectLHeight = (float) ((textSize*2));
         initPaint();
         selectPaint();
     }

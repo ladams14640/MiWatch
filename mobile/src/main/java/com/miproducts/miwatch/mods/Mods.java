@@ -32,4 +32,5 @@ public class Mods extends View {
     public void unSelectPaint(){}
 
     public int getId(){return 0;}
+    private void log(String msg){}
 }

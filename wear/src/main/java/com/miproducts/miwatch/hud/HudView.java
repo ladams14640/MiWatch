@@ -234,7 +234,8 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
 
     /**
      * Called by DegreeMod, will refresh their stuff.
-     * @param dataMap - just a true statement value to tell a node to get degrees.
+     * @param dataMap - new DataMap with a oscillating boolean value, to stimulate a change in the
+     *                MainCompanionActivity's Listener.
      */
     public void refreshDegrees(DataMap dataMap) {
         log("refreshDegrees dataMap: " + dataMap);

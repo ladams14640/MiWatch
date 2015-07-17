@@ -98,16 +98,13 @@ public class DegreeMod extends View {
         if(!locationRect.contains((int)x,(int)y)) return false;
         else {
             log("touch is inside");
-            //TODO lets refresh degrees
             // Create a DataMap object and send it to the data layer
             DataMap dataMap = new DataMap();
-
-            // send out all the user's choices to the node. To be picked up by the watch on it's node.
             refreshDegrees(dataMap);
             return true;
         }
     }
-
+    // Lets tell HudView to send out a message to the dataLayer
     private void refreshDegrees(DataMap dataMap) {
         refresh = true;
         bRefresh = !bRefresh;

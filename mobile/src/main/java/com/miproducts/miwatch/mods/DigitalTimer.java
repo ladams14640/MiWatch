@@ -30,7 +30,7 @@ public class DigitalTimer extends Mods implements CustomizedMods{
     private final static String TAG = "DigitalTimer";
     private String digitalTime = "10:00";
     private float xTime, yTime;
-    private int digitalSize = 100;
+    private int digitalSize = Consts.sizeDigitalTime;
     // 2 and 1/2 of the size
     private float digitalRectWidth = (2 * digitalSize) + (digitalSize/2);
     private float digitalRectLHeight = digitalSize;
@@ -108,7 +108,7 @@ public class DigitalTimer extends Mods implements CustomizedMods{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawRect(selectRect, timeRectPaint);
+        //canvas.drawRect(selectRect, timeRectPaint);
         canvas.drawText(digitalTime, xTime, yTime, mTimePaint);
 
     }
@@ -148,8 +148,10 @@ public class DigitalTimer extends Mods implements CustomizedMods{
             case MotionEvent.ACTION_MOVE:
                 svView.viewIsDragging(true);
                 xTime = event.getX()-digitalRectWidth/2;
-
-                yTime = event.getY()-digitalRectLHeight/2;
+                // make sure we do not go over the hud
+                if((int)(event.getY()-digitalRectLHeight/2) < Consts.yHudPosition){
+                    yTime = event.getY()-digitalRectLHeight/2;
+                }
                 resetRectPosition();
                 return true;
             // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE
