@@ -18,11 +18,11 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by ladam_000 on 7/3/2015.
  */
-public class DigitalTimer extends View {
+public class DigitalTimer extends View implements CustomizedMods{
     private final static String TAG = "DigitalTimer";
     private String digitalTime = "10:00";
     private float xTime, yTime;
-    private float digitalSize = 100;
+    private int digitalSize = 100;
     // 2 and 1/2 of the size
     private float digitalRectWidth = (2 * digitalSize) + (digitalSize/2);
     private float digitalRectLHeight = digitalSize;
@@ -41,7 +41,7 @@ public class DigitalTimer extends View {
     private boolean isVisible = true;
 
 
-    public float getSize(){
+    public int getSize(){
         return digitalSize;
     }
 
@@ -169,7 +169,7 @@ public class DigitalTimer extends View {
         timeRectPaint.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
-    public void unselectPaint() {
+    public void unSelectPaint() {
         timeRectPaint.setColor(getResources().getColor(R.color.digital_time_blue));
 
     }
@@ -244,5 +244,10 @@ public class DigitalTimer extends View {
 
     public int getColor() {
         return currentColor;
+    }
+
+    @Override
+    public boolean getViewsVisibility() {
+        return isVisible;
     }
 }

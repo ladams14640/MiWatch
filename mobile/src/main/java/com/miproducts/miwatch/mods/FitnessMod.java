@@ -20,15 +20,15 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by larry on 6/29/15.
  */
-public class FitnessMod extends View {
+public class FitnessMod extends View implements CustomizedMods {
     private Context mContext;
     private WatchFaceSurfaceView svView;
     private Bitmap bFitness;
     private Bitmap bResizeFitness;
 
     Rect locationRect;
-    private float width = 200;
-    private float height = 200;
+    private int width = 200;
+    private int height = 200;
     private float x, y;
     private Paint mPaint;
     private Paint pRect;
@@ -36,9 +36,11 @@ public class FitnessMod extends View {
     private boolean isVisible = true;
 
 
-    public float getSize(){
+    public int getSize(){
         return width;
     }
+
+
     public FitnessMod(Context context, WatchFaceSurfaceView svView) {
         super(context);
         mContext = context;
@@ -138,7 +140,7 @@ public class FitnessMod extends View {
         pRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
-    public void unselectPaint() {
+    public void unSelectPaint() {
         pRect.setColor(getResources().getColor(R.color.digital_time_blue));
 
     }

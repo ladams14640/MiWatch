@@ -11,6 +11,9 @@ import com.miproducts.miwatch.mods.FitnessMod;
 import com.miproducts.miwatch.mods.TimerView;
 
 /**
+ *
+ * Use this class to get all of the different view's information.
+ * Far better to seperate all of this from the WatchFaceMenu.
  * Created by ladam_000 on 7/11/2015.
  */
 public class GetViewProperties {

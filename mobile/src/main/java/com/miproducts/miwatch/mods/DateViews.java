@@ -17,7 +17,7 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by ladam_000 on 7/5/2015.
  */
-public class DateViews extends View {
+public class DateViews extends View implements CustomizedMods{
     private static final String TAG = "DateViews";
 
     private WatchFaceSurfaceView svView;
@@ -115,9 +115,6 @@ public class DateViews extends View {
 
     }
 
-
-
-
     private void initPositions() {
         x = Consts.xDatePosition;
         y = Consts.yTimePosition;
@@ -184,7 +181,7 @@ public class DateViews extends View {
         pRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
-    public void unselectPaint() {
+    public void unSelectPaint() {
         pRect.setColor(getResources().getColor(R.color.digital_time_blue));
 
     }

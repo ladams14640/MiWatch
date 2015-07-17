@@ -19,7 +19,7 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by ladam_000 on 6/29/2015.
  */
-public class EventMod extends View {
+public class EventMod extends View implements CustomizedMods{
 
 
     private Context mContext;
@@ -30,14 +30,14 @@ public class EventMod extends View {
 
     private WatchFaceSurfaceView svWatchView;
     private float xText, yText;
-    private float textSize = 40;
+    private int textSize = 40;
     private float displayedTextSize = textSize*2;
     String mEventInfo = "Info stuff";
     String mEventTitle = "Title stuff";
     private int currentColor;
     private boolean isVisible = true;
 
-    public float getSize(){
+    public int getSize(){
         return textSize;
     }
 
@@ -152,7 +152,7 @@ public class EventMod extends View {
         mPaintRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
-    public void unselectPaint() {
+    public void unSelectPaint() {
         mPaintRect.setColor(getResources().getColor(R.color.digital_time_blue));
 
     }

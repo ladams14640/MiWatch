@@ -199,12 +199,12 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     }
 
     private void resetViewsToUnselected() {
-        mDegreeMod.unselectPaint();
-        mEventMod.unselectPaint();
-        mDigitalTimer.unselectPaint();
-        mFitnessMod.unselectPaint();
-        mDateViews.unselectPaint();
-        mTimerView.unselectPaint();
+        mDegreeMod.unSelectPaint();
+        mEventMod.unSelectPaint();
+        mDigitalTimer.unSelectPaint();
+        mFitnessMod.unSelectPaint();
+        mDateViews.unSelectPaint();
+        mTimerView.unSelectPaint();
     }
 
 

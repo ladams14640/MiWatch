@@ -41,7 +41,7 @@ import android.widget.LinearLayout;
 /**
  * Created by ladam_000 on 6/28/2015.
  */
-public class TimerView extends View {
+public class TimerView extends View implements CustomizedMods{
     private Context mContext;
     Paint mPaint;
 
@@ -178,7 +178,7 @@ public class TimerView extends View {
         mPaint.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
-    public void unselectPaint() {
+    public void unSelectPaint() {
         mPaint.setColor(getResources().getColor(R.color.digital_time_blue));
 
     }
