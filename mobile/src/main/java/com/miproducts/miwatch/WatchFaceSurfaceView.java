@@ -63,12 +63,12 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
     }
 
     private void init() {
-       // log("init");
+        log("init");
 
         stThread = new SurfaceThread(this);
 
         setOnTouchListener(this);
-        surfaceHolder = getHolder();
+        surfaceHolder =  getHolder();
 
         initMods();
         mGetProperties = new GetViewProperties(
@@ -82,38 +82,25 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                stThread.passHolder(holder);
-                //  log("surfaecHolder callback surface created");
-                //stThread.setRunning(true);
-                //stThread.start(); // handle this inside the thread now.
-
+                log("surface created.");
+                //if it is the first time the thread starts
+                stThread = new SurfaceThread(stThread.getSvView());
+                stThread.passHolder(surfaceHolder);
+                stThread.setRunning(true);
+                stThread.start();  // Start a new thread
             }
 
-            /**
-             * Everytime This surfaceChange happens it's after the screen pops up and is visible it seems.
-             * So whether from scratch or from unpause this method is called only when surface becomes visible.
-             * Does not get called when it hides.
-             * @param holder
-             * @param format
-             * @param width
-             * @param height
-             */
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                log("changed");
-                // incase we come back from a paused state.
-                //if (isShowing)
 
-                //stThread.passHolder(holder);
-
-                stThread.setRunning(true);
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                stThread.setRunning(false);
+
             }
         });
+
 
     }
 
@@ -122,9 +109,6 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         return width;
     }
 
-    public float getCanvasHeight(){
-        return height;
-    }
 
     private void initMods() {
         mDigitalTimer = new DigitalTimer(getContext(), this);

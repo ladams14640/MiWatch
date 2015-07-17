@@ -99,8 +99,8 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         svView.threadRun(false);
+        super.onPause();
     }
 
     @Override

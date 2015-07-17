@@ -23,10 +23,11 @@ public class SurfaceThread extends Thread{
     public void setRunning(boolean run){
             isRunning = run;
 
-            if(!hasStarted){
-                start();
-                hasStarted = true;
-            }
+           // if(!hasStarted){
+              //if(isRunning)
+               // start();
+            //    hasStarted = true;
+            //}
 
 
     }
@@ -64,5 +65,9 @@ public class SurfaceThread extends Thread{
 
     public void passHolder(SurfaceHolder holder) {
         mHolder = holder;
+    }
+
+    public WatchFaceSurfaceView getSvView(){
+        return svView;
     }
 }
