@@ -20,7 +20,12 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by larry on 6/29/15.
  */
-public class FitnessMod extends View implements CustomizedMods {
+public class FitnessMod extends Mods implements CustomizedMods {
+    private final static int ID = Consts.FITNESS;
+    @Override
+    public int getId() {
+        return ID;
+    }
     private Context mContext;
     private WatchFaceSurfaceView svView;
     private Bitmap bFitness;
@@ -42,7 +47,7 @@ public class FitnessMod extends View implements CustomizedMods {
 
 
     public FitnessMod(Context context, WatchFaceSurfaceView svView) {
-        super(context);
+        super(context, svView);
         mContext = context;
         this.svView = svView;
         bFitness = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_fitness_white);
@@ -124,7 +129,7 @@ public class FitnessMod extends View implements CustomizedMods {
                 log("xPosition = " + x);
                 log("yPosition = " + y);
                 svView.viewIsDragging(false);
-
+                svView.setSelection(ID, false);
                 //svView.setSelection(svView.FITNESS, false);
                 //unselectPaint();
                 repositionRect();
@@ -139,7 +144,7 @@ public class FitnessMod extends View implements CustomizedMods {
     private void selectPaint() {
         pRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
-
+    @Override
     public void unSelectPaint() {
         pRect.setColor(getResources().getColor(R.color.digital_time_blue));
 

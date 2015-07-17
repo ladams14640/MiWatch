@@ -41,7 +41,12 @@ import android.widget.LinearLayout;
 /**
  * Created by ladam_000 on 6/28/2015.
  */
-public class TimerView extends View implements CustomizedMods{
+public class TimerView extends Mods implements CustomizedMods{
+    private static final int ID = Consts.DIGITAL_TIMER;
+    @Override
+    public int getId() {
+        return ID;
+    }
     private Context mContext;
     Paint mPaint;
 
@@ -62,7 +67,7 @@ public class TimerView extends View implements CustomizedMods{
 
 
     public TimerView(Context context, WatchFaceSurfaceView svView) {
-        super(context);
+        super(context, svView);
       //  log("init");
         this.mContext = context;
         this.svView = svView;
@@ -178,6 +183,7 @@ public class TimerView extends View implements CustomizedMods{
         mPaint.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
+    @Override
     public void unSelectPaint() {
         mPaint.setColor(getResources().getColor(R.color.digital_time_blue));
 

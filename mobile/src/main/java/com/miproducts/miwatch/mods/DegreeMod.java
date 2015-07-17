@@ -16,8 +16,12 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by larry on 6/29/15.
  */
-public class DegreeMod extends View implements CustomizedMods{
-
+public class DegreeMod extends Mods implements CustomizedMods{
+    private final static int ID = Consts.DEGREE;
+    @Override
+    public int getId() {
+        return ID;
+    }
     private Context mContext;
     private WatchFaceSurfaceView svView;
     Paint mPaint;
@@ -40,7 +44,7 @@ public class DegreeMod extends View implements CustomizedMods{
     private int currentColor;
 
     public DegreeMod(Context context, WatchFaceSurfaceView svView) {
-        super(context);
+        super(context, svView);
 
         this.mContext = context;
         this.svView = svView;
@@ -152,7 +156,7 @@ public class DegreeMod extends View implements CustomizedMods{
     private void selectPaint() {
         mPaint1.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
-
+    @Override
     public void unSelectPaint() {
         mPaint1.setColor(getResources().getColor(R.color.digital_time_blue));
 

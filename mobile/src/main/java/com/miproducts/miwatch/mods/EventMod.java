@@ -19,8 +19,8 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by ladam_000 on 6/29/2015.
  */
-public class EventMod extends View implements CustomizedMods{
-
+public class EventMod extends Mods implements CustomizedMods{
+    private final static int ID = Consts.EVENT;
 
     private Context mContext;
     private Paint mTimePaint;
@@ -46,7 +46,7 @@ public class EventMod extends View implements CustomizedMods{
     private float yCenterOfRect = digitalRectLHeight/2;
 
     public EventMod(Context context, WatchFaceSurfaceView svWatchView) {
-        super(context);
+        super(context, svWatchView);
         this.mContext = context;
         this.svWatchView = svWatchView;
 
@@ -93,6 +93,7 @@ public class EventMod extends View implements CustomizedMods{
     // finger location while moving.
     float xMove, yMove;
     boolean isDragging = false;
+
     public boolean touchInside(MotionEvent event){
         // if we are dragging no need to check if we are within the square, just drag it.
         if(!isDragging) {
@@ -152,6 +153,7 @@ public class EventMod extends View implements CustomizedMods{
         mPaintRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
 
+    @Override
     public void unSelectPaint() {
         mPaintRect.setColor(getResources().getColor(R.color.digital_time_blue));
 
@@ -219,5 +221,10 @@ public class EventMod extends View implements CustomizedMods{
 
     public boolean getViewsVisibility() {
         return isVisible;
+    }
+
+    @Override
+    public int getId() {
+        return ID;
     }
 }

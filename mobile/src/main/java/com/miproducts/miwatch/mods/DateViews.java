@@ -17,7 +17,13 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by ladam_000 on 7/5/2015.
  */
-public class DateViews extends View implements CustomizedMods{
+public class DateViews extends Mods implements CustomizedMods{
+    private static final int ID = Consts.DATE;
+    @Override
+    public int getId() {
+        return ID;
+    }
+
     private static final String TAG = "DateViews";
 
     private WatchFaceSurfaceView svView;
@@ -46,7 +52,7 @@ public class DateViews extends View implements CustomizedMods{
     }
 
     public DateViews(Context context, WatchFaceSurfaceView svView) {
-        super(context);
+        super(context, svView);
         this.svView = svView;
         this.mContext = context;
         initPositions();
@@ -59,6 +65,7 @@ public class DateViews extends View implements CustomizedMods{
     // finger location while moving.
     float xMove, yMove;
     boolean isDragging = false;
+
     public boolean touchInside(MotionEvent event){
         // if we are dragging no need to check if we are within the square, just drag it.
         if(!isDragging) {
@@ -180,7 +187,7 @@ public class DateViews extends View implements CustomizedMods{
     private void selectPaint() {
         pRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
-
+    @Override
     public void unSelectPaint() {
         pRect.setColor(getResources().getColor(R.color.digital_time_blue));
 

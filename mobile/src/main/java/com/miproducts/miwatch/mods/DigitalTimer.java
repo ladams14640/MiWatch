@@ -18,7 +18,15 @@ import com.miproducts.miwatch.utilities.Consts;
 /**
  * Created by ladam_000 on 7/3/2015.
  */
-public class DigitalTimer extends View implements CustomizedMods{
+public class DigitalTimer extends Mods implements CustomizedMods{
+    private static final int ID = Consts.DIGITAL_TIMER;
+    @Override
+    public int getId() {
+        return ID;
+    }
+
+
+
     private final static String TAG = "DigitalTimer";
     private String digitalTime = "10:00";
     private float xTime, yTime;
@@ -128,19 +136,17 @@ public class DigitalTimer extends View implements CustomizedMods{
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-               // log("down");
-                //xTime = event.getX()-digitalRectWidth/2;
-                //yTime = event.getY()-digitalRectLHeight/2;
+                // Tell SurfaceView we are selected, and to make sure all touches go to us now.
                 svView.setSelection(Consts.DIGITAL_TIMER, true);
+                // Tell surface View we are dragging.
                 svView.viewIsDragging(true);
-
+                // make sure rectangle turns orange to indicate selection
                 selectPaint();
                 resetRectPosition();
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                //log("moving");
-                //log("moving the text Mod");
+                svView.viewIsDragging(true);
                 xTime = event.getX()-digitalRectWidth/2;
 
                 yTime = event.getY()-digitalRectLHeight/2;
@@ -152,9 +158,7 @@ public class DigitalTimer extends View implements CustomizedMods{
                 log("xTime = " + xTime);
                 log("yTime = " + yTime);
                 svView.viewIsDragging(false);
-
-                //svView.setSelection(svView.DIGITAL_TIMER, false);
-                //unselectPaint();
+                //unlectPaint();
                 resetRectPosition();
                 yMove = 0;
                 xMove = 0;
@@ -168,7 +172,7 @@ public class DigitalTimer extends View implements CustomizedMods{
     private void selectPaint() {
         timeRectPaint.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
-
+    @Override
     public void unSelectPaint() {
         timeRectPaint.setColor(getResources().getColor(R.color.digital_time_blue));
 
@@ -196,7 +200,7 @@ public class DigitalTimer extends View implements CustomizedMods{
 
 
     public DigitalTimer(Context context, WatchFaceSurfaceView svView) {
-        super(context);
+        super(context, svView);
         this.svView = svView;
         mContext = context;
         init();

@@ -7,12 +7,11 @@ import android.view.MotionEvent;
  */
 public interface CustomizedMods  {
     int getSize();
-    boolean touchInside(MotionEvent event);
-    void unSelectPaint();
     float getX();
     float getY();
     void changeSize(int newSize);
     void setVisibility(boolean visible);
     int getColor();
     boolean getViewsVisibility();
+    int getId();
 }

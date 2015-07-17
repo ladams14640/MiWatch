@@ -23,6 +23,7 @@ import com.miproducts.miwatch.mods.DegreeMod;
 import com.miproducts.miwatch.mods.DigitalTimer;
 import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.mods.FitnessMod;
+import com.miproducts.miwatch.mods.Mods;
 import com.miproducts.miwatch.mods.TimerView;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.GetViewProperties;
@@ -54,6 +55,7 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
     private int width = 600, height = 600;
 
+    private Mods[] lViews = new Mods[6];
 
     public WatchFaceSurfaceView(Context context) {
         super(context);
@@ -132,17 +134,21 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
         mDateViews = new DateViews(getContext(), this);
         mTimerView = new TimerView(getContext(), this);
 
+        lViews[0] = mDigitalTimer;
+        lViews[1] = mEventMod;
+        lViews[2] = mFitnessMod;
+        lViews[3] = mDegreeMod;
+        lViews[4] = mDateViews;
+        lViews[5] = mTimerView;
+
     }
 
     protected void drawSomething(Canvas canvas) {
             if(canvas != null) {
                 canvas.drawColor(Color.BLACK);
-                mDigitalTimer.draw(canvas);
-                mEventMod.draw(canvas);
-                mFitnessMod.draw(canvas);
-                mDegreeMod.draw(canvas);
-                mDateViews.draw(canvas);
-                mTimerView.draw(canvas);
+                for(int i = 0; i < lViews.length; i++){
+                    lViews[i].draw(canvas);
+                }
             }
 
     }
@@ -156,12 +162,10 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
             switch(currentlySelectedView){
                 // essentially initial press will go here.
                 case Consts.NONE:
-                    mDegreeMod.touchInside(event);
-                    mEventMod.touchInside(event);
-                    mDigitalTimer.touchInside(event);
-                    mFitnessMod.touchInside(event);
-                    mDateViews.touchInside(event);
-                    mTimerView.touchInside(event);
+                    for(int i = 0; i < lViews.length; i++){
+                        lViews[i].touchInside(event);
+                    }
+
                     break;
                 case Consts.DIGITAL_TIMER:
                     mDigitalTimer.touchInside(event);
@@ -184,27 +188,30 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
 
             }
         }
-        // we werent dragging anything, but something could be still selected
+        // we weren't dragging anything, but something could be still selected
         else {
-            // reset the view's rectangles so they are "unselected"
-            resetViewsToUnselected();
-            mDegreeMod.touchInside(event);
-            mEventMod.touchInside(event);
-            mDigitalTimer.touchInside(event);
-            mFitnessMod.touchInside(event);
-            mDateViews.touchInside(event);
-            mTimerView.touchInside(event);
+
+            for(int i = 0; i < lViews.length; i++){
+                lViews[i].touchInside(event);
+            }
         }
         return true;
     }
 
     private void resetViewsToUnselected() {
-        mDegreeMod.unSelectPaint();
-        mEventMod.unSelectPaint();
-        mDigitalTimer.unSelectPaint();
-        mFitnessMod.unSelectPaint();
-        mDateViews.unSelectPaint();
-        mTimerView.unSelectPaint();
+        for(int i = 0; i < lViews.length; i++){
+                lViews[i].unSelectPaint();
+        }
+    }
+
+    private void resetViewsButCurrent(int selection) {
+        for(int i = 0; i < lViews.length; i++){
+            if(lViews[i].getId() != selection){
+                log("View with ID was not the selected one.: " + lViews[i].getId());
+                lViews[i].unSelectPaint();
+            }
+        }
+
     }
 
 
@@ -243,16 +250,17 @@ public class WatchFaceSurfaceView extends SurfaceView implements View.OnTouchLis
      */
     public void setSelection(int selection, boolean b) {
         if(b == false){
+            resetViewsButCurrent(selection);
             currentlySelectedView = Consts.NONE;
             // Tell the MainActivity, so he can adjust the Menu's values
             ((MiDigitalWatchFaceCompanionConfigActivity) getContext()).setMenuSelection(Consts.NONE);
         }else {
             // Tell the MainActivity, so he can adjust the Menu's values
             currentlySelectedView = selection;
+            resetViewsButCurrent(selection);
             ((MiDigitalWatchFaceCompanionConfigActivity) getContext()).setMenuSelection(currentlySelectedView);
         }
     }
-
 
 
     /**
