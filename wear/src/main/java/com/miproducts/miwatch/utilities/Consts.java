@@ -8,30 +8,27 @@ import android.provider.CalendarContract;
 public class Consts {
 
 
-    public static final char DEGREE = 0x00B0;
-    public static final int NORMAL_ALPHA = 255;
+    // represents the Degree Symbol
+    public static final char DEGREE_SIGN = 0x00B0;
 
-    public static final int MSG_UPDATE_TIME = 0;
-    public static final int MSG_LOAD_MEETINGS = 1;
+    // Heuristic
+    public final static int canvasWidth = 600;
+    public final static int canvasHeight = 600;
 
-    public static final long NORMAL_UPDATE_RATE_MS = 500;
+    // TIME
+    public static final int xTimePosition = canvasWidth/2;
+    public static final int yTimePosition = 142;
+    public static final int sizeDigitalTime = 50;
+    // EVENT
+    public static final int xEventPosition = 57;
+    public static final int yEventPosition = (int) (canvasHeight * (.4));
 
+    // HUD
+    public static final int yHudPosition = (int) (canvasHeight * (.3));
 
-    public static final String KEY_CONFIG_REQUIRE_INTERVAL = "RequireInterval";
-    public static final String KEY_CONFIG_TEMPERATURE_SCALE = "TemperatureScale";
-    public static final String KEY_WEATHER_CONDITION = "Condition";
-    public static final String KEY_WEATHER_SUNRISE = "Sunrise";
-    public static final String KEY_WEATHER_SUNSET = "Sunset";
-    public static final String KEY_CONFIG_THEME = "Theme";
-    public static final String KEY_CONFIG_TIME_UNIT = "TimeUnit";
-    public static final String KEY_WEATHER_TEMPERATURE = "Temperature";
-    public static final String KEY_WEATHER_UPDATE_TIME = "Update_Time";
-    public static final String PATH_CONFIG = "/DigitalWatchFaceService/Config/";
-    public static final String PATH_WEATHER_INFO = "/WeatherWatchFace/WeatherInfo";
-    public static final String PATH_WEATHER_REQUIRE = "/WeatherService/Require";
-    public static final String COLON_STRING = ":";
-    public static final String PACKAGE_NAME = Consts.class.getPackage().getName();
-    public static final int ZIP_CODE = 04005;
+    // DateViews
+    public static final int xDatePosition = 100;
+    public static final int yDatePositions = 120;
 
 
     public final static int ID_FITNESS_HUD = 0;
@@ -71,6 +68,14 @@ public class Consts {
     public final static int CALENDAR_YR_TIME = 5;
 
 
+    /** For selection purposes */
+    public static final int NONE = 0;
+    public static final int DIGITAL_TIMER = 1;
+    public static final int EVENT = 2;
+    public static final int FITNESS = 3;
+    public static final int DEGREE = 4;
+    public static final int DATE = 5;
+    public static final int ALARM_TIMER = 6;
 
 
 

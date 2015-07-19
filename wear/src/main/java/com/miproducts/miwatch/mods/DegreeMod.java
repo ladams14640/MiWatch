@@ -90,7 +90,7 @@ public class DegreeMod extends View {
 
 
         //canvas.drawRect(locationRect,mPaint1);
-        canvas.drawText(temp+ Consts.DEGREE,x-halfTextSize,y-30,mPaint);
+        canvas.drawText(temp+ Consts.DEGREE_SIGN,x-halfTextSize,y-30,mPaint);
 
     }
 
