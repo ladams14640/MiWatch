@@ -1,33 +1,17 @@
 package com.miproducts.miwatch.mods;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.TextView;
-
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
-import com.google.android.gms.wearable.Wearable;
-import com.miproducts.miwatch.MiDigitalWatchFace;
-import com.miproducts.miwatch.container.Event;
 import com.miproducts.miwatch.hud.HudView;
-import com.miproducts.miwatch.utilities.BitmapConverter;
 import com.miproducts.miwatch.utilities.ConverterUtil;
 import com.miproducts.miwatch.utilities.LoadMeetingTask;
 
@@ -39,34 +23,52 @@ import java.util.List;
  */
 public class EventMod extends View {
 
-    private final int CALENDAR_SWIPE_THRESHOLD = -50;
-
+    private final int EVENT_FORWARD_THRESHOLD = -50;
+    private int EVENT_BACKWARD_THRESHOLD;
 
     private int mIndex;
     private int mEventIndex;
+
     LoadMeetingTask mLoadMeetingTask;
 
-
     private Context mContext;
+    // Paint for the text
     private Paint mPaint;
+    // Rectangle of the view so we can tell if touches are within it's perimeter.
     private Rect locationRect;
-    private int width;
-    private int height = 100;
-    private int x, y;
+
+    // to get the WatchFace SurfaceView's width/height
     private HudView mHudView;
-    private float xText;
-    private int textSize = 24;
-    private int textHalfSize = textSize/2;
-    // keep track if we are animating
+
+    // keep track if we are animating - dont want to animate more than once at a time.
     private boolean isAnimating = false;
 
-
+    // Event Strings to fill
     String mEventInfo = "";
     String mEventTitle = "";
     String mEventDesc = "";
 
+    // keep track of what event we were and are viewing.
     private int eventIndex;
-    private boolean isTaskRunning = false;
+
+    // TEXT RELATED STUFF
+    // Event text position, size; rect positions, size
+    private int X_ORIGINAL_POSITION;
+    private int Y_ORIGINAL_POSITION;
+    private int RECT_LENGTH;
+    private int RECT_WIDTH;
+
+    private int width;
+    private int height = 100;
+    private float xText;
+    private int textSize = 24;
+
+    // FINGER TOUCH STUFF
+    // finger location when initial press.
+    float xDown;
+    // finger location while moving.
+    float xMove, xOffsetTouch;
+    boolean isDragging = false;
 
 
     public void setEventIndex(int index){
@@ -77,17 +79,31 @@ public class EventMod extends View {
         super(context);
         this.mContext = context;
         this.mHudView = mHud;
-        x = mContext.getWallpaperDesiredMinimumWidth()/10;
-        y = (int)mHudView.getTopOfHud()+10;
+
+        initPositions();
+        initPaint();
+
+    }
+
+
+    private void initPositions() {
+        // we always animate to this position, might as well save it.
+        X_ORIGINAL_POSITION = mContext.getWallpaperDesiredMinimumWidth()/10;
+        Y_ORIGINAL_POSITION = (int)mHudView.getTopOfHud()+10;
+
+        // set width
         width = mContext.getWallpaperDesiredMinimumWidth()-50;
 
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.width = width;
-        params.height = y+height;
-        setLayoutParams(params);
+        RECT_LENGTH = X_ORIGINAL_POSITION+width;
+        RECT_WIDTH = Y_ORIGINAL_POSITION+height;
+        locationRect = new Rect(X_ORIGINAL_POSITION, Y_ORIGINAL_POSITION, RECT_LENGTH, RECT_WIDTH);
+        xText = X_ORIGINAL_POSITION;
 
+        // set threshold
+        EVENT_BACKWARD_THRESHOLD  = (int) mHudView.getSurfaceWidth()/2;
+    }
 
-        locationRect = new Rect(x, y,x+width, y+height);
+    private void initPaint() {
         mPaint = new Paint();
         mPaint.setColor(getResources().getColor(android.R.color.white));
         mPaint.setTextSize(textSize);
@@ -95,16 +111,9 @@ public class EventMod extends View {
         mPaint.setAntiAlias(true);
         mPaint.setDither(false);
         mPaint.setTextAlign(Paint.Align.LEFT);
-        xText = x;
-
-       // initASyncTask();
-
     }
-    public void initASyncTask(){
-        mLoadMeetingTask = null;
-        mLoadMeetingTask = new LoadMeetingTask(mContext, EventMod.this, mHudView);
-        mLoadMeetingTask.execute();
-    }
+
+
     /**
      * I want to slide the Event right off
      *
@@ -113,20 +122,16 @@ public class EventMod extends View {
      * @return - nothing really, I am not relying on this boolean return, but I kept it for future
      * possibilities.
     */
-    // finger location when initial press.
-    float xDown;
-    // finger location while moving.
-    float xMove, xOffsetTouch;
-    boolean isDragging = false;
+
     public boolean touchInside(MotionEvent event){
         if(!locationRect.contains((int)event.getX(),(int)event.getY())) return false;
         else {
-            log("touch is inside");
+            //log("touch is inside");
             // touch has come in
 
             switch(event.getAction()){
                 case MotionEvent.ACTION_DOWN:
-                    log("down");
+                    //log("down");
                     // no need to move view if animating.
                     if(!isAnimating)
                         xDown = event.getX();
@@ -136,15 +141,16 @@ public class EventMod extends View {
                 case MotionEvent.ACTION_MOVE:
                     // no adjustments if we are animating
                     if(!isAnimating) {
-                        log("moving");
+                        //log("moving");
                         xMove = event.getX();
                         xOffsetTouch = xMove - xDown;
-                        float deltaX = Math.abs(xOffsetTouch);
                         isDragging = true;
                         xText = (int) xOffsetTouch;
-                        log("position of xText == " + xText);
+                        //log("position of xText == " + xText);
                         mHudView.invalidate();
-                        if(xText < CALENDAR_SWIPE_THRESHOLD){
+                        // if finger has dragged forward or backwards enough to instigate a "EventChange"
+                        if(xText < EVENT_FORWARD_THRESHOLD
+                                || xText > EVENT_BACKWARD_THRESHOLD){
                             isAnimating = true;
                             fingerOff();
                         }
@@ -176,20 +182,21 @@ public class EventMod extends View {
 
 
     private void fingerOff() {
-        log("finger off and I was dragging = " + isDragging);
+        //log("finger off and I was dragging = " + isDragging);
         if(isDragging){
             isDragging = false;
             // View was dragged far enough to animate into the next Event.
-            if(xText < CALENDAR_SWIPE_THRESHOLD ){
-                Log.d("Threshold", "met");
+            if(xText < EVENT_FORWARD_THRESHOLD ){
+                //log("next Event forward");
                 animateChangeInEvent(true);
                 return;
 
             }
             // finger went far enough to go backwards
-            else if(xText > mHudView.getWidth()/2){
+            else if(xText > EVENT_BACKWARD_THRESHOLD){
                 log("next Event backwards.");
                 animateChangeInEvent(false);
+                return;
             }
 
 
@@ -200,18 +207,17 @@ public class EventMod extends View {
                 xDown = 0;
                 xMove = 0;
 
-                x = mContext.getWallpaperDesiredMinimumWidth()/10;
-                y = (int)mHudView.getTopOfHud()+10;
-                xText= x;
+                xText= X_ORIGINAL_POSITION;
 
                 mHudView.invalidate();
                 return;
             }
 
         }
-        x = mContext.getWallpaperDesiredMinimumWidth()/10;
-        y = (int)mHudView.getTopOfHud()+10;
-        xText= x;
+        // was not dragging bring the xText back.
+        else{
+            xText= X_ORIGINAL_POSITION;
+        }
 
 
     }
@@ -221,27 +227,44 @@ public class EventMod extends View {
      * @param nextForwardEvent - tell us if we are going forward with next event, or backwards with previous event.
      */
     private void animateChangeInEvent(final boolean nextForwardEvent) {
+        // set these based on the user's gesture
         float destination = 0;
         float from = 0;
-        //TODO #1 test this out.
-        // so we are getting next Event and moving the view from right to left.
+        int duration = 500;
+
+        // get next Event and moving the view from right to left.
         if(nextForwardEvent){
-            destination = x;
+            destination = X_ORIGINAL_POSITION;
             from = mContext.getWallpaperDesiredMinimumWidth();
         }
         // get previous Event and move the view from left to right.
         else {
-            from = x;
-            destination = mContext.getWallpaperDesiredMinimumWidth()-100;
+            from = -500;
+            destination = X_ORIGINAL_POSITION;
         }
+
+        isAnimating = true;
+        animateEventChange(from, destination, duration, nextForwardEvent);
+
+    }
+
+    /**
+     *
+     * @param from - position we will be animating from.
+     * @param destination - position we will be animating to.
+     * @param duration - the time it will take for animation to be complete, indirectly effects speed of animation as well.
+     * @param nextForwardEvent - true = fetch next Event; false = fetch prior Event.
+     */
+    private void animateEventChange(float from, float destination, int duration, final boolean nextForwardEvent) {
 
         ValueAnimator animator = ValueAnimator.ofFloat(from, destination);
 
-        log("Event Index we are using is " + mEventIndex);
+        //log("Event Index we are using is " + mEventIndex);
         // It will take 1000ms for the animator to go from the width of the canvas to the
+
         // original position.
-        animator.setDuration(500); // .5 second
-        isAnimating = true;
+        animator.setDuration(duration); // .5 second
+
         // Callback that executes on animation steps.
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             boolean alreadySetEvent = false;
@@ -249,41 +272,65 @@ public class EventMod extends View {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = ((Float) (animation.getAnimatedValue())).floatValue();
                 //Log.d("ValueAnimator", "value=" + value);
-                if(!alreadySetEvent) {
-                   //TODO this is where i would dump this conditional - if(nextForwardEvent)
+                while(!alreadySetEvent) {
                     // dont want to do this more than once.
                     alreadySetEvent = true;
-                    log("current Event Size = " + mHudView.getEventSize());
-                    if (mHudView.getEventSize() > eventIndex + 1) {
-                        log("next Event");
-                        eventIndex += 1;
-                        setNextEvent(eventIndex);
+
+                    // Next Event
+                    if(nextForwardEvent){
+                        // lets set the new events while we animate.
+//                        log("current Event Size = " + mHudView.getEventSize());
+                        if (mHudView.getEventSize() > eventIndex + 1) {
+  //                          log("next Event");
+                            eventIndex += 1;
+                            setNextEvent(eventIndex);
+                        }
+                        // we have reached out limit and we want now to go back
+                        // to original position
+                        else {
+    //                        log("first event");
+                            eventIndex = 0;
+                            setNextEvent(eventIndex);
+                        }
                     }
-                    // we have reached out limit and we want now to go back
-                    // to original position
+                    // Prior Event
                     else {
-                        log("first event");
-                        eventIndex = 0;
-                        setNextEvent(eventIndex);
+                        // lets set the new events while we animate.
+               //         log("current Event Size = " + mHudView.getEventSize());
+                        if (eventIndex - 1 > 0) {
+                 //           log("next Event");
+                            eventIndex -= 1;
+                            setNextEvent(eventIndex);
+                        }
+                        // we have reached out limit and we want now to go back
+                        // to original position
+                        else {
+             //               log("first event");
+                            eventIndex = mHudView.getEventSize();
+                            setNextEvent(eventIndex);
+                        }
                     }
                 }
-                xText = value;
-                mHudView.invalidate();
+                 xText = value;
+                 mHudView.invalidate();
+
                 // we have finished.
-                if (value <= x) {
-                    log("animation done");
+                if (value == X_ORIGINAL_POSITION) {
+                    //log("animation done");
+                    // reset values
                     isDragging = false;
                     xDown = 0;
                     xMove = 0;
-                    xText = x;
+                    xText = X_ORIGINAL_POSITION;
                     isAnimating = false;
                     mHudView.invalidate();
                 }
+
             }
-
-
         });
-        log("animation start");
+
+        //log("animation start");
+
         animator.start();
     }
 
@@ -292,8 +339,8 @@ public class EventMod extends View {
     public void draw(Canvas canvas) {
         super.draw(canvas);
         //canvas.drawRect(locationRect, mPaint);
-        canvas.drawText(mEventInfo, xText, y + textSize, mPaint);
-        canvas.drawText(mEventTitle, xText, y + (textSize*2), mPaint);
+        canvas.drawText(mEventInfo, xText, Y_ORIGINAL_POSITION + textSize, mPaint);
+        canvas.drawText(mEventTitle, xText, Y_ORIGINAL_POSITION + (textSize * 2), mPaint);
     //        canvas.drawText(mEventDesc, xText, y + (textSize * 3), mPaint);
         }
 
@@ -313,19 +360,29 @@ public class EventMod extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    private void cancelLoadMeetingTask() {
-        if (mLoadMeetingTask != null) {
-            mLoadMeetingTask.cancel(true);
-        }
+    /**
+     * Called by the HudView
+     */
+    public void initASyncTask(){
+        mLoadMeetingTask = null;
+        mLoadMeetingTask = new LoadMeetingTask(mContext, EventMod.this, mHudView);
+        mLoadMeetingTask.execute();
     }
+    /**
+     * Called by the HudView
+     */
+    public void cancelTasks() {
+        mLoadMeetingTask.cancel(true);
+    }
+
     public void justAdded() {
         //log("mLoadMeetingTask status = " + mLoadMeetingTask.getStatus().toString());
         // lets fetch new events if we got any
-        xText = x;
+        xText = X_ORIGINAL_POSITION;
     }
     public int setNextEvent(int index) {
-        log("setNextEvent");
-        isTaskRunning = false;
+        //log("setNextEvent");
+        //isTaskRunning = false;
         if(mHudView.getEventSize() > index){// calendar[0] = Wed
 
             String dayOfMonth = mHudView.getEvent(index).dayOfMonth;
@@ -361,27 +418,15 @@ public class EventMod extends View {
 
             mEventIndex = 0;
         }
-        log("mEvents.size = " + mHudView.getEventSize());
-        log("return " + mEventIndex);
+        //log("mEvents.size = " + mHudView.getEventSize());
+        //log("return " + mEventIndex);
         mHudView.invalidate();
         return mEventIndex;
-
-    }
-
-    public void cancelTasks() {
-        mLoadMeetingTask.cancel(true);
-    }
-
-    public void LoadingMeetingsDone() {
 
     }
 
     public int getEventsSize() {
         return mHudView.getEventSize();
     }
-
-
-
-
 
 }

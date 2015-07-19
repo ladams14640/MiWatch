@@ -65,20 +65,38 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
 
     public HudView(Context context, boolean isRound, MiDigitalWatchFace.Engine engine) {
         super(context);
+
         mContext = context;
         setOnTouchListener(this);
         mEngine = engine;
-        w =mEngine.getWidth();
+
+
+        w = mEngine.getWidth();
         h = mEngine.getHeight();
+
         mRect= new Rect((int)x,(int)y,(int)w,(int)h);
 
         this.isRound = isRound;
 
+        initPaint();
+
+        mEvents = new ArrayList<Event>();
+
+        initMods();
+
+    }
+
+    public float getSurfaceWidth(){
+        return w;
+    }
+
+    private void initPaint() {
         mTestPaint = new Paint();
         mTestPaint.setColor(getResources().getColor(R.color.digital_time_blue));
         mTestPaint.setAlpha(100);
-        // if the screen is round than we need these values further over
-        mEvents = new ArrayList<Event>();
+    }
+
+    private void initMods() {
         if(isTimer){
             mTimerMod = new TimerMod(mContext,this);
         }
@@ -92,6 +110,7 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
             mEventMod = new EventMod(mContext, this);
         }
     }
+
     public boolean isRound(){
         return isRound;
     }
