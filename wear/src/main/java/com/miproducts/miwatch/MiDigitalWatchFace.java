@@ -59,8 +59,10 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.hud.HudView;
+import com.miproducts.miwatch.mods.DateMod;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.ConverterUtil;
+import com.miproducts.miwatch.utilities.ModPositionFunctions;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.util.Calendar;
@@ -87,6 +89,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
     public Engine onCreateEngine() {
         return new Engine();
     }
+
+
 
     public class Engine extends CanvasWatchFaceService.Engine implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
         static final int MSG_UPDATE_TIME = 0;
@@ -164,12 +168,6 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         float yPositionForTime;
         float xPositionForTime;
 
-        float yPositionForDayOfMonth;
-        float xPositionForDayOfMonth;
-
-        float yPositionForDayOfWeek;
-        float xPositionForDayOfWeek;
-
         // get the day of week and day of month
         String[] dayOfWeekAndDayOfMonth;
         String dayOfWeek;
@@ -183,6 +181,10 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
         boolean isHudDisplaying = false;
         boolean isPeakCardPeaking = false;
+        // Date
+        DateMod mDateMod;
+
+
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
@@ -240,18 +242,12 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
         private void setPositionForWatchfaceObjects() {
             // Time
-            xPositionForTime = (getWallpaperDesiredMinimumWidth() / 2) - (getWallpaperDesiredMinimumWidth() / 10);
+            xPositionForTime = ModPositionFunctions.getLeftTimerPosition(getWallpaperDesiredMinimumWidth());
 
             SettingsManager sm = new SettingsManager(mContext);
             sm.writeToPreferences(SettingsManager.DIGITAL_TIME_X, (int)xPositionForTime);
 
-            yPositionForTime = 115;
-            // Day
-            xPositionForDayOfMonth = getWallpaperDesiredMinimumWidth() / 5;
-            yPositionForDayOfMonth = yPositionForTime;
-            // Date
-            xPositionForDayOfWeek = getWallpaperDesiredMinimumWidth() / 5;
-            yPositionForDayOfWeek = yPositionForTime - 35;
+            yPositionForTime = ModPositionFunctions.getTopTimerPosition(getWallpaperDesiredMinimumHeight());
         }
 
         private void setCalendar() {
@@ -335,6 +331,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
                 // Update time zone in case it changed while we weren't visible.
                 setCalendar();
+                // reset DateMod so its fresh.
+                mDateMod = null;
                 addHudView();
                 if (mHudView.isEventModActive()) {
                     mHudView.initEventSyncTask();
@@ -448,7 +446,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
-            //log("onDraw");
+
             mDayTimeDateCalendar.setTimeInMillis(System.currentTimeMillis());
             // Draw the background.
             canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
@@ -459,9 +457,13 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
 
             canvas.drawText(ConverterUtil.normalizeHour(hour) + ":" + ConverterUtil.normalizeMinute(minute), xPositionForTime, yPositionForTime, mDigitalPaint);
-            canvas.drawText(dayOfWeek, xPositionForDayOfWeek, yPositionForDayOfWeek, mDigitalDayOfWeekPaint);
 
-            canvas.drawText(dayOfMonth, xPositionForDayOfMonth, yPositionForDayOfMonth, mDigitalDayOfMonthPaint);
+            if(mDateMod == null){
+                mDateMod = new DateMod(mContext, MiDigitalWatchFace.this, dayOfMonth, dayOfWeek);
+            }else {
+                mDateMod.draw(canvas);
+            }
+
 
             if (isHudDisplaying && !isPeakCardPeaking)
                 mHudView.draw(canvas);

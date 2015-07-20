@@ -15,6 +15,7 @@ import com.miproducts.miwatch.mods.*;
 import com.miproducts.miwatch.mods.DegreeMod;
 import com.miproducts.miwatch.mods.FitnessMod;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.ModPositionFunctions;
 
 /**
  * Created by ladam_000 on 7/19/2015.
@@ -26,17 +27,25 @@ public class WatchFaceSurfaceViewConfig extends SurfaceView {
     private SurfaceHolder surfaceHolder;
     private SurfaceThread stThread;
 
+    private Context mContext;
+
     // mods
-    private DateViews mDateViews;
     //private HudView mHudView;
-    private DigitalTimer mDigitalTimer;
+    //private DigitalTimer mDigitalTimer;
 
     private int width = 0, height = 600;
 
-
+    private PickingMod mDigitalTimer;
+    private PickingMod mDate;
+    private PickingMod mAlarm;
+    private PickingMod mEvent;
+    private PickingMod mFitness;
+    private PickingMod mDegrees;
 
     public WatchFaceSurfaceViewConfig(Context context) {
         super(context);
+        mContext = context;
+
         init();
 
     }
@@ -83,12 +92,7 @@ public class WatchFaceSurfaceViewConfig extends SurfaceView {
         return height;
     }
     private void initMods() {
-       // mHudView = new HudView(getContext(),this);
-        mDateViews = new DateViews(getContext(), this);
-        mDigitalTimer = new DigitalTimer(getContext(), this);
-
-
-    }
+          }
 
     protected void drawSomething(Canvas canvas) {
 
@@ -96,14 +100,29 @@ public class WatchFaceSurfaceViewConfig extends SurfaceView {
             if(width == 0){
                 width = canvas.getWidth();
                 height = canvas.getHeight();
-            }
-            // background
-            canvas.drawColor(Color.BLACK);
 
-            // Hud
-            //mHudView.draw(canvas);
-            mDateViews.draw(canvas);
-            mDigitalTimer.draw(canvas);
+                mDigitalTimer = new PickingMod(getContext(),this,
+                        // left wall
+                        ModPositionFunctions.getLeftTimerPosition(width),
+                        // top wall
+                        ModPositionFunctions.getTopTimerPosition(height),
+                        // ID
+                        Consts.DIGITAL_TIMER);
+
+                mDate = new PickingMod(getContext(), this,
+                        ModPositionFunctions.getLeftDatePosition(width),
+                        ModPositionFunctions.getTopDatePosition(height),
+                        Consts.DATE);
+            }{
+                // background
+                canvas.drawColor(Color.BLACK);
+
+                // Hud
+                //mHudView.draw(canvas);
+                mDigitalTimer.draw(canvas);
+                mDate.draw(canvas);
+
+            }
         }
 
     }

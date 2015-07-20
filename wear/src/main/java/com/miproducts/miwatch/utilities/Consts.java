@@ -18,7 +18,7 @@ public class Consts {
     // TIME
     public static final int xTimePosition = canvasWidth/2;
     public static final int yTimePosition = 142;
-    public static final int sizeDigitalTime = 50;
+    public static final int sizeDigitalTime = 75;
     // EVENT
     public static final int xEventPosition = 57;
     public static final int yEventPosition = (int) (canvasHeight * (.4));
