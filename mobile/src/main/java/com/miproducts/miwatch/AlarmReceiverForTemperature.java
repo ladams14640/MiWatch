@@ -63,7 +63,7 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
             AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 
             Calendar instance = Calendar.getInstance();
-            instance.add(Calendar.SECOND, 30);
+            instance.add(Calendar.MINUTE, 30);
 
             alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
             if(!repeat){
