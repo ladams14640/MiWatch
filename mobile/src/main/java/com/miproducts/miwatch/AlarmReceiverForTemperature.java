@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -63,18 +64,14 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
             AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 
             Calendar instance = Calendar.getInstance();
-            instance.add(Calendar.MINUTE, 30);
 
-            alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
-            if(!repeat){
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 300000, 300000, pendingIntent);            if(!repeat){
                 Log.d("received Alarm", "cancel temperature alarm fetch");
                 alarmManager.cancel(pendingIntent);
             }else {
                 Log.d("received Alarm", "keep temperature alarm fetch");
 
             }
-            //Toast.makeText(mContext, "received Alarm", Toast.LENGTH_LONG).show();
-           // Log.i("DISPLAY ALL", "ALARM SET UP");
 
     }
 

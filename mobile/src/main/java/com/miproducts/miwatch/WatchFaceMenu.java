@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -142,11 +143,9 @@ public class WatchFaceMenu  {
         AlarmManager alarmManager = (AlarmManager)mActivity.getSystemService(Context.ALARM_SERVICE);
 
         Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.SECOND, 20);
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
-        //Toast.makeText(mActivity, "Start Alarm", Toast.LENGTH_LONG).show();
-        //Log.i("DISPLAY ALL", "ALARM SET UP");
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 300000, 300000, pendingIntent);
+
     }
 
 
