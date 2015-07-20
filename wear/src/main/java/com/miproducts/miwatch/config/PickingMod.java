@@ -39,6 +39,8 @@ public class PickingMod extends Mods implements CustomizedMods {
 
     // incase an ID of timer is passed
     DigitalTimer mDigitalTimer;
+    // incase an ID of date is passed
+   // DateViews mDate;
 
     /**
      *
@@ -65,6 +67,9 @@ public class PickingMod extends Mods implements CustomizedMods {
 
         if(ID == Consts.DIGITAL_TIMER){
             mDigitalTimer = new DigitalTimer(getContext(),svView, leftBorder, topBorder);
+        }
+        else if(ID == Consts.DATE){
+          //  mDate = new DateViews(getContext(),svView);
         }
 
         drawRectBorder();
