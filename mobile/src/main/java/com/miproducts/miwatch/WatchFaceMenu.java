@@ -136,17 +136,17 @@ public class WatchFaceMenu  {
     private void setAlarmToFetchDegreesIn30() {
         // lets setup the alarm to run and post the degrees
         Intent intent = new Intent(mActivity, AlarmReceiverForTemperature.class);
-        intent.putExtra(Consts.KEY_ALARM_REPEAT, false);
+        intent.putExtra(Consts.KEY_ALARM_REPEAT, true);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mActivity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager)mActivity.getSystemService(Context.ALARM_SERVICE);
 
         Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.MINUTE, 30);
+        instance.add(Calendar.SECOND, 20);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
         //Toast.makeText(mActivity, "Start Alarm", Toast.LENGTH_LONG).show();
-        Log.i("DISPLAY ALL", "ALARM SET UP");
+        //Log.i("DISPLAY ALL", "ALARM SET UP");
     }
 
 

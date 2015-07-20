@@ -147,7 +147,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private void setAlarmFetchForOnce() {
         // lets setup the alarm to run and post the degrees
         Intent intent = new Intent(MiDigitalWatchFaceCompanionConfigActivity.this, AlarmReceiverForTemperature.class);
-        intent.putExtra(Consts.KEY_ALARM_REPEAT, true);
+        intent.putExtra(Consts.KEY_ALARM_REPEAT, false);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MiDigitalWatchFaceCompanionConfigActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager)MiDigitalWatchFaceCompanionConfigActivity.this.getSystemService(Context.ALARM_SERVICE);
@@ -156,7 +156,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         instance.add(Calendar.SECOND, 3);
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
-        Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Start Alarm", Toast.LENGTH_LONG).show();
+        //Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Start Alarm", Toast.LENGTH_LONG).show();
         Log.i("DISPLAY ALL", "ALARM SET UP");
     }
 

@@ -44,32 +44,37 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
                 .addApi(Wearable.API)
                 .build();
 
+        // if so then we repeat
+        boolean repeat = intent.getBooleanExtra(Consts.KEY_ALARM_REPEAT, false);
+
+        setRepeatAlarm(repeat);
+
         getTemp();
-        if(intent.getBooleanExtra("DONT_REPEAT", false)){
-
-        }
-        // came from activity to not continue to repeat.
-        else {
-            setRepeatAlarm();
-
-        }
 
     }
 
-    private void setRepeatAlarm() {
+    private void setRepeatAlarm(boolean repeat) {
             // lets setup the alarm to run and post the degrees
             Intent intent = new Intent(mContext, AlarmReceiverForTemperature.class);
 
+            intent.putExtra(Consts.KEY_ALARM_REPEAT, repeat);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 
             Calendar instance = Calendar.getInstance();
-            instance.add(Calendar.MINUTE, 30);
+            instance.add(Calendar.SECOND, 30);
 
             alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
-            Toast.makeText(mContext, "Start Alarm", Toast.LENGTH_LONG).show();
-            Log.i("DISPLAY ALL", "ALARM SET UP");
+            if(!repeat){
+                Log.d("received Alarm", "cancel temperature alarm fetch");
+                alarmManager.cancel(pendingIntent);
+            }else {
+                Log.d("received Alarm", "keep temperature alarm fetch");
+
+            }
+            //Toast.makeText(mContext, "received Alarm", Toast.LENGTH_LONG).show();
+           // Log.i("DISPLAY ALL", "ALARM SET UP");
 
     }
 
@@ -103,6 +108,7 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
 
         @Override
         protected void onPostExecute(String result) {
+            Toast.makeText(mContext, "Fahrenheit = " + tempInFah, Toast.LENGTH_SHORT).show();
 
 
             Log.d(TAG, "onPostExecute");
@@ -112,36 +118,17 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
             int indexInt = result.indexOf("temp");
             int begOfTempValue = indexInt+6;
             int endOfTempValue = result.indexOf(",", begOfTempValue);
+
             String temperatureInCelsius = result.substring(begOfTempValue, endOfTempValue);
+
             // temperature in Fahrenheit
             int tempInCels = (int) ConverterUtil.convertKelvinToCelsiusconvertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
             Log.d(TAG, "Celsius = "+ tempInCels);
+
             // TODO atm this sends the temperature results to the MainCompanionActivity - we want to
             //TODO change this so we can do it regardless if application on phone is on.
             tempInFah = ConverterUtil.convertCelsiusToFahrenheit(tempInCels);
             Log.d(TAG, "Fahrenheit = " + tempInFah);
-
-
-            // TODO if I can make a AlarmManager that wakes up the CompanionConfigActivity then we can
-            // TODO remove all of this down to end of function, because we will handle it this way.
-            /*
-            // lets wake up Companion
-            Intent intent = new Intent(getApplicationContext(), MiDigitalWatchFaceCompanionConfigActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    getApplicationContext(),
-                    PENDING_INTENT_ID,
-                    intent,
-                    PendingIntent.FLAG_CANCEL_CURRENT);
-
-            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500, pendingIntent); // half a sec
-            */
-            // TODO if I can make a AlarmManager that wakes up the CompanionConfigActivity then we can
-            // TODO remove all of this down to end of function, because we will handle it this way.
-
-
 
             /**/
             // WE ARE DOING 2 THINGS:

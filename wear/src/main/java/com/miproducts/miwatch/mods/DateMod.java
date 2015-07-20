@@ -35,8 +35,6 @@ public class DateMod extends View implements CustomizedMods{
     private Context mContext;
 
     private int x, y;
-    private String dateOfWeek = "Sun";
-    private String dateOfMonth = "05";
 
     private Paint pDateOfWeek;
     private Paint pDateOfMonth;
@@ -110,8 +108,8 @@ public class DateMod extends View implements CustomizedMods{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawText(dateOfWeek, x, y-textSize, pDateOfWeek);
-        canvas.drawText(dateOfMonth, x, y, pDateOfMonth);
+        canvas.drawText(dayOfWeek, x, y-textSize, pDateOfWeek);
+        canvas.drawText(dayOfMonth, x, y, pDateOfMonth);
         // canvas.drawRect(mSelectRect, pRect);
 
 
