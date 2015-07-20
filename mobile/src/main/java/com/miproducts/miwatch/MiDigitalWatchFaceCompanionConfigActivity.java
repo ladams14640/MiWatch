@@ -1,7 +1,9 @@
 package com.miproducts.miwatch;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.wearable.companion.WatchFaceCompanion;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -25,6 +28,8 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.utilities.Consts;
+
+import java.util.Calendar;
 
 /**
  * Created by larry on 7/2/15.
@@ -109,6 +114,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        setAlarmFetchForOnce();
 
     }
 
@@ -138,7 +144,21 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
 
 
+    private void setAlarmFetchForOnce() {
+        // lets setup the alarm to run and post the degrees
+        Intent intent = new Intent(MiDigitalWatchFaceCompanionConfigActivity.this, AlarmReceiverForTemperature.class);
+        intent.putExtra(Consts.KEY_ALARM_REPEAT, true);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MiDigitalWatchFaceCompanionConfigActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        AlarmManager alarmManager = (AlarmManager)MiDigitalWatchFaceCompanionConfigActivity.this.getSystemService(Context.ALARM_SERVICE);
+
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.SECOND, 3);
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
+        Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Start Alarm", Toast.LENGTH_LONG).show();
+        Log.i("DISPLAY ALL", "ALARM SET UP");
+    }
 
 
 

@@ -94,4 +94,6 @@ public class Consts {
  //   public static final String
 
 
+    public static final String KEY_ALARM_REPEAT = "DONT_REPEAT";
+
 }

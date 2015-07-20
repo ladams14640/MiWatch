@@ -1,5 +1,9 @@
 package com.miproducts.miwatch;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -9,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.wearable.DataApi;
@@ -22,6 +27,7 @@ import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.MenuPackageUtility;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -114,6 +120,9 @@ public class WatchFaceMenu  {
                             //Requires a new thread to avoid blocking the UI
                             new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
                             //log("surface starts at " + mActivity.getSurfaceX());
+
+
+                            setAlarmToFetchDegreesIn30();
                         }
                     }
 
@@ -122,6 +131,22 @@ public class WatchFaceMenu  {
                 return false;
             }
         });
+    }
+    // fetch degrees in 30 mins by setting an Alarm to our BroadcastREceiver, AlarmReceiverForTemperature
+    private void setAlarmToFetchDegreesIn30() {
+        // lets setup the alarm to run and post the degrees
+        Intent intent = new Intent(mActivity, AlarmReceiverForTemperature.class);
+        intent.putExtra(Consts.KEY_ALARM_REPEAT, false);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mActivity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager)mActivity.getSystemService(Context.ALARM_SERVICE);
+
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.MINUTE, 30);
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
+        //Toast.makeText(mActivity, "Start Alarm", Toast.LENGTH_LONG).show();
+        Log.i("DISPLAY ALL", "ALARM SET UP");
     }
 
 

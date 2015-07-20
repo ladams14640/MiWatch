@@ -136,12 +136,12 @@ public class DegreeMod extends View {
      * coupled wirth the boolean Allows us to avboid that.
      */
     public void resetTemp() {
-        if(refresh == true){
+       // if(refresh == true){
             int numTemp = sm.getIntFromPreferences(Consts.DEGREE_REFRESH);
             if(numTemp != 0)
                 temp = Integer.toString(numTemp);
             invalidate();
-        }
+      //  }
     }
 
     public void cancelDisplayRefresh() {
