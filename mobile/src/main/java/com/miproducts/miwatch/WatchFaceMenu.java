@@ -137,14 +137,15 @@ public class WatchFaceMenu  {
     private void setAlarmToFetchDegreesIn30() {
         // lets setup the alarm to run and post the degrees
         Intent intent = new Intent(mActivity, AlarmReceiverForTemperature.class);
+        // tell em to repeat in ALarmReceiverForTemperature
         intent.putExtra(Consts.KEY_ALARM_REPEAT, true);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mActivity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager)mActivity.getSystemService(Context.ALARM_SERVICE);
 
-        Calendar instance = Calendar.getInstance();
+        //Calendar instance = Calendar.getInstance();
 
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 300000, 300000, pendingIntent);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 10000, pendingIntent);
 
     }
 

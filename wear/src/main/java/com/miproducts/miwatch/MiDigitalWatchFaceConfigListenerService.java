@@ -12,9 +12,12 @@ import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
+
+import java.util.List;
 
 /**
  * Created by larry on 7/2/15.
@@ -29,6 +32,7 @@ private static final String TAG = "DigitalListenerService";
         Log.d(TAG, "onConnected: " + bundle);
 
     }
+
 
     @Override
     public void onConnectionSuspended(int cause) {

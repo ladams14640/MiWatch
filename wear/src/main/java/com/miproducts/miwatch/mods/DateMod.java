@@ -108,7 +108,7 @@ public class DateMod extends View implements CustomizedMods{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawText(dayOfWeek, x, y-textSize, pDateOfWeek);
+        canvas.drawText(dayOfWeek, x, y - textSize, pDateOfWeek);
         canvas.drawText(dayOfMonth, x, y, pDateOfMonth);
         // canvas.drawRect(mSelectRect, pRect);
 
@@ -167,5 +167,9 @@ public class DateMod extends View implements CustomizedMods{
 
     public boolean getViewsVisibility() {
         return isVisible;
+    }
+    public void updateDate(String dayOfMonth, String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+        this.dayOfMonth = dayOfMonth;
     }
 }

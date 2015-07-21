@@ -11,8 +11,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.CapabilityApi;
+import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -65,7 +69,7 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
 
             Calendar instance = Calendar.getInstance();
 
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 300000, 300000, pendingIntent);            if(!repeat){
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 10000, 10000, pendingIntent);            if(!repeat){
                 Log.d("received Alarm", "cancel temperature alarm fetch");
                 alarmManager.cancel(pendingIntent);
             }else {
@@ -110,6 +114,8 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
 
             Log.d(TAG, "onPostExecute");
         }
+        boolean changeBoolToUpdateDataLayerNodes = false;
+
         private String sendHttpRequest() {
             String result = httpClient.getWeatherData("Biddeford");
             int indexInt = result.indexOf("temp");
@@ -119,7 +125,7 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
             String temperatureInCelsius = result.substring(begOfTempValue, endOfTempValue);
 
             // temperature in Fahrenheit
-            int tempInCels = (int) ConverterUtil.convertKelvinToCelsiusconvertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
+            int tempInCels = (int) ConverterUtil.convertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
             Log.d(TAG, "Celsius = "+ tempInCels);
 
             // TODO atm this sends the temperature results to the MainCompanionActivity - we want to
@@ -135,6 +141,11 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
             DataMap dataMap = new DataMap();
             // going to continue using the broadcast KEY, it is unique after in DataApi.
             dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, tempInFah);
+
+            // change value to get new responses
+            changeBoolToUpdateDataLayerNodes = !changeBoolToUpdateDataLayerNodes;
+
+            dataMap.putBoolean("DUMMY_KEY", changeBoolToUpdateDataLayerNodes);
             // send off to wearable - listener over there will be listening.
             new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
 
@@ -151,9 +162,6 @@ public class AlarmReceiverForTemperature extends BroadcastReceiver{
         }
 
     }
-
-
-
     class SendToDataLayerThread extends Thread {
         String path;
         DataMap dataMap;

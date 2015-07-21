@@ -69,6 +69,12 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+
+//TODO send message for the updates, because once the App stops showing it no longer posts the new info in datalayer, so maybe it wil to message,
+// it will continue to run in the background and get the data, but it wont post it to the datalayer
+// so if we just send it through a message maybe then it will actually send it and our watchface then can receive it.
+//http://android-wear-docs.readthedocs.org/en/latest/sync.html
+
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
@@ -139,11 +145,14 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             }
         };
 
+        // It is the MiDigitalWatchFaceConfigListenerService who sends out a broadcast to this, after it
+        // stores the degrees in the @SettingsManager Preference.
         final BroadcastReceiver brDegreeRefresh = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (isHudDisplaying && !isPeakCardPeaking) {
                     log("refreshing Degrees from MiDigitalWatchfaceBroadcast");
+                    // this will eventually tell Degree to grab its degrees from the Preference (@SettingsManager)
                     mHudView.resetTemp();
                 }
             }
@@ -332,7 +341,6 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                 // Update time zone in case it changed while we weren't visible.
                 setCalendar();
                 // reset DateMod so its fresh.
-                mDateMod = null;
                 addHudView();
                 if (mHudView.isEventModActive()) {
                     mHudView.initEventSyncTask();
@@ -459,8 +467,11 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             canvas.drawText(ConverterUtil.normalizeHour(hour) + ":" + ConverterUtil.normalizeMinute(minute), xPositionForTime, yPositionForTime, mDigitalPaint);
 
             if(mDateMod == null){
+                // make new object
                 mDateMod = new DateMod(mContext, MiDigitalWatchFace.this, dayOfMonth, dayOfWeek);
             }else {
+                // just pump new values here, incase they changed.
+                mDateMod.updateDate(dayOfMonth, dayOfWeek);
                 mDateMod.draw(canvas);
             }
 
