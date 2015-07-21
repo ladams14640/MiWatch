@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.support.wearable.companion.WatchFaceCompanion;
@@ -26,10 +27,17 @@ import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
+import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by larry on 7/2/15.
@@ -51,15 +59,15 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         setContentView(R.layout.main_activity);
         initLayout();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+       mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
 
-
+        // notified by ConfigListener that temp is requested. - not used anymore - was for degrees on watch to instigate temop change
         brDegree = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                log("Temperature is = " + intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0));
+                log("brDegree - Temperature is = " + intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0));
                 int temp = intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0);
                 DataMap dataMap = new DataMap();
                 // going to continue using the broadcast KEY, it is unique after in DataApi.
@@ -68,6 +76,10 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
                 svMenu.sendOutDataToWearable(dataMap);
             }
         };
+
+        // lets get the current temperature and send it to wearable
+        getTemp();
+
     }
 
     private void initLayout() {
@@ -75,13 +87,124 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         svMenu = new WatchFaceMenu(this);
     }
 
+
+    // #################### TEMPERATURE STARTS
+
+    private void getTemp() {
+        JSONWeatherTask task = new JSONWeatherTask();
+        task.execute();
+    }
+
+
+    int tempInFah;
+
+
+    public class JSONWeatherTask extends AsyncTask<String,Void,String> {
+        WeatherHttpClient httpClient;
+        public JSONWeatherTask(){
+            httpClient = new WeatherHttpClient();
+            Log.d(TAG, "Made");
+        }
+
+        private static final String TAG = "JSONWeatherTask";
+
+        @Override
+        protected String doInBackground(String... params) {
+            Log.d(TAG, "BackGround");
+
+            String data = String.valueOf(sendHttpRequest());
+            return data;
+        }
+
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(getApplicationContext(), "Temperature " + tempInFah, Toast.LENGTH_SHORT).show();
+
+
+            Log.d(TAG, "onPostExecute");
+        }
+        private int sendHttpRequest() {
+            // get the JSON GEOLOCATION TEMP DETAILS
+            String result = httpClient.getWeatherData("Biddeford");
+            // parse the temp value
+            int indexInt = result.indexOf("temp");
+            int begOfTempValue = indexInt+6;
+            int endOfTempValue = result.indexOf(",", begOfTempValue);
+            // Kelvin version
+            String temperatureInCelsius = result.substring(begOfTempValue, endOfTempValue);
+            // Celsius version
+            int tempInCels = (int) ConverterUtil.convertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
+            // Fernheit
+            tempInFah = ConverterUtil.convertCelsiusToFahrenheit(tempInCels);
+
+            // send out to the dataLayer
+            DataMap dataMap = new DataMap();
+            // going to continue using the broadcast KEY, it is unique after in DataApi.
+            dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, tempInFah);
+            // send off to wearable - listener over there will be listening.
+            new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
+            return tempInFah;
+        }
+
+    }
+
+
+
+    class SendToDataLayerThread extends Thread {
+        String path;
+        DataMap dataMap;
+
+        // Constructor for sending data objects to the data layer
+        SendToDataLayerThread(String p, DataMap data) {
+            path = p;
+            dataMap = data;
+
+        }
+
+        public void run() {
+            if (mGoogleApiClient != null) {
+                log("mGoogle != null!");
+                mGoogleApiClient.blockingConnect(5, TimeUnit.SECONDS);
+
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                for (Node node : nodes.getNodes()) {
+
+                    // Construct a DataRequest and send over the data layer
+                    PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                    putDMR.getDataMap().putAll(dataMap);
+                    PutDataRequest request = putDMR.asPutDataRequest();
+                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApiClient, request).await();
+                    if (result.getStatus().isSuccess()) {
+                        Log.d(TAG, "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
+                    } else {
+                        // Log an error
+                        Log.d(TAG, "ERROR: failed to send DataMap");
+                    }
+                }
+            }else {
+                log("mGoogle == null!");
+            }
+        }
+    }
+
+
+
+// #################### TEMPERATURE ENDS
+
+
+
+
+
+
+
+
+
+
     @Override
     protected void onStart() {
         super.onStart();
-
-        if(mGoogleApiClient != null && !mGoogleApiClient.isConnected()){
-            mGoogleApiClient.connect();
-        }
 
         initReceivers();
         svView.threadRun(true);
@@ -89,16 +212,12 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
 
     private void initReceivers() {
-
         registerReceiver(brDegree, new IntentFilter(Consts.BROADCAST_DEGREE));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
         unregisterReceiver(brDegree);
     }
 
@@ -111,54 +230,13 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-        setAlarmFetchForOnce();
 
     }
 
 
 
 
-    private void displayNoConnectedDeviceDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        String messageText = "No Device";
-        String okText = "No Device Connected";
-        builder.setMessage(messageText)
-                .setCancelable(false)
-                .setPositiveButton(okText, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
 
-
-
-
-    public float getSurfaceX(){
-        return svView.getCanvasX();
-    }
-
-
-
-    private void setAlarmFetchForOnce() {
-        // lets setup the alarm to run and post the degrees
-        Intent intent = new Intent(MiDigitalWatchFaceCompanionConfigActivity.this, AlarmReceiverForTemperature.class);
-        intent.putExtra(Consts.KEY_ALARM_REPEAT, false);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MiDigitalWatchFaceCompanionConfigActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager alarmManager = (AlarmManager)MiDigitalWatchFaceCompanionConfigActivity.this.getSystemService(Context.ALARM_SERVICE);
-
-        Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.SECOND, 3);
-
-        alarmManager.set(AlarmManager.RTC_WAKEUP, instance.getTimeInMillis(), pendingIntent);
-        //Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Start Alarm", Toast.LENGTH_LONG).show();
-        Log.i("DISPLAY ALL", "ALARM SET UP");
-    }
 
 
 
@@ -172,12 +250,6 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     }
 
 
-
-
-
-    public GoogleApiClient getApiClient(){
-        return mGoogleApiClient;
-    }
 
     /**
      * Called by WatchFaceSurfaceView, when an individual View tells the Surface View it has been
@@ -249,10 +321,5 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private void log(String s) {
         Log.d(TAG, s);
         //init();
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mGoogleApiClient.connect();
     }
 }

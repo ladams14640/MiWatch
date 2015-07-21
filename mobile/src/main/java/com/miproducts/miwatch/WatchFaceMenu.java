@@ -115,15 +115,22 @@ public class WatchFaceMenu  {
                             //oscillate = !oscillate;
                             //dataMap.putBoolean("DUMMY TO MAKE SURE ITS ALWAYS FRESH", oscillate);
 
-                            // send out all the user's choices to the node. To be picked up by the watch on it's node.
-                            mMenuPackageUtility.handleAllPackaging(dataMap);
+                            // store all of the view's properties in the datamap before sending it off.
+                            //mMenuPackageUtility.handleAllPackaging(dataMap);
 
-                            //Requires a new thread to avoid blocking the UI
-                            new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
+                            // Requires a new thread to avoid blocking the UI
+                            //new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
                             //log("surface starts at " + mActivity.getSurfaceX());
 
 
-                            setAlarmToFetchDegreesIn30();
+                            //setAlarmToFetchDegreesIn30();
+
+
+
+
+                            // Not sure if I want to send Data from here - lets try a service that does it
+                            //Intent intent = new Intent(mActivity, WeatherPostingService.class);
+                           // mActivity.startService(intent);
                         }
                     }
 
@@ -133,21 +140,7 @@ public class WatchFaceMenu  {
             }
         });
     }
-    // fetch degrees in 30 mins by setting an Alarm to our BroadcastREceiver, AlarmReceiverForTemperature
-    private void setAlarmToFetchDegreesIn30() {
-        // lets setup the alarm to run and post the degrees
-        Intent intent = new Intent(mActivity, AlarmReceiverForTemperature.class);
-        // tell em to repeat in ALarmReceiverForTemperature
-        intent.putExtra(Consts.KEY_ALARM_REPEAT, true);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mActivity, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        AlarmManager alarmManager = (AlarmManager)mActivity.getSystemService(Context.ALARM_SERVICE);
-
-        //Calendar instance = Calendar.getInstance();
-
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 10000, pendingIntent);
-
-    }
 
 
     /**
@@ -157,6 +150,36 @@ public class WatchFaceMenu  {
     public void sendOutDataToWearable(DataMap dataMap){
         //Requires a new thread to avoid blocking the UI
         new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
+    }
+
+    class SendToDataLayerThread extends Thread {
+        String path;
+        DataMap dataMap;
+
+        // Constructor for sending data objects to the data layer
+        SendToDataLayerThread(String p, DataMap data) {
+            path = p;
+            dataMap = data;
+        }
+/*
+        public void run() {
+            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mActivity.getApiClient()).await();
+            for (Node node : nodes.getNodes()) {
+
+                // Construct a DataRequest and send over the data layer
+                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                putDMR.getDataMap().putAll(dataMap);
+                PutDataRequest request = putDMR.asPutDataRequest();
+           //     DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mActivity.getApiClient(),request).await();
+                if (result.getStatus().isSuccess()) {
+                    Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
+                } else {
+                    // Log an error
+                    Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
+                }
+            }
+        }
+        */
     }
 
 
@@ -220,34 +243,5 @@ public class WatchFaceMenu  {
         etSize.setText(Integer.toString((int) mActivity.getSizeOfView(viewNumber)));
         ibColor.setBackgroundColor(mActivity.getSelectedViewsColor(viewNumber));
         cbVisible.setChecked(mActivity.getViewsVisibility(viewNumber));
-    }
-
-    class SendToDataLayerThread extends Thread {
-        String path;
-        DataMap dataMap;
-
-        // Constructor for sending data objects to the data layer
-        SendToDataLayerThread(String p, DataMap data) {
-            path = p;
-            dataMap = data;
-        }
-
-        public void run() {
-            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mActivity.getApiClient()).await();
-            for (Node node : nodes.getNodes()) {
-
-                // Construct a DataRequest and send over the data layer
-                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
-                putDMR.getDataMap().putAll(dataMap);
-                PutDataRequest request = putDMR.asPutDataRequest();
-                DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mActivity.getApiClient(),request).await();
-                if (result.getStatus().isSuccess()) {
-                    Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
-                } else {
-                    // Log an error
-                    Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
-                }
-            }
-        }
     }
 }

@@ -13,6 +13,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -23,14 +25,15 @@ import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
 import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by ladam_000 on 7/12/2015.
  */
 public class ConfigListenerService extends WearableListenerService
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener, MessageApi.MessageListener {
 
     private static final String TAG = "DigitalListenerService";
-    private static final int PENDING_INTENT_ID = 2;
     private GoogleApiClient mGoogleApi;
 
 
@@ -51,8 +54,6 @@ public class ConfigListenerService extends WearableListenerService
         Log.d(TAG, "onConnectionFailed: " + result);
 
     }
-
-//TODO this will go off wehen the companion sends off some data or when the wearable does.
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         log("onDataChanged");
@@ -101,36 +102,16 @@ public class ConfigListenerService extends WearableListenerService
             int indexInt = result.indexOf("temp");
             int begOfTempValue = indexInt+6;
             int endOfTempValue = result.indexOf(",", begOfTempValue);
+            // temp comes in kelvin
             String temperatureInCelsius = result.substring(begOfTempValue, endOfTempValue);
-            // temperature in Fahrenheit
-            int tempInCels = (int) ConverterUtil.convertKelvinToCelsiusconvertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
+
+            // temp in celsius
+            int tempInCels = (int) ConverterUtil.convertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
             Log.d(TAG, "Celsius = "+ tempInCels);
-            // TODO atm this sends the temperature results to the MainCompanionActivity - we want to
-            //TODO change this so we can do it regardless if application on phone is on.
+
+            // temp in fehreinheit
              tempInFah = ConverterUtil.convertCelsiusToFahrenheit(tempInCels);
             Log.d(TAG, "Fahrenheit = " + tempInFah);
-
-
-           // TODO if I can make a AlarmManager that wakes up the CompanionConfigActivity then we can
-            // TODO remove all of this down to end of function, because we will handle it this way.
-            /*
-            // lets wake up Companion
-            Intent intent = new Intent(getApplicationContext(), MiDigitalWatchFaceCompanionConfigActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    getApplicationContext(),
-                    PENDING_INTENT_ID,
-                    intent,
-                    PendingIntent.FLAG_CANCEL_CURRENT);
-
-            AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500, pendingIntent); // half a sec
-            */
-            // TODO if I can make a AlarmManager that wakes up the CompanionConfigActivity then we can
-            // TODO remove all of this down to end of function, because we will handle it this way.
-
-
 
             /**/
             // send out to the dataLayer
@@ -170,6 +151,7 @@ public class ConfigListenerService extends WearableListenerService
         public void run() {
             if (mGoogleApi != null) {
                 log("mGoogle != null!");
+                mGoogleApi.blockingConnect(5, TimeUnit.SECONDS);
 
                 NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApi).await();
                 for (Node node : nodes.getNodes()) {

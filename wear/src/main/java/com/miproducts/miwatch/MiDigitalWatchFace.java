@@ -53,6 +53,7 @@ import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
@@ -522,7 +523,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
          */
         //TODO read desc and maybe we change that phone requirement.
         public void refreshDegrees(DataMap dataMap) {
-            log("sending to Thread now ");
+            log("sending to Thread now " );
             //Requires a new thread to avoid blocking the UI
             new SendToDataLayerThread(Consts.WEARABLE_TO_PHONE_PATH, dataMap).start();
         }
@@ -546,6 +547,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         class SendToDataLayerThread extends Thread {
             String path;
             DataMap dataMap;
+            String testmsg = "degree";
 
             // Constructor for sending data objects to the data layer
             SendToDataLayerThread(String p, DataMap data) {
@@ -554,21 +556,14 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             }
 
             public void run() {
-                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-                for (Node node : nodes.getNodes()) {
-
                     // Construct a DataRequest and send over the data layer
                     PutDataMapRequest putDMR = PutDataMapRequest.create(path);
                     putDMR.getDataMap().putAll(dataMap);
                     PutDataRequest request = putDMR.asPutDataRequest();
-                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApiClient,request).await();
-                    if (result.getStatus().isSuccess()) {
-                        Log.d("MiDigitalWatchFace", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
-                    } else {
-                        // Log an error
-                        Log.d("MiDigitalWatchFace", "ERROR: failed to send DataMap");
-                    }
-                }
+                    Wearable.DataApi.putDataItem(mGoogleApiClient,request).await();
+
+
+
             }
         }
 
