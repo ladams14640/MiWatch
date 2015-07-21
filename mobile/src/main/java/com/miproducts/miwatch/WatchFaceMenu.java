@@ -100,37 +100,18 @@ public class WatchFaceMenu  {
 
                         // log("enter pressed");
                         if (etSize.getText().toString() != "") {
-
+                            // change the look of the view's sizes.
                             int newValue = Integer.parseInt(etSize.getText().toString());
                             mActivity.ChangeViewSize(newValue, selectedView);
 
                             // Create a DataMap object and send it to the data layer
                             DataMap dataMap = new DataMap();
-                            // TODO need to do this atm, we set it to true by watch, false by this
-                            // TODO this way we can see changes and  track changes for testing
-                            // TODO will need a solution for reseting the value back to false.
-
-                            //TODO no need to set that now - we are
-                            // temp to reset for testing
-                            //oscillate = !oscillate;
-                            //dataMap.putBoolean("DUMMY TO MAKE SURE ITS ALWAYS FRESH", oscillate);
-
                             // store all of the view's properties in the datamap before sending it off.
                             //mMenuPackageUtility.handleAllPackaging(dataMap);
 
                             // Requires a new thread to avoid blocking the UI
                             //new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
-                            //log("surface starts at " + mActivity.getSurfaceX());
 
-
-                            //setAlarmToFetchDegreesIn30();
-
-
-
-
-                            // Not sure if I want to send Data from here - lets try a service that does it
-                            //Intent intent = new Intent(mActivity, WeatherPostingService.class);
-                           // mActivity.startService(intent);
                         }
                     }
 
@@ -161,29 +142,9 @@ public class WatchFaceMenu  {
             path = p;
             dataMap = data;
         }
-/*
-        public void run() {
-            NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mActivity.getApiClient()).await();
-            for (Node node : nodes.getNodes()) {
-
-                // Construct a DataRequest and send over the data layer
-                PutDataMapRequest putDMR = PutDataMapRequest.create(path);
-                putDMR.getDataMap().putAll(dataMap);
-                PutDataRequest request = putDMR.asPutDataRequest();
-           //     DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mActivity.getApiClient(),request).await();
-                if (result.getStatus().isSuccess()) {
-                    Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
-                } else {
-                    // Log an error
-                    Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
-                }
-            }
-        }
-        */
     }
 
 
-    private static final String COUNT_KEY = "com.miproducts.miwatch";
 
     private void log(String s) {
         Log.d(TAG, s);
