@@ -70,8 +70,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-
-//TODO send message for the updates, because once the App stops showing it no longer posts the new info in datalayer, so maybe it wil to message,
+//TODO begin to work back on customizing application. start with setting boolean for when we are in the new activity and when we are in the old.
 // it will continue to run in the background and get the data, but it wont post it to the datalayer
 // so if we just send it through a message maybe then it will actually send it and our watchface then can receive it.
 //http://android-wear-docs.readthedocs.org/en/latest/sync.html
@@ -348,7 +347,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                 }
             } else {
                 if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.disconnect();
+                    //mGoogleApiClient.disconnect();
                 }
                 unregisterReceiver();
                 removeHudView();

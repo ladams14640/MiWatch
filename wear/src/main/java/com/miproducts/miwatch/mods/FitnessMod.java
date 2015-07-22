@@ -28,10 +28,15 @@ public class FitnessMod extends ImageView {
 
     Rect locationRect;
     RectF outerSizeRingRect;
+    RectF innerSizeRingRect;
+    RectF innerInnerSizeRingRect;
+
     private int width = 100;
     private int height = 100;
+
     private int outerHeight = height/2;
     private int outerWidth = width/2;
+
 
     private int x, y;
     private Paint mPaint;
@@ -58,12 +63,19 @@ public class FitnessMod extends ImageView {
 
         bResizeFitness = BitmapConverter.getResizedBitmap(bFitness, width, height);
         locationRect = new Rect(x, y,x+width, y+height);
-        outerSizeRingRect = new RectF(x+(outerWidth/2),y+(outerHeight/2),x+(int)(width*.25), y+(int)(height*.25)); // since outer is half of width and height, to get it in the middle we can just do it like this, might be more trouble some when we try to get something a little more fancy.
+
+        outerSizeRingRect = new RectF(x+(outerWidth/2), // 25
+                y+(outerHeight/2),  // 25
+                x+(int)(width*.75),// 75
+                y+(int)(height*.75)); // 75
+        innerSizeRingRect = new RectF(x + (int)((outerWidth/2) + 8), y+(int)((outerHeight/2) + 8), x+(int)((width*.75) - 8), y+(int)((height*.75) - 8));
+        innerInnerSizeRingRect = new RectF(x + (int)((outerWidth/2) + 14), y+(int)((outerHeight/2) + 14), x+(int)((width*.75) - 14), y+(int)((height*.75) - 14));
+
 
         mPaint = new Paint();
 
         // Settings
-        mPaint.setAntiAlias(false);
+        mPaint.setAntiAlias(true);
         mPaint.setFilterBitmap(false);
         mPaint.setDither(true);
         mPaint.setStrokeWidth(3);
@@ -80,7 +92,6 @@ public class FitnessMod extends ImageView {
         if(!locationRect.contains((int)x,(int)y)) return false;
         else {
             log("touch is inside");
-           // Intent i = mContext.getPackageManager().getLaunchIntentForPackage("com.asus.wellness");
             Intent i = mContext.getPackageManager().getLaunchIntentForPackage("com.google.android.apps.fitness");
 
             mContext.startActivity(i);
@@ -92,8 +103,9 @@ public class FitnessMod extends ImageView {
     public void draw(Canvas canvas) {
         //canvas.drawBitmap(bResizeFitness, x, y, null);
        // canvas.drawRect(locationRect, mPaintTest);
-        canvas.drawArc(outerSizeRingRect,270,240,false, mPaint);
-
+        canvas.drawArc(outerSizeRingRect,270,300,false, mPaint);
+        canvas.drawArc(innerSizeRingRect, 270,240,false, mPaint);
+        canvas.drawArc(innerInnerSizeRingRect, 270,180, false, mPaint);
         super.draw(canvas);
 
     }
