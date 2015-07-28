@@ -60,7 +60,7 @@ public class ConfigListenerService extends WearableListenerService
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         log("onDataChanged");
-
+        mSettingsManager = new SettingsManager(getApplicationContext());
         mGoogleApi = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
@@ -89,9 +89,7 @@ public class ConfigListenerService extends WearableListenerService
         @Override
         protected String doInBackground(String... params) {
             Log.d(TAG, "BackGround");
-            //int zipcode = mSettingsManager.getZipCode();
-            // TODO #1 this is hardcoded and needs to be changed!! - testing mSettingsManager causing issues?
-            int zipcode = Integer.parseInt("04005");
+            int zipcode = mSettingsManager.getZipCode();
             String returnedData;
             if(zipcode != 0){
                 returnedData = String.valueOf(sendHttpRequest(zipcode));
