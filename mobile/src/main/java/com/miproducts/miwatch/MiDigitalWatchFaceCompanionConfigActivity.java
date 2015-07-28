@@ -35,6 +35,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
 import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +50,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private WatchFaceSurfaceView svView;
     private WatchFaceMenu svMenu;
     private BroadcastReceiver brDegree;
-
+    private SettingsManager mSettingsManager;
 
 
     @Override
@@ -57,6 +58,8 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
+        mSettingsManager = new SettingsManager(this);
+
         initLayout();
 
        mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -78,7 +81,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         };
 
         // lets get the current temperature and send it to wearable
-        getTemp();
+       // getTemp();
 
     }
 
@@ -111,9 +114,15 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         @Override
         protected String doInBackground(String... params) {
             Log.d(TAG, "BackGround");
-
-            String data = String.valueOf(sendHttpRequest());
-            return data;
+            int zipcode = mSettingsManager.getZipCode();
+            String returnedData;
+            if(zipcode != 0){
+                returnedData = String.valueOf(sendHttpRequest(zipcode));
+            }
+            else {
+                returnedData = String.valueOf(sendHttpRequest(04005));
+            }
+            return returnedData;
         }
 
 
@@ -125,9 +134,10 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
             Log.d(TAG, "onPostExecute");
         }
-        private int sendHttpRequest() {
+        private int sendHttpRequest(int zipcode) {
+
             // get the JSON GEOLOCATION TEMP DETAILS
-            String result = httpClient.getWeatherData("Biddeford");
+            String result = httpClient.getWeatherData(zipcode);
             // parse the temp value
             int indexInt = result.indexOf("temp");
             int begOfTempValue = indexInt+6;
