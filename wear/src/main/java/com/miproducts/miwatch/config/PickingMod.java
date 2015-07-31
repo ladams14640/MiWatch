@@ -7,19 +7,16 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 
 import com.miproducts.miwatch.R;
+import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.utilities.Consts;
-
+    //TODO July 31 2015 - Continue with the last 3 mods, 
 /**
  *
  * We will be using this Mod to customize which Mod is being displayed to the user and where.
- * This will be like a place holder for the configuration screen, that will allow the user to do 2
+ * This will be like a place holder in the configuration screen, that will allow the user to do 2
  * things.
  * 1. Change the color scheme of watchface
  * 2. change the individual Mod showing / change which mod is showing where.
- *
- * Handle DigitalTimer ID differently
- *
- *
  *
  * Created by ladam_000 on 7/19/2015.
  */
@@ -30,7 +27,7 @@ public class PickingMod extends Mods implements CustomizedMods {
     // border of the Mod
     private Rect rectBorder;
     // the rectangle border input.
-    private int leftBorder, topBorder, rightBorder, botBorder;
+    private float leftBorder, topBorder, rightBorder, botBorder;
     private int width = 60, height = 60;
     private int ID = 0;
 
@@ -41,6 +38,8 @@ public class PickingMod extends Mods implements CustomizedMods {
     DigitalTimer mDigitalTimer;
     // incase an ID of date is passed
    // DateViews mDate;
+    // incase an ID of Event is passed
+    EventView mEvent;
 
     /**
      *
@@ -50,7 +49,8 @@ public class PickingMod extends Mods implements CustomizedMods {
      * @param topBorder - right side
      * @param initialID - ID
      */
-    public PickingMod(Context context, WatchFaceSurfaceViewConfig svView, int leftBorder, int topBorder, int initialID) {
+    public PickingMod(Context context, WatchFaceSurfaceViewConfig svView,
+                      float leftBorder, float topBorder, int initialID) {
         super(context, svView);
 
         // set the rect perimeter values.
@@ -70,6 +70,9 @@ public class PickingMod extends Mods implements CustomizedMods {
         }
         else if(ID == Consts.DATE){
           //  mDate = new DateViews(getContext(),svView);
+        }
+        else if(ID == Consts.EVENT){
+            mEvent = new EventView(getContext(), svView, leftBorder, topBorder);
         }
 
         drawRectBorder();
@@ -94,6 +97,9 @@ public class PickingMod extends Mods implements CustomizedMods {
         // special case for digital time
         if(ID == Consts.DIGITAL_TIMER){
             mDigitalTimer.draw(canvas);
+        }else if(ID == Consts.EVENT){
+            // no rect, it will have a special rectangle
+            mEvent.draw(canvas);
         }
         // normal case, lets draw the rectangle and have the mod draw itself.
         else {

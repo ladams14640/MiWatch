@@ -44,6 +44,7 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -59,6 +60,7 @@ import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.miproducts.miwatch.config.MiDigitalUtil;
 import com.miproducts.miwatch.hud.HudView;
 import com.miproducts.miwatch.mods.DateMod;
 import com.miproducts.miwatch.utilities.Consts;
@@ -90,7 +92,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     // whether we are on a round device or not for positions. (matters for the mods it seems)
     private boolean isRound = false;
-
+    Engine engine;
     @Override
     public Engine onCreateEngine() {
         return new Engine();
@@ -98,7 +100,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
 
 
-    public class Engine extends CanvasWatchFaceService.Engine implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
+
+    public class Engine extends CanvasWatchFaceService.Engine{
         static final int MSG_UPDATE_TIME = 0;
 
         @Override
@@ -193,6 +196,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         // Date
         DateMod mDateMod;
 
+        SettingsManager settingsManager;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -227,8 +231,23 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
 
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+
+                        }
+                    })
                     .addApi(Wearable.API)
                     .build();
 
@@ -237,6 +256,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
             displayWidth = mWindowManager.getDefaultDisplay().getWidth();
             displayHeight = mWindowManager.getDefaultDisplay().getHeight();
+
+            settingsManager = new SettingsManager(mContext);
+
 
             setPositionForWatchfaceObjects();
             setPaintForWatchFaceObjects(resources);
@@ -345,6 +367,12 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                 if (mHudView.isEventModActive()) {
                     mHudView.initEventSyncTask();
                 }
+                //retrieveSettingsManagerColor();
+
+                /**
+                 *  determine if we need to remove hud (if we are viewing {@Link MiDigitalWatchFaceConfiguration} Screen)
+                 */
+                retrieveSettingsManagerHud();
             } else {
                 if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
                     //mGoogleApiClient.disconnect();
@@ -356,6 +384,18 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             // Whether the timer should be running depends on whether we're visible (as well as
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
+        }
+
+        // only time this will be false is if the MiDigitalWatchFaceConfiguration has been called, to reverse we will need to
+        // provoke a onVisibilityChange
+        public void retrieveSettingsManagerHud() {
+            if(settingsManager.getHudRemove()){
+                removeHudView();
+            }
+        }
+
+        private void retrieveSettingsManagerColor() {
+            log("color going to be " + settingsManager.getMainColor());
         }
 
         public void removeHudView() {
@@ -527,29 +567,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             new SendToDataLayerThread(Consts.WEARABLE_TO_PHONE_PATH, dataMap).start();
         }
 
-        @Override
-        public void onConnected(Bundle bundle) {
-            log("onConnected " + bundle);
-        }
 
-        @Override
-        public void onConnectionSuspended(int i) {
-            log("onConnectionSuspended");
-        }
-
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            log("onConnectionFailed");
-        }
-
-
-        //TODO #1 stop here and finish 7/30/15 9:56. We will want to make sure we 1st grab
-        //TODO the removal of the hud, and test this. once we got the removal of the hud we can lay
-        //TODO more ground work for the communication of the main color and eventually the mods.
-        @Override
-        public void onDataChanged(DataEventBuffer dataEventBuffer) {
-
-        }
 
 
         class SendToDataLayerThread extends Thread {

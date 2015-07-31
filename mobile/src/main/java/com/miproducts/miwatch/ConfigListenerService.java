@@ -64,8 +64,12 @@ public class ConfigListenerService extends WearableListenerService
         mGoogleApi = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
-
-            getTemp();
+        //TODO if any issues with receiving data this is why. - check and delete toDO
+            try{
+                getTemp();
+            }finally {
+                dataEventBuffer.close();
+            }
     }
 
     private void getTemp() {

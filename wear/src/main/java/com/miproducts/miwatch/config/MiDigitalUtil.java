@@ -12,7 +12,9 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.DigitalWatchFaceUtil;
 
 /**
@@ -26,7 +28,7 @@ public class MiDigitalUtil {
     /**
      * The path for the {@link DataItem} containing {@link com.miproducts.miwatch.MiDigitalWatchFace} configuration.
      */
-    public static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
+    public static final String PATH_WITH_FEATURE = "/wearable_to_wearable";
     /**
      * The {@link DataMap} key for {@link com.miproducts.miwatch.MiDigitalWatchFace} main color that can be changed.
      */
@@ -48,7 +50,7 @@ public class MiDigitalUtil {
     public static final String HUD_REMOVE = "HUD_REMOVE";
 
 
-    private void log(String s){
+    private static void log(String s){
         Log.d(TAG, s);
     }
 
@@ -59,10 +61,13 @@ public class MiDigitalUtil {
      * If the config DataItem doesn't exist, it's created.
      */
     public static void putConfigDataItem(GoogleApiClient googleApiClient, DataMap newConfig) {
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(PATH_WITH_FEATURE);
-        DataMap configToPut = putDataMapRequest.getDataMap();
+        PutDataMapRequest putDMR = PutDataMapRequest.create(PATH_WITH_FEATURE);
+        log("putConfigDataItem");
+        DataMap configToPut = putDMR.getDataMap();
         configToPut.putAll(newConfig);
-        Wearable.DataApi.putDataItem(googleApiClient, putDataMapRequest.asPutDataRequest())
+        //new SendToDataLayerThread(PATH_WITH_FEATURE, configToPut, googleApiClient).start();
+
+        Wearable.DataApi.putDataItem(googleApiClient, putDMR.asPutDataRequest())
                 .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
                     @Override
                     public void onResult(DataApi.DataItemResult dataItemResult) {
@@ -73,5 +78,27 @@ public class MiDigitalUtil {
                 });
     }
 
+    static class SendToDataLayerThread extends Thread {
+        String path;
+        DataMap dataMap;
+        String testmsg = "degree";
+        private GoogleApiClient mGoogleApiClient;
+
+        // Constructor for sending data objects to the data layer
+        SendToDataLayerThread(String p, DataMap data, GoogleApiClient mGoogleApiClient) {
+            log("thread kickOff");
+            path = p;
+            dataMap = data;
+            this.mGoogleApiClient = mGoogleApiClient;
+        }
+
+        public void run() {
+            // Construct a DataRequest and send over the data layer
+            PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+            putDMR.getDataMap().putAll(dataMap);
+            PutDataRequest request = putDMR.asPutDataRequest();
+            Wearable.DataApi.putDataItem(mGoogleApiClient, request);
+        }
+    }
 
 }

@@ -7,6 +7,8 @@ package com.miproducts.miwatch.utilities;
 import android.content.SharedPreferences;
 import android.content.Context;
 
+import com.miproducts.miwatch.config.MiDigitalUtil;
+
 /**
  * Created by larry on 7/8/15.
  */
@@ -55,4 +57,27 @@ public class SettingsManager {
 
     public static final String DIGITAL_TIME_X = "DIGITAL_TIME_X";
     // public
+
+
+
+    public void setMainColor(String defaultColor){
+        mEditor.putString(MiDigitalUtil.KEY_MAIN_COLOR, defaultColor);
+        mEditor.apply();
+        mEditor.commit();
+    }
+
+    public String getMainColor(){
+        return mPrefs.getString(MiDigitalUtil.KEY_MAIN_COLOR, "nothing_set");
+    }
+
+    public void setHudRemove(boolean hudRemove){
+        mEditor.putBoolean(MiDigitalUtil.KEY_HUD_ACTION, hudRemove);
+        mEditor.apply();
+        mEditor.commit();
+    }
+    public Boolean getHudRemove(){
+        return mPrefs.getBoolean(MiDigitalUtil.KEY_HUD_ACTION, false);
+
+    }
+
 }

@@ -14,6 +14,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.miproducts.miwatch.config.MiDigitalUtil;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
@@ -52,10 +53,9 @@ private static final String TAG = "DigitalListenerService";
         SettingsManager sm = new SettingsManager(getApplicationContext());
 
         DataMap dataMap;
-        for (DataEvent event : dataEventBuffer) {
-            // Check the data type
-            //if (event.getType() == DataEvent.TYPE_CHANGED) {
 
+        try{
+            for (DataEvent event : dataEventBuffer) {
                 dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
 
                 Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
@@ -73,10 +73,14 @@ private static final String TAG = "DigitalListenerService";
                 }else {
                     log("value came back as 0");
                 }
-           // }
 
+
+            }
+        }finally {
+            dataEventBuffer.close();
         }
-        }
+
+    }
 
 
     private void updateCount(int y) {

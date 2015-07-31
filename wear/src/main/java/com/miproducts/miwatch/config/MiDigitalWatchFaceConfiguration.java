@@ -18,6 +18,7 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.MiDigitalWatchFace;
 import com.miproducts.miwatch.R;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
 /**
  * Class the user sees when he clicks on the configuration clock on his WatchFace Choice Screen.
@@ -28,7 +29,7 @@ public class MiDigitalWatchFaceConfiguration extends Activity{
     private static final String TAG = "DigitalWatchFaceConfig";
     private WatchFaceSurfaceViewConfig svView;
     private GoogleApiClient mGoogleApiClient;
-
+    private SettingsManager settingsManager;
 
     public MiDigitalWatchFaceConfiguration() {
 
@@ -41,61 +42,42 @@ public class MiDigitalWatchFaceConfiguration extends Activity{
         svView = new WatchFaceSurfaceViewConfig(getApplicationContext());
         svView = (WatchFaceSurfaceViewConfig) findViewById(R.id.surfaceView);
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "onConnected: " + connectionHint);
-                        }
-                    }
+        settingsManager = new SettingsManager(getApplicationContext());
 
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "onConnectionSuspended: " + cause);
-                        }
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) {
-                            Log.d(TAG, "onConnectionFailed: " + result);
-                        }
-                    }
-                })
-                .addApi(Wearable.API)
-                .build();
+
+
+
+        // we want to remove the hud - it prevents user from switching up watchfaces
     }
 
     // Handle the surfaceview's thread
     @Override
     protected void onStart() {
+        updateConfigHudRemove();
         svView.threadRun(true);
         super.onStart();
     }
     // Handle the surfaceview's thread
     @Override
     protected void onPause() {
+        log("Paused");
         svView.threadRun(false);
+        //TODO save the color choice here.
+        settingsManager.setHudRemove(false);
         super.onPause();
     }
 
 
 
     private void updateConfigHudRemove(){
-        DataMap configKeysToOverwrite = new DataMap();
-        configKeysToOverwrite.putString(MiDigitalUtil.KEY_HUD_ACTION, MiDigitalUtil.HUD_REMOVE);
-        MiDigitalUtil.putConfigDataItem(mGoogleApiClient, configKeysToOverwrite);
+        log("updateConfigHudRemove");
+        settingsManager.setHudRemove(true);
+
     }
 
-    // update the main color
-    private void updateConfigForMainColor(final int mainColor) {
-        DataMap configKeysToOverwrite = new DataMap();
-        configKeysToOverwrite.putInt(MiDigitalUtil.KEY_MAIN_COLOR,
-                mainColor);
-        MiDigitalUtil.putConfigDataItem(mGoogleApiClient, configKeysToOverwrite);
+    public void log(String s) {
+        Log.d(TAG, s);
     }
+
 
 }

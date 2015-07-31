@@ -93,12 +93,12 @@ public class WatchFaceSurfaceViewConfig extends SurfaceView {
     }
     private void initMods() {
           }
-
+    //TODO we need to create a color choice some how.
     protected void drawSomething(Canvas canvas) {
 
         if(canvas != null) {
             if(width == 0){
-                width = canvas.getWidth();
+                width = canvas.getWidth()-40;
                 height = canvas.getHeight();
 
                 mDigitalTimer = new PickingMod(getContext(),this,
@@ -110,9 +110,14 @@ public class WatchFaceSurfaceViewConfig extends SurfaceView {
                         Consts.DIGITAL_TIMER);
 
                 mDate = new PickingMod(getContext(), this,
-                        ModPositionFunctions.getLeftDatePosition(width),
-                        ModPositionFunctions.getTopDatePosition(height),
+                        ModPositionFunctions.getLeftDateConfigPosition(width),
+                        ModPositionFunctions.getTopDateConfigPosition(height),
                         Consts.DATE);
+
+                mEvent = new PickingMod(getContext(), this,
+                        ModPositionFunctions.getLeftEventConfigPosition(width),
+                        ModPositionFunctions.getTopEventConfigPosition(height),
+                        Consts.EVENT);
             }{
                 // background
                 canvas.drawColor(Color.BLACK);
@@ -121,7 +126,7 @@ public class WatchFaceSurfaceViewConfig extends SurfaceView {
                 //mHudView.draw(canvas);
                 mDigitalTimer.draw(canvas);
                 mDate.draw(canvas);
-
+                mEvent.draw(canvas);
             }
         }
 
