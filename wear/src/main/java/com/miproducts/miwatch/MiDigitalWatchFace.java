@@ -98,7 +98,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
 
 
-    public class Engine extends CanvasWatchFaceService.Engine implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    public class Engine extends CanvasWatchFaceService.Engine implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener {
         static final int MSG_UPDATE_TIME = 0;
 
         @Override
@@ -540,6 +540,15 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         @Override
         public void onConnectionFailed(ConnectionResult connectionResult) {
             log("onConnectionFailed");
+        }
+
+
+        //TODO #1 stop here and finish 7/30/15 9:56. We will want to make sure we 1st grab
+        //TODO the removal of the hud, and test this. once we got the removal of the hud we can lay
+        //TODO more ground work for the communication of the main color and eventually the mods.
+        @Override
+        public void onDataChanged(DataEventBuffer dataEventBuffer) {
+
         }
 
 

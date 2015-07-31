@@ -107,7 +107,13 @@ public class DegreeMod extends View {
     // Lets tell HudView to send out a message to the dataLayer
     private void refreshDegrees(DataMap dataMap) {
         refresh = true;
-        bRefresh = !bRefresh;
+        if(bRefresh == true){
+            bRefresh = false;
+        }else if(bRefresh == false){
+            bRefresh = true;
+        }
+        //bRefresh = !bRefresh;
+        log("refresh = " + bRefresh);
         /*Pack true to refresh degrees */
         dataMap.putBoolean(Consts.DEGREE_REFRESH,
                 bRefresh);

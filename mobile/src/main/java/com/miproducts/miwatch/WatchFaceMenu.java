@@ -26,6 +26,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.MenuPackageUtility;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +40,7 @@ public class WatchFaceMenu  {
     private static final String TAG = "WatchFaceMenu";
 
     // Menu Stuff
-    private EditText etSize;
+    private EditText etSize, etZipCode;
     private ImageButton ibColor;
     private CheckBox cbVisible;
     private TextView tvSelectedView;
@@ -53,13 +54,19 @@ public class WatchFaceMenu  {
     // Mack Daddy Handler
     MenuPackageUtility mMenuPackageUtility;
 
+    // Preferences
+    SettingsManager mSettingsManager;
+
     public WatchFaceMenu(MiDigitalWatchFaceCompanionConfigActivity miDigitalWatchFaceCompanionConfigActivity){
         mActivity = miDigitalWatchFaceCompanionConfigActivity;
         tvSelectedView = (TextView) mActivity.findViewById(R.id.tvSelectedMod);
         mMenuPackageUtility = new MenuPackageUtility(mActivity);
+        mSettingsManager = new SettingsManager(mActivity);
+
         initEtSize();
         initIbColor();
         initCbVisible();
+        initZipCode();
     }
 
     private void initCbVisible() {
@@ -111,6 +118,13 @@ public class WatchFaceMenu  {
 
                             // Requires a new thread to avoid blocking the UI
                             //new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
+                            // TODO probably need to check the zipcode with a registry of zipcodes to make sure its right.
+                            // save zipcode
+                            if(Integer.parseInt(etZipCode.getText().toString()) != 0){
+                                mSettingsManager.saveZipcode(Integer.parseInt(etZipCode.getText().toString()));
+                            }else {
+                                Toast.makeText(mActivity, "Can't Save the Zipcode", Toast.LENGTH_SHORT).show();
+                            }
 
                         }
                     }
@@ -122,6 +136,47 @@ public class WatchFaceMenu  {
         });
     }
 
+
+    private void initZipCode(){
+        etZipCode = (EditText) mActivity.findViewById(R.id.etZipcode);
+
+        int savedZipCode = mSettingsManager.getZipCode();
+        //if(savedZipCode != 0){
+            etZipCode.setText(Integer.toString(savedZipCode));
+       //}
+        etZipCode.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // wasnt up button wasnt the enter key
+                if (event.getAction() != KeyEvent.ACTION_UP)
+                    return false;
+                if (event.getKeyCode() != KeyEvent.KEYCODE_ENTER)
+                    return false;
+
+
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+
+                        // log("enter pressed");
+                        if (etSize.getText().toString() != "") {
+
+                            // TODO probably need to check the zipcode with a registry of zipcodes to make sure its right.
+                            // save zipcode
+                            if(Integer.parseInt(etZipCode.getText().toString()) != 0){
+                                mSettingsManager.saveZipcode(Integer.parseInt(etZipCode.getText().toString()));
+                            }else {
+                                Toast.makeText(mActivity, "Can't Save the Zipcode", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    }
+
+                }
+
+                return false;
+            }
+        });
+    }
 
 
     /**

@@ -16,15 +16,14 @@ import java.net.URL;
 public class WeatherHttpClient {
 
     private static final String TAG = "WeatherHTTPCLient";
-    //TODO hardcoded here for testing.
-    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
+    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?zip=";
    // String test= "http://openweathermap.org/city/4958141";
 
-    public String getWeatherData(String location) {
+    public String getWeatherData(int location) {
         Log.d(TAG, "get Temperature for: " + location);
         HttpURLConnection con = null ;
         InputStream is = null;
-        String url = BASE_URL + location+",usa";
+        String url = BASE_URL + location+",us";
         try {
             con = (HttpURLConnection) ( new URL(url)).openConnection();
             con.setRequestMethod("GET");

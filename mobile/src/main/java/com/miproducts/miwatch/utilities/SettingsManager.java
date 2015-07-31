@@ -12,6 +12,9 @@ public class SettingsManager {
     private SharedPreferences mPrefs;
     private SharedPreferences.Editor mEditor;
 
+    private static final String KEY_ZIPCODE = "KEY_ZIPCODE";
+
+
     public SettingsManager(Context applicationContext) {
         mPrefs = applicationContext.getSharedPreferences(SHARED_PREFERENCES_NAME,Context.MODE_PRIVATE);
         mEditor = mPrefs.edit();
@@ -49,6 +52,16 @@ public class SettingsManager {
         return mPrefs.getBoolean(key, false);
     }
 
+
+
+    public void saveZipcode(int zipcode){
+        mEditor.putInt(KEY_ZIPCODE, zipcode);
+        mEditor.apply();
+        mEditor.commit();
+    }
+    public int getZipCode(){
+        return mPrefs.getInt(KEY_ZIPCODE, 0);
+    }
 
     public static final String DIGITAL_TIME_X = "DIGITAL_TIME_X";
     // public

@@ -24,7 +24,10 @@ import com.google.android.gms.wearable.WearableListenerService;
 import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
 import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,7 +38,7 @@ public class ConfigListenerService extends WearableListenerService
 
     private static final String TAG = "DigitalListenerService";
     private GoogleApiClient mGoogleApi;
-
+    private SettingsManager mSettingsManager;
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -57,9 +60,11 @@ public class ConfigListenerService extends WearableListenerService
     @Override
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         log("onDataChanged");
+        mSettingsManager = new SettingsManager(getApplicationContext());
         mGoogleApi = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
+
             getTemp();
     }
 
@@ -84,9 +89,15 @@ public class ConfigListenerService extends WearableListenerService
         @Override
         protected String doInBackground(String... params) {
             Log.d(TAG, "BackGround");
-
-            String data = sendHttpRequest();
-            return data;
+            int zipcode = mSettingsManager.getZipCode();
+            String returnedData;
+            if(zipcode != 0){
+                returnedData = String.valueOf(sendHttpRequest(zipcode));
+            }
+            else {
+                returnedData = String.valueOf(sendHttpRequest(04005));
+            }
+            return returnedData;
         }
 
 
@@ -97,8 +108,8 @@ public class ConfigListenerService extends WearableListenerService
 
             Log.d(TAG, "onPostExecute");
         }
-        private String sendHttpRequest() {
-            String result = httpClient.getWeatherData("Biddeford");
+        private String sendHttpRequest(int zipcode) {
+            String result = httpClient.getWeatherData(zipcode);
             int indexInt = result.indexOf("temp");
             int begOfTempValue = indexInt+6;
             int endOfTempValue = result.indexOf(",", begOfTempValue);
@@ -153,22 +164,22 @@ public class ConfigListenerService extends WearableListenerService
                 log("mGoogle != null!");
                 mGoogleApi.blockingConnect(5, TimeUnit.SECONDS);
 
-                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApi).await();
-                for (Node node : nodes.getNodes()) {
+               // NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApi).await();
+               // for (Node node : nodes.getNodes()) {
 
                     // Construct a DataRequest and send over the data layer
                     PutDataMapRequest putDMR = PutDataMapRequest.create(path);
                     putDMR.getDataMap().putAll(dataMap);
                     PutDataRequest request = putDMR.asPutDataRequest();
-                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApi, request).await();
-                    if (result.getStatus().isSuccess()) {
+                    Wearable.DataApi.putDataItem(mGoogleApi, request);
+                   /* if (result.getStatus().isSuccess()) {
                         Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
                     } else {
                         // Log an error
                         Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
-                    }
-                }
-            }else {
+                    }*/
+                //}
+           }else {
                 log("mGoogle == null!");
             }
         }

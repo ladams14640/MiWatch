@@ -59,7 +59,7 @@ private static final String TAG = "DigitalListenerService";
                 dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
 
                 Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
-                //TODO WILL CAUSE ISSUES IF TEMP IS 0 I am sure. - actualyl will just fill in 0
+
                 if(dataMap.getInt(Consts.KEY_BROADCAST_DEGREE,0) != 0){
                     log("value was not 0");
                     // save the new temperature
