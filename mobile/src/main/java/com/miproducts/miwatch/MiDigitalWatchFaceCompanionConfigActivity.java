@@ -24,7 +24,6 @@ import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.util.List;
-//TODO #1lets build a COntent provider to save these Locations!!!
 /**
  * 1. We will allow user to input the zipcode of the area he wants weather.
  * 2. If we get back a result, else tell him not valid address, we will Build a View and put it into the ListView. - maybe refresh
@@ -78,16 +77,19 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
         etZipCode = (EditText) findViewById(R.id.etZipcode);
 
+        if(!mSettingsManager.getZipCode().equals("NONE")) // TODO CONSTANT PLS
+            etZipCode.setText(mSettingsManager.getZipCode());
 
-
+        //TODO handle done according, close keyboard - handle bAddWeather to close keyboard as well.
         bAddWeatherLocation = (ImageButton) findViewById(R.id.bAddWeatherLocation);
         bAddWeatherLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // save this zipcode as the one we want to fetch for for the phone - the most active one.
-                mSettingsManager.saveZipcode(String.valueOf(etZipCode.getText().toString()));
+
+
                 WeatherLocation weatherLocation = new WeatherLocation();
-                weatherLocation.setZipcode(mSettingsManager.getZipCode());
+                weatherLocation.setZipcode(etZipCode.getText().toString());
                 getTemp(weatherLocation);
                 //TODO if we get back a result then lets add it to the COntent Provider.
 

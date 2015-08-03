@@ -1,6 +1,7 @@
 package com.miproducts.miwatch.Weather.openweather;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -15,8 +16,7 @@ import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SendToDataLayerThread;
 import com.miproducts.miwatch.utilities.SettingsManager;
 import com.miproducts.miwatch.Container.WeatherLocation;
-//TODO done LETS MAKE SURE WE CHECK TO SEE IF ITS A ZIPCODE.
-//TODO done LETS MAKE SURE WE ALSO CHECK IF WE GOT INTERNET ABILITY.
+
 
 //TODO check over the work when requested by the watch
 //TODO update weather if we do currently have the zipcode in the database.
@@ -25,14 +25,29 @@ import com.miproducts.miwatch.Container.WeatherLocation;
  * Created by ladam_000 on 8/1/2015.
  */
 public class JSONWeatherTask extends AsyncTask<String,Void,String> {
+    // max length of a integer to check against
+    private static final int MAX_INTEGER_LENGTH = 11;
+    // error indicate it is not a proper zipcode
+    private static final String ERROR_ZIP = "ZIP_ISSUE";
+    // error indicate we are not online
+    private static final String ERROR_ONLINE = "ONLINE_ISSUE";
+    // error we use if we didnt get a result back from trying to reach out to the weather online.
     private static final int ERROR_URL = -2000;
+
     private WeatherHttpClient httpClient;
     private SettingsManager mSettingsManager;
     private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private WeatherLocation locationToFill;
     private WeatherLocationDbHelper dbHelper;
+    private boolean fromActivity = false;
 
+    /**
+     * From ConfigServiceListener
+     * @param mContext
+     * @param mSettingsManager
+     * @param mGoogleApiClient
+     */
     public JSONWeatherTask(Context mContext, SettingsManager mSettingsManager, GoogleApiClient mGoogleApiClient){
         Log.d(TAG, "Made");
         this.mSettingsManager = mSettingsManager;
@@ -40,6 +55,9 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         this.mGoogleApiClient = mGoogleApiClient;
         httpClient = new WeatherHttpClient();
         locationToFill = null;
+
+        // indicate we are from a Service and not an Activity (our app is not present on the screen.)
+        fromActivity = false;
     }
 
     /**
@@ -60,23 +78,42 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         dbHelper = new WeatherLocationDbHelper(mContext);
         httpClient = new WeatherHttpClient();
 
+        // indicate we are from Activity not Service - our app is showing.
+        fromActivity = true;
+
     }
     private static final String TAG = "JSONWeatherTask";
-
+    //mSettingsManager.saveZipcode(String.valueOf(etZipCode.getText().toString()));
     @Override
     protected String doInBackground(String... params) {
         Log.d(TAG, "BackGround");
-        String zipcode = mSettingsManager.getZipCode();
+        String zipcode;
+        //TODO setup boolean clean this shit up!
+        if(fromActivity){
+            // fresh zipcode, not one from the preferences.
+            zipcode = locationToFill.getZipcode();
+        }
+        else {
+            zipcode = mSettingsManager.getZipCode();
+        }
+
+        // store data
         String returnedData;
+
+        // check if we are even online
         if(isOnline()){
-            if(!zipcode.equals("NONE")){
-                // not a integer
-                if(zipcode.length() >= 11) // integer can only be 10 digits max
-                    return "ZIP_ISSUE";
+            // check to see if this is the user's first time in the app
+            if(!zipcode.equals(SettingsManager.NOTHING_SAVED))
+            {
+                // not a integer if it exceeds MAX_INTER_LENGTH
+                if(zipcode.length() >= MAX_INTEGER_LENGTH)
+                    return ERROR_ZIP;
                 returnedData = String.valueOf(sendHttpRequest(Integer.valueOf(zipcode)));
             }
             else {
-                Log.d(TAG, "NONE was set so lets grab Biddeford.");
+                Log.d(TAG, "NONE - must be first time was set so lets grab Biddeford.");
+                // lets save biddos since first time
+                mSettingsManager.saveZipcode("04005");
                 returnedData = String.valueOf(sendHttpRequest(04005));
             }
             // onlt send out the temperature if the result back was not an error
@@ -84,11 +121,11 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 // send to watch
                 sendHandledTemperatureToWatch(returnedData);
             }else {
-                return "ZIP_ISSUE";
+                return ERROR_ZIP; //TODO Constance these out.
             }
 
         }else {
-            return "ONLINE_ISSUE";
+            return ERROR_ONLINE;
         }
 
         return null;
@@ -106,7 +143,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         // by default result should return a null - unless there was an issue.
         if(result != null){
             //TODO make these constant.s
-            if(result.equals("ZIP_ISSUE")){
+            if(result.equals(ERROR_ZIP)){
                 Toast.makeText(mContext, "Not proper zipcode!", Toast.LENGTH_LONG).show();
 
                 return;
@@ -130,19 +167,40 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         // get the JSON GEOLOCATION TEMP DETAILS
         String result = httpClient.getWeatherData(zipcode);
         // parse the temp value
-        if(resultIsValid(result)){ // make sure we got back a proper value
+        if(resultIsValid(result)){
+
             int tempInFah = parseTemp(result);
 
             // we want to return more than just a temp
-            if(locationToFill != null){
-                //TODO #@DSDSD!111111
+            if(fromActivity){
+
+                //TODO reformat here
                 String city = parseCity(result);
 
                 locationToFill.setCity(city);
                 locationToFill.setTemperature(tempInFah);
+
                 // make sure we don't already have a copy of this location - compare zipcodes.
                 if(!dbHelper.doesLocationExist(locationToFill))
                     dbHelper.addLocation(locationToFill);// Store into the Database
+                // update the database because we already have this zipcode
+                else {dbHelper.updateTemperature(locationToFill);}
+                // save the new zipcode.
+                mSettingsManager.saveZipcode(locationToFill.getZipcode());
+            }
+            // we caem from Config
+            else {
+                // send out to the dataLayer
+                DataMap dataMap = new DataMap();
+                // going to continue using the broadcast KEY, it is unique after in DataApi.
+                dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, tempInFah);
+                // send off to wearable - listener over there will be listening.
+                new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap, mGoogleApiClient).start();
+
+                // send this to the MainCompanionActivity to send it off to wearable. -
+                Intent sendDegreesIntent = new Intent(Consts.BROADCAST_DEGREE);
+                sendDegreesIntent.putExtra(Consts.KEY_BROADCAST_DEGREE, tempInFah);
+                mContext.sendBroadcast(sendDegreesIntent);
             }
 
             return tempInFah;

@@ -13,7 +13,7 @@ public class SettingsManager {
     private SharedPreferences.Editor mEditor;
 
     private static final String KEY_ZIPCODE = "KEY_ZIPCODE";
-
+    public static final String NOTHING_SAVED = "NONE";
 
     public SettingsManager(Context applicationContext) {
         mPrefs = applicationContext.getSharedPreferences(SHARED_PREFERENCES_NAME,Context.MODE_PRIVATE);
@@ -42,7 +42,7 @@ public class SettingsManager {
         mEditor.commit();
     }
     public String getZipCode(){
-        return mPrefs.getString(KEY_ZIPCODE, "NONE");
+        return mPrefs.getString(KEY_ZIPCODE, NOTHING_SAVED);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.miproducts.miwatch;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
+import com.miproducts.miwatch.Weather.openweather.JSONWeatherTask;
 import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
@@ -64,12 +66,11 @@ public class ConfigListenerService extends WearableListenerService
                 dataEventBuffer.close();
             }
     }
-
     private void getTemp() {
-        JSONWeatherTask task = new JSONWeatherTask();
+        JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApi);
         task.execute();
     }
-
+/*
 //TODO move all of this over to the method we got. promote DRY.
     int tempInFah;
 
@@ -122,7 +123,7 @@ public class ConfigListenerService extends WearableListenerService
              tempInFah = ConverterUtil.convertCelsiusToFahrenheit(tempInCels);
             Log.d(TAG, "Fahrenheit = " + tempInFah);
 
-            /**/
+
             // send out to the dataLayer
             DataMap dataMap = new DataMap();
             // going to continue using the broadcast KEY, it is unique after in DataApi.
@@ -170,19 +171,13 @@ public class ConfigListenerService extends WearableListenerService
                     putDMR.getDataMap().putAll(dataMap);
                     PutDataRequest request = putDMR.asPutDataRequest();
                     Wearable.DataApi.putDataItem(mGoogleApi, request);
-                   /* if (result.getStatus().isSuccess()) {
-                        Log.d("WatchFaceMenu", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
-                    } else {
-                        // Log an error
-                        Log.d("WatchFaceMenu", "ERROR: failed to send DataMap");
-                    }*/
-                //}
+
            }else {
                 log("mGoogle == null!");
             }
         }
     }
-
+*/
 
     public void log(String s) {
         Log.d("Phone Service Listener", s);

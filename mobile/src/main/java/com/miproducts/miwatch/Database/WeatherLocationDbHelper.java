@@ -106,5 +106,57 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
     }
 
 
+    public void updateTemperature(WeatherLocation locationToFill) {
+        log("updateTemperature");
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        List<WeatherLocation> weatherLocations = new ArrayList<WeatherLocation>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + DbContractor.WeatherLoc.TABLE_NAME;
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                WeatherLocation weatherLocation = new WeatherLocation();
+                // weather
+                weatherLocation.setTemperature(Integer.parseInt(cursor.getString(0)));
+                log("temp " + cursor.getString(2));
+                // city
+                weatherLocation.setCity(cursor.getString(1));
+                log("city " + cursor.getString(1));
+                // zipcode
+                weatherLocation.setZipcode(cursor.getString(2));
+                log("zipcode " + cursor.getString(0));
+                // Adding Weather Location to list
+                weatherLocations.add(weatherLocation);
+            } while (cursor.moveToNext());
+        }
+
+        if(weatherLocations != null && weatherLocations.size() > 0){
+            for(WeatherLocation loc : weatherLocations){
+                // find the entry that has the same zipcode.
+                if(loc.getZipcode().equals(locationToFill.getZipcode())){
+                    // build up new value
+                    ContentValues cv = new ContentValues();
+                    cv.put(DbContractor.WeatherLoc.COLUMN_TEMPERATURE,
+                            locationToFill.getTemperature());
+
+                    //String sql = "UPDATE "+ DbContractor.WeatherLoc.TABLE_NAME + " SET " + DbContractor.WeatherLoc.COLUMN_TEMPERATURE + " = '" + locationToFill.getTemperature() + " WHERE " + DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = " + locationToFill.getZipcode();
+
+                    int result = db.update(DbContractor.WeatherLoc.TABLE_NAME,
+                            cv,
+                            DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = ?",
+                            new String[] {locationToFill.getZipcode()});
+
+                    log("updated db, # rows effected = " + result);
+
+                }
+            }
+        }
+        db.close();
+        cursor.close();
+
+    }
 }

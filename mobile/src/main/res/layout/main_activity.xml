@@ -24,7 +24,7 @@
                 android:layout_height="40dp"
                 android:inputType="number"
                 android:ems="11"
-                android:text="04005"
+                android:text=""
                 android:id="@+id/etZipcode" />
 
         <ImageButton
