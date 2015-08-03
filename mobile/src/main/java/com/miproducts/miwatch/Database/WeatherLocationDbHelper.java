@@ -69,13 +69,24 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
                 // zipcode
                 weatherLocation.setZipcode(cursor.getString(2));
                 log("zipcode " + cursor.getString(0));
-                // Adding contact to list
+                // Adding Weather Location to list
                 weatherLocations.add(weatherLocation);
             } while (cursor.moveToNext());
         }
 
         // return contact list
         return weatherLocations;
+    }
+
+
+    public boolean doesLocationExist(WeatherLocation wLocation){
+        List<WeatherLocation> allLocations = getAllWeatherLocations();
+        for(int i = 0; i < allLocations.size(); i++){
+            if(wLocation.getZipcode().equals(allLocations.get(i).getZipcode())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void log(String msg) {
