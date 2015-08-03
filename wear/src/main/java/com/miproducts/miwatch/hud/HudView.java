@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.wearable.DataMap;
 import com.miproducts.miwatch.MiDigitalWatchFace;
@@ -24,7 +23,6 @@ import com.miproducts.miwatch.mods.DegreeMod;
 import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.mods.FitnessMod;
 import com.miproducts.miwatch.mods.TimerMod;
-import com.miproducts.miwatch.utilities.Consts;
 
 import java.util.ArrayList;
 import java.util.List;

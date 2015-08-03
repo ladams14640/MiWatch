@@ -3,127 +3,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-
     >
-<!--android:launchMode="singleInstance"
-    android:noHistory="true"-->
-
-        <com.miproducts.miwatch.WatchFaceSurfaceView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/surfaceView" />
-
 
     <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:weightSum="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Zipcode"
+                android:id="@+id/tvZipcode" />
+
+            <EditText
+                android:layout_width="149dp"
+                android:layout_height="40dp"
+                android:inputType="number"
+                android:ems="11"
+                android:text="04005"
+                android:id="@+id/etZipcode" />
+
+        <ImageButton
+            android:src="@android:drawable/ic_menu_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bAddWeatherLocation" />
+    </LinearLayout>
+
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:id="@+id/tvSelectedMod"
-            android:gravity="center_horizontal"
-            android:layout_gravity="center_horizontal"
-            android:nestedScrollingEnabled="false" />
+        android:id="@+id/lvLocations" />
 
-            <LinearLayout
-                android:id="@+id/rlSurfaceMenu"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_horizontal"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:weightSum="1">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="Size"
-                        android:id="@+id/tvSize" />
-                    <EditText
-                        android:layout_width="69dp"
-                        android:layout_height="40dp"
-                        android:inputType="number"
-                        android:id="@+id/etSize"
-                        android:layout_gravity="center_horizontal"
-                        android:text="20" />
-                </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:weightSum="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Color"
-                    android:id="@+id/tvColor" />
-
-                <ImageButton
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:id="@+id/imageView"
-                    android:background="@color/digital_time_blue" />
-          </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:weightSum="1">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Visibile"
-                    android:id="@+id/tvVisible" />
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/cbVisibile"
-                    android:checked="true" />
-            </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:weightSum="1">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Zipcode"
-                    android:id="@+id/tvZipcode" />
-
-                <EditText
-                    android:layout_width="72dp"
-                    android:layout_height="40dp"
-                    android:inputType="number"
-                    android:ems="11"
-                    android:text="04005"
-                    android:id="@+id/etZipcode" />
-                    </LinearLayout>
-            </LinearLayout>
-    </LinearLayout>
 </LinearLayout>

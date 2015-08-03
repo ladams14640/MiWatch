@@ -96,5 +96,10 @@
     <orderEntry type="library" exported="" name="play-services-base-7.3.0" level="project" />
     <orderEntry type="library" exported="" name="wearable-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.0.0" level="project" />
+    <orderEntry type="library" name="play-services-base-7.5.0" level="project" />
+    <orderEntry type="library" name="play-services-wearable-7.5.0" level="project" />
+    <orderEntry type="library" name="wearable-1.1.0" level="project" />
+    <orderEntry type="module" module-name="mobile" />
+    <orderEntry type="module" module-name="mobile" />
   </component>
 </module>

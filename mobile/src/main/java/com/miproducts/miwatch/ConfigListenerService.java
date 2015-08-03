@@ -1,8 +1,5 @@
 package com.miproducts.miwatch;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,9 +11,6 @@ import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.MessageEvent;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
@@ -26,11 +20,10 @@ import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Responsible for listening for the wearable.
  * Created by ladam_000 on 7/12/2015.
  */
 public class ConfigListenerService extends WearableListenerService
@@ -77,7 +70,7 @@ public class ConfigListenerService extends WearableListenerService
         task.execute();
     }
 
-
+//TODO move all of this over to the method we got. promote DRY.
     int tempInFah;
 
 
@@ -93,12 +86,13 @@ public class ConfigListenerService extends WearableListenerService
         @Override
         protected String doInBackground(String... params) {
             Log.d(TAG, "BackGround");
-            int zipcode = mSettingsManager.getZipCode();
+            String zipcode = mSettingsManager.getZipCode();
             String returnedData;
-            if(zipcode != 0){
-                returnedData = String.valueOf(sendHttpRequest(zipcode));
+            if(!zipcode.equals("NONE")){
+                returnedData = String.valueOf(sendHttpRequest(Integer.valueOf(zipcode)));
             }
             else {
+                // use biddo as default for now
                 returnedData = String.valueOf(sendHttpRequest(04005));
             }
             return returnedData;
