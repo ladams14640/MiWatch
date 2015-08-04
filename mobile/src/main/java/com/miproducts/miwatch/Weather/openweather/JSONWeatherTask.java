@@ -216,6 +216,9 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
          *              dt":1438648952,"sys":{"type":1,"id":1355,"message":0.0041,"country":"US","sunrise":1438680935,"sunset":1438733096},"id":5090347,"name":"North Conway","cod":200}
          *
          * description
+         * // i picked up
+         *      // light intensity shower rain
+         *
          *  light rain - sun and rain
          *  overcast clouds - cloud
          *  broken clouds - sun cloud
@@ -262,8 +265,6 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                     String town = resultObject.getString("name");
 
                     //TODO reformat here
-                    String city = parseCity(result);
-
                     locationToFill.setCity(town);
                     locationToFill.setTemperature(tempInFah);
                     locationToFill.setDesc(description.getString("description").replace("proximity", ""));
