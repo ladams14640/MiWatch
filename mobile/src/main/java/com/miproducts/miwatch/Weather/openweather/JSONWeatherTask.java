@@ -17,6 +17,10 @@ import com.miproducts.miwatch.utilities.SendToDataLayerThread;
 import com.miproducts.miwatch.utilities.SettingsManager;
 import com.miproducts.miwatch.Container.WeatherLocation;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 //TODO check over the work when requested by the watch
 //TODO update weather if we do currently have the zipcode in the database.
@@ -166,6 +170,74 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
 
         // get the JSON GEOLOCATION TEMP DETAILS
         String result = httpClient.getWeatherData(zipcode);
+        /**
+         *
+         *
+         * fine
+         * {"coord":{"lon":-70.44,"lat":43.5},
+         * "weather":
+         *       [
+         *          {   "id":803,"main":"Clouds",
+         *              "description":"broken clouds",
+         *              "icon":"04n"}],
+         *              "base":"cmc stations",
+         *              "main":{
+         *              "temp":298.16,
+         *              "pressure":1008,
+         *              "humidity":54,
+         *              "temp_min":295.35,
+         *              "temp_max":299.15},
+         *              "wind":{"speed":4.1,"deg":240},
+         *              "clouds":{"all":75},"
+         *              dt":1438648183,
+         *              "sys":{"type":1,"id":1366,
+         *              "message":0.0117,
+         *              "country":"US",
+         *              "sunrise":1438680854,
+         *              "sunset":1438732847},
+         *              "id":4977222,
+         *              "name":"Saco",
+         *              "cod":200
+         *              }
+         *
+         *          // raining
+         *              {
+         *              "coord":
+         *              {"lon":-71.13,"lat":44.05},
+         *              "weather":[
+         *              {"id":500,
+         *              "main":"Rain",
+         *              "description":"light rain",
+         *              "icon":"10n"}],
+         *              "base":"cmc stations","main":{"temp":291.28,"pressure":1008,"humidity":93,"temp_min":289.26,"temp_max":292.15},
+         *              "wind":{"speed":1.53,"deg":224},
+         *              "rain":{"1h":0.38},
+         *              "clouds":{"all":90},"
+         *              dt":1438648952,"sys":{"type":1,"id":1355,"message":0.0041,"country":"US","sunrise":1438680935,"sunset":1438733096},"id":5090347,"name":"North Conway","cod":200}
+         *
+         * description
+         *  light rain - sun and rain
+         *  overcast clouds - cloud
+         *  broken clouds - sun cloud
+         *  scattered clouds = clouds sun
+         *  sky is clear - sun
+         *  moderate rain - sun rain
+         *  few clouds - sun clouds
+         *  moderate rain - rain
+         * Thunderstorm - cloud - but soon to be cloud and lightning
+         *
+         * bar harbor
+         * {"coord":{"lon":-68.2,"lat":44.39},
+         * "weather":[{"id":804,
+         *          "main":"Clouds",
+         *          "description":"overcast clouds","icon":"04n"}
+         *          ],
+         *          "base":"cmc stations","main":{"temp":294.15,"pressure":1009,"humidity":100,"temp_min":294.15,"temp_max":294.15},"wind":{"speed":5.1,"deg":210},"clouds":{"all":90},"dt":1438648500,"sys":{"type":1,"id":1349,"message":0.0093,"country":"US","sunrise":1438680177,"sunset":1438732447},"id":4957320,"name":"Bar Harbor","cod":200}
+         *
+         *
+         */
+        // weather
+        // temp
         // parse the temp value
         if(resultIsValid(result)){
 
@@ -187,6 +259,23 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 else {dbHelper.updateTemperature(locationToFill);}
                 // save the new zipcode.
                 mSettingsManager.saveZipcode(locationToFill.getZipcode());
+                try{
+                    JSONObject resultObject = new JSONObject(result);
+                    JSONArray jsonArrayWeather = resultObject.getJSONArray("weather");
+                    JSONObject c = jsonArrayWeather.getJSONObject(0);
+                    //JSONObject jsonObjectDescript = jsonArrayWeather.getJSONArray("description");
+                    log("weather pulled out " + c.getString("description"));
+                    //TODO WE GOT the description of the weather - lets setup our db to receive it
+                    //todo lets get some constants for this stuff.
+
+
+
+                }catch(JSONException e){
+                    log("issue with json = " + e.getMessage());
+                }
+
+
+
             }
             // we caem from Config
             else {
