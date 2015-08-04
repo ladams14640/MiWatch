@@ -69,7 +69,15 @@ public class WeatherLocationAdapter extends BaseAdapter{
         tvCity.setText(mLocations.get(position).getCity());
         tvTemp.setText(String.valueOf(mLocations.get(position).getTemperature()));
         tvDesc.setText(mLocations.get(position).getDesc());
-        tvTime.setText(TimeUnit.MILLISECONDS.convert(mLocations.get(position).getTime_stamp(),TimeUnit.HOURS) + " : "); //+ " : " + TimeUnit.MILLISECONDS.toMinutes(mLocations.get(position).getTime_stamp()
+
+        // get current time
+        long currentTime = System.currentTimeMillis();
+        long currentHour = TimeUnit.MILLISECONDS.convert(currentTime, TimeUnit.HOURS);
+        // get saved time
+        long savedHours = TimeUnit.MILLISECONDS.convert(mLocations.get(position).getTime_stamp(),TimeUnit.HOURS);
+
+        // subtract the two times.
+        tvTime.setText(currentHour - savedHours + " : "); //+ " : " + TimeUnit.MILLISECONDS.toMinutes(mLocations.get(position).getTime_stamp()
 
         return rowView;
     }
