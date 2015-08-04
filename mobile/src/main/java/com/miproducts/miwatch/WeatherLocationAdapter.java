@@ -1,15 +1,19 @@
 package com.miproducts.miwatch;
 
 import android.content.Context;
+import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.miproducts.miwatch.Container.WeatherLocation;
 
+import java.sql.Time;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Adapter for the list view
@@ -28,12 +32,9 @@ public class WeatherLocationAdapter extends BaseAdapter{
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
-    //TODO just built up layout now must tie to it.
-
 
     private void addLocation(WeatherLocation newLocation){
         mLocations.add(newLocation);
-        //TODO maybe invalidate after adding new item.
     }
 
     @Override
@@ -60,11 +61,15 @@ public class WeatherLocationAdapter extends BaseAdapter{
         TextView tvZipcode = (TextView) rowView.findViewById(R.id.tvZipCode);
         TextView tvCity = (TextView) rowView.findViewById(R.id.tvCity);
         TextView tvTemp = (TextView) rowView.findViewById(R.id.tvDegree);
+        // we will do logic here to pick the image
+        TextView tvDesc = (TextView) rowView.findViewById(R.id.tvDesc);
+        TextView tvTime = (TextView) rowView.findViewById(R.id.tvTimeStamp);
 
         tvZipcode.setText(mLocations.get(position).getZipcode());
         tvCity.setText(mLocations.get(position).getCity());
         tvTemp.setText(String.valueOf(mLocations.get(position).getTemperature()));
-
+        tvDesc.setText(mLocations.get(position).getDesc());
+        tvTime.setText(TimeUnit.MILLISECONDS.toHours(mLocations.get(position).getTime_stamp()) + " : " + TimeUnit.MILLISECONDS.toMinutes(mLocations.get(position).getTime_stamp()));
         return rowView;
     }
 }

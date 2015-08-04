@@ -65,7 +65,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 log("brDegree - Temperature is = " + intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0));
-                int temp = intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0);
+                int temp = intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0); //TODO constants these
                 DataMap dataMap = new DataMap();
                 // going to continue using the broadcast KEY, it is unique after in DataApi.
                 dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, temp);
@@ -77,7 +77,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
         etZipCode = (EditText) findViewById(R.id.etZipcode);
 
-        if(!mSettingsManager.getZipCode().equals("NONE")) // TODO CONSTANT PLS
+        if(!mSettingsManager.getZipCode().equals(SettingsManager.NOTHING_SAVED))
             etZipCode.setText(mSettingsManager.getZipCode());
 
         //TODO handle done according, close keyboard - handle bAddWeather to close keyboard as well.
@@ -87,17 +87,15 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
             public void onClick(View v) {
                 // save this zipcode as the one we want to fetch for for the phone - the most active one.
 
+                //TODO have preferences save whether or not this view is currently selected.
 
                 WeatherLocation weatherLocation = new WeatherLocation();
                 weatherLocation.setZipcode(etZipCode.getText().toString());
                 getTemp(weatherLocation);
-                //TODO if we get back a result then lets add it to the COntent Provider.
-
             }
         });
 
 
-        //TODO #1lets build a COntent provider to save these Locations!!!
         lvLocations = (ListView) findViewById(R.id.lvLocations);
         updateUI();
 
@@ -129,15 +127,6 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
     }
 
-
-
-
-
-
-
-
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -157,6 +146,6 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
     private void log(String s) {
         Log.d(TAG, s);
-        //init();
+
     }
 }

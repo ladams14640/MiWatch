@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -125,7 +126,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 // send to watch
                 sendHandledTemperatureToWatch(returnedData);
             }else {
-                return ERROR_ZIP; //TODO Constance these out.
+                return ERROR_ZIP;
             }
 
         }else {
@@ -146,7 +147,6 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
     protected void onPostExecute(String result) {
         // by default result should return a null - unless there was an issue.
         if(result != null){
-            //TODO make these constant.s
             if(result.equals(ERROR_ZIP)){
                 Toast.makeText(mContext, "Not proper zipcode!", Toast.LENGTH_LONG).show();
 
@@ -228,11 +228,13 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
          *
          * bar harbor
          * {"coord":{"lon":-68.2,"lat":44.39},
-         * "weather":[{"id":804,
-         *          "main":"Clouds",
-         *          "description":"overcast clouds","icon":"04n"}
-         *          ],
-         *          "base":"cmc stations","main":{"temp":294.15,"pressure":1009,"humidity":100,"temp_min":294.15,"temp_max":294.15},"wind":{"speed":5.1,"deg":210},"clouds":{"all":90},"dt":1438648500,"sys":{"type":1,"id":1349,"message":0.0093,"country":"US","sunrise":1438680177,"sunset":1438732447},"id":4957320,"name":"Bar Harbor","cod":200}
+         * "weather":[{"id":804,"main":"Clouds","description":"overcast clouds","icon":"04n"}],
+         *          "base":"cmc stations",
+         *          "main":{"temp":294.15,"pressure":1009,"humidity":100,"temp_min":294.15,"temp_max":294.15},
+         *          "wind":{"speed":5.1,"deg":210},
+         *          "clouds":{"all":90},"dt":1438648500,
+         *          "sys":{"type":1,"id":1349,"message":0.0093,"country":"US","sunrise":1438680177,"sunset":1438732447},
+         *              "id":4957320,"name":"Bar Harbor","cod":200}
          *
          *
          */
@@ -241,32 +243,65 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         // parse the temp value
         if(resultIsValid(result)){
 
+            //TODO refactor and grab this with the JSON OBJECT
             int tempInFah = parseTemp(result);
 
             // we want to return more than just a temp
             if(fromActivity){
 
-                //TODO reformat here
-                String city = parseCity(result);
+                try{
 
-                locationToFill.setCity(city);
-                locationToFill.setTemperature(tempInFah);
+
+                    //  json result
+                    JSONObject resultObject = new JSONObject(result);
+                    JSONArray jsonArrayWeather = resultObject.getJSONArray("weather");
+
+                    // description from JSONObject
+                    JSONObject description = jsonArrayWeather.getJSONObject(0);
+                    // get Name of town from JSONObject
+                    String town = resultObject.getString("name");
+
+                    //TODO reformat here
+                    String city = parseCity(result);
+
+                    locationToFill.setCity(town);
+                    locationToFill.setTemperature(tempInFah);
+                    locationToFill.setDesc(description.getString("description").replace("proximity", ""));
+                    locationToFill.setTime_stamp(System.currentTimeMillis());
+
+                    log("weather pulled out " + description.getString("description"));
+
+                    //log("name of place with jsonArray = " + town);
+                }catch(JSONException e){
+                    log("issue with json = " + e.getMessage());
+                }
+
+
+
+
+
 
                 // make sure we don't already have a copy of this location - compare zipcodes.
                 if(!dbHelper.doesLocationExist(locationToFill))
                     dbHelper.addLocation(locationToFill);// Store into the Database
                 // update the database because we already have this zipcode
-                else {dbHelper.updateTemperature(locationToFill);}
+                else {dbHelper.updateTemperatureAndTime(locationToFill);}
                 // save the new zipcode.
                 mSettingsManager.saveZipcode(locationToFill.getZipcode());
                 try{
+                    //  json result
                     JSONObject resultObject = new JSONObject(result);
                     JSONArray jsonArrayWeather = resultObject.getJSONArray("weather");
-                    JSONObject c = jsonArrayWeather.getJSONObject(0);
-                    //JSONObject jsonObjectDescript = jsonArrayWeather.getJSONArray("description");
-                    log("weather pulled out " + c.getString("description"));
-                    //TODO WE GOT the description of the weather - lets setup our db to receive it
-                    //todo lets get some constants for this stuff.
+
+                    // description from JSONObject
+                    JSONObject description = jsonArrayWeather.getJSONObject(0);
+                    // get Name of town from JSONObject
+                    String town = resultObject.getString("name");
+
+                    log("weather pulled out " + description.getString("description"));
+
+                    log("name of place with jsonArray = " + town);
+
 
 
 

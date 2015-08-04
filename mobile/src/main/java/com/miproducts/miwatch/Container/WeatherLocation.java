@@ -11,6 +11,31 @@ public class WeatherLocation {
     private int temperature;
     private String zipcode;
     private String city;
+    private String desc;
+    private long time_stamp;
+
+
+
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public void setTime_stamp(long time_stamp) {
+        this.time_stamp = time_stamp;
+    }
+
+
+
+    public long getTime_stamp() {
+        return time_stamp;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+
 
     public WeatherLocation() {
 

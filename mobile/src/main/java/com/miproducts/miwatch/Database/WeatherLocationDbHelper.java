@@ -26,7 +26,7 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
        super(context, DATABASE_NAME , null, DATABASE_VERSION);
    }
 
-
+    //TODO letsm ake sure we update the time stamp and description
     public void addLocation(WeatherLocation wLocation){
         // grab a copy of the database.
         SQLiteDatabase database = this.getWritableDatabase();
@@ -39,6 +39,10 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
         insertableRow.put(DbContractor.WeatherLoc.COLUMN_CITY, wLocation.getCity());
         // TEMP
         insertableRow.put(DbContractor.WeatherLoc.COLUMN_TEMPERATURE, String.valueOf(wLocation.getTemperature()));
+        // DESC
+        insertableRow.put(DbContractor.WeatherLoc.COLUMN_DESC, wLocation.getDesc());
+        // TIME_STAMP
+        insertableRow.put(DbContractor.WeatherLoc.COLUMN_TIME, wLocation.getTime_stamp());
 
         float id = database.insert(DbContractor.WeatherLoc.TABLE_NAME, null, insertableRow);
         Log.d("DBHelper", "id of added item = " + id);
@@ -47,6 +51,8 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
     }
 
     // Getting All Contacts
+    //TODO lets grab desc and timestamp
+
     public List<WeatherLocation> getAllWeatherLocations() {
         log("getAllWeatherLocations");
         List<WeatherLocation> weatherLocations = new ArrayList<WeatherLocation>();
@@ -69,6 +75,14 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
                 // zipcode
                 weatherLocation.setZipcode(cursor.getString(2));
                 log("zipcode " + cursor.getString(0));
+
+                //todo desc
+                weatherLocation.setDesc(cursor.getString(3));
+                //todo time_stamp
+                weatherLocation.setTime_stamp(cursor.getLong(4));
+
+
+
                 // Adding Weather Location to list
                 weatherLocations.add(weatherLocation);
             } while (cursor.moveToNext());
@@ -106,7 +120,9 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
     }
 
 
-    public void updateTemperature(WeatherLocation locationToFill) {
+
+    //TODO letsm ake sure we update the time stamp and description
+    public void updateTemperatureAndTime(WeatherLocation locationToFill) {
         log("updateTemperature");
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -128,21 +144,34 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
                 log("city " + cursor.getString(1));
                 // zipcode
                 weatherLocation.setZipcode(cursor.getString(2));
+                //todo desc
+                weatherLocation.setDesc(cursor.getString(3));
+                //todo time_stamp
+                weatherLocation.setTime_stamp(cursor.getLong(4));
+
                 log("zipcode " + cursor.getString(0));
                 // Adding Weather Location to list
                 weatherLocations.add(weatherLocation);
             } while (cursor.moveToNext());
         }
 
+        //TODO lets not iterate over this seperately when we are done.
         if(weatherLocations != null && weatherLocations.size() > 0){
             for(WeatherLocation loc : weatherLocations){
-                // find the entry that has the same zipcode.
+                // we set this location - when we instantiated this dbHelper.
+
                 if(loc.getZipcode().equals(locationToFill.getZipcode())){
                     // build up new value
                     ContentValues cv = new ContentValues();
+                    // save temp
                     cv.put(DbContractor.WeatherLoc.COLUMN_TEMPERATURE,
                             locationToFill.getTemperature());
+                    // save time
+                    cv.put(DbContractor.WeatherLoc.COLUMN_TIME, locationToFill.getTime_stamp());
+                    // save desc
+                    cv.put(DbContractor.WeatherLoc.COLUMN_DESC, locationToFill.getDesc());
 
+                    // TODO save time stamp too.
                     //String sql = "UPDATE "+ DbContractor.WeatherLoc.TABLE_NAME + " SET " + DbContractor.WeatherLoc.COLUMN_TEMPERATURE + " = '" + locationToFill.getTemperature() + " WHERE " + DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = " + locationToFill.getZipcode();
 
                     int result = db.update(DbContractor.WeatherLoc.TABLE_NAME,
