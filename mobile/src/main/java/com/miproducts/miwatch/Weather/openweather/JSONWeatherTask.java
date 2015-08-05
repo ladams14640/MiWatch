@@ -218,6 +218,8 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
          * description
          * // i picked up
          *      // light intensity shower rain
+         *      // broken clouds
+         *
          *
          *  light rain - sun and rain
          *  overcast clouds - cloud

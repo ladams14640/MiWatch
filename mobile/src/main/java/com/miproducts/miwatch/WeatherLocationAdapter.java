@@ -7,11 +7,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.miproducts.miwatch.Container.TimeKeeper;
 import com.miproducts.miwatch.Container.WeatherLocation;
+import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
+import com.miproducts.miwatch.utilities.TimerFormat;
 
 import java.sql.Time;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -64,21 +69,50 @@ public class WeatherLocationAdapter extends BaseAdapter{
         // we will do logic here to pick the image
         TextView tvDesc = (TextView) rowView.findViewById(R.id.tvDesc);
         TextView tvTime = (TextView) rowView.findViewById(R.id.tvTimeStamp);
+        ImageView ivWeather  =  (ImageView) rowView.findViewById(R.id.ivWeather);
 
         tvZipcode.setText(mLocations.get(position).getZipcode());
         tvCity.setText(mLocations.get(position).getCity());
         tvTemp.setText(String.valueOf(mLocations.get(position).getTemperature()));
         tvDesc.setText(mLocations.get(position).getDesc());
 
-        // get current time
-        long currentTime = System.currentTimeMillis();
-        long currentHour = TimeUnit.MILLISECONDS.convert(currentTime, TimeUnit.HOURS);
-        // get saved time
-        long savedHours = TimeUnit.MILLISECONDS.convert(mLocations.get(position).getTime_stamp(),TimeUnit.HOURS);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(mLocations.get(position).getTime_stamp());
+        String time = checkForMilitaryTime(cal.getTime().getHours(), cal.getTime().getMinutes());
 
-        // subtract the two times.
-        tvTime.setText(currentHour - savedHours + " : "); //+ " : " + TimeUnit.MILLISECONDS.toMinutes(mLocations.get(position).getTime_stamp()
+        String desc = mLocations.get(position).getDesc();
+        if(desc.equals("sky is clear")){
+            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_sun));
+        }
+        else if(desc.equals("few clouds")){
+            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_cloudy));
+        }
+        else if(desc.equals("broken clouds")){
+            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_cloudy));
+        }
+        else if(desc.equals("light intensity shower rain")){
+            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_rain));
+        }
+
+
+        tvTime.setText(time);
 
         return rowView;
+    }
+
+    private String checkForMilitaryTime(int hours, int mins) {
+        String AM = "AM";
+        String nMin = String.valueOf(mins);
+
+        if(hours > 12 ){
+            hours = hours - 12;
+            AM = "PM";
+        }
+
+        if(mins <= 9){
+            nMin = "0"+mins;
+        }
+
+        return hours + ":" + nMin + AM;
     }
 }
