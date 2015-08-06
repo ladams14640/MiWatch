@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.miproducts.miwatch.Container.TimeKeeper;
 import com.miproducts.miwatch.Container.WeatherLocation;
 import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
+import com.miproducts.miwatch.utilities.SettingsManager;
 import com.miproducts.miwatch.utilities.TimerFormat;
 
 import java.sql.Time;
@@ -29,13 +30,15 @@ public class WeatherLocationAdapter extends BaseAdapter{
     private Context mContext;
     private int rowForLocationToInflate;
     private LayoutInflater inflater;
+    private SettingsManager mSettingsMananger;
 
     public WeatherLocationAdapter(List<WeatherLocation> mLocations, Context mContext, int rowForLocationToInflate) {
         this.mLocations = mLocations;
         this.mContext = mContext;
         this.rowForLocationToInflate = rowForLocationToInflate;
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        // to grab the saved zipcode (selected zipcode)
+        mSettingsMananger = new SettingsManager(mContext);
     }
 
     private void addLocation(WeatherLocation newLocation){
@@ -59,54 +62,68 @@ public class WeatherLocationAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //TODO build a viewholder
+            //TODO build a viewholder
 
-        View rowView = inflater.inflate(rowForLocationToInflate, parent, false);
+            // Inflate up
+            View rowView = inflater.inflate(rowForLocationToInflate, parent, false);
 
-        TextView tvZipcode = (TextView) rowView.findViewById(R.id.tvZipCode);
-        TextView tvCity = (TextView) rowView.findViewById(R.id.tvCity);
-        TextView tvTemp = (TextView) rowView.findViewById(R.id.tvDegree);
-        // we will do logic here to pick the image
-        TextView tvDesc = (TextView) rowView.findViewById(R.id.tvDesc);
-        TextView tvTime = (TextView) rowView.findViewById(R.id.tvTimeStamp);
-        ImageView ivWeather  =  (ImageView) rowView.findViewById(R.id.ivWeather);
+            // Link up
+            TextView tvZipcode = (TextView) rowView.findViewById(R.id.tvZipCode);
+            TextView tvCity = (TextView) rowView.findViewById(R.id.tvCity);
+            TextView tvTemp = (TextView) rowView.findViewById(R.id.tvDegree);
 
-        tvZipcode.setText(mLocations.get(position).getZipcode());
-        tvCity.setText(mLocations.get(position).getCity());
-        tvTemp.setText(String.valueOf(mLocations.get(position).getTemperature()));
-        tvDesc.setText(mLocations.get(position).getDesc());
+            // we will do logic here to pick the image
+            TextView tvDesc = (TextView) rowView.findViewById(R.id.tvDesc);
+            TextView tvTime = (TextView) rowView.findViewById(R.id.tvTimeStamp);
+            ImageView ivWeather  =  (ImageView) rowView.findViewById(R.id.ivWeather);
+            TextView tvSelected = (TextView) rowView.findViewById(R.id.tvCurrentlySelected);
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(mLocations.get(position).getTime_stamp());
-        String time = checkForMilitaryTime(cal.getTime().getHours(), cal.getTime().getMinutes());
+            tvZipcode.setText(mLocations.get(position).getZipcode());
+            tvCity.setText(mLocations.get(position).getCity());
+            tvTemp.setText(String.valueOf(mLocations.get(position).getTemperature()));
+            tvDesc.setText(mLocations.get(position).getDesc());
 
-        String desc = mLocations.get(position).getDesc();
-        if(desc.equals("sky is clear")){
-            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_sun));
-        }
-        else if(desc.equals("few clouds")){
-            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_cloudy));
-        }
-        else if(desc.equals("broken clouds")){
-            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_cloudy));
-        }
-        else if(desc.equals("light intensity shower rain")){
-            ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_rain));
-        }
+            // whats currently selected.
+            if(mSettingsMananger.getZipCode().equals(mLocations.get(position).getZipcode())){
+                tvSelected.setText("Currently Selected");
+            }
+
+            // Format the saved time.
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(mLocations.get(position).getTime_stamp());
+            String time = checkForMilitaryTime(cal.getTime().getHours(), cal.getTime().getMinutes());
+            tvTime.setText(time);
+
+            // Decide what image to display - based off the description we got back.
+            String desc = mLocations.get(position).getDesc();
+            if(desc.equals("sky is clear")){
+                ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_sun));
+            }
+            else if(desc.equals("few clouds")){
+                ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_cloudy));
+            }
+            else if(desc.equals("broken clouds")){
+                ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_cloudy));
+            }
+            else if(desc.equals("light intensity shower rain")){
+                ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_rain));
+            }
 
 
-        tvTime.setText(time);
 
-        return rowView;
+            return rowView;
     }
 
     private String checkForMilitaryTime(int hours, int mins) {
         String AM = "AM";
         String nMin = String.valueOf(mins);
 
+        if(hours >= 12){
+            AM = "PM";
+        }
+
         if(hours > 12 ){
             hours = hours - 12;
-            AM = "PM";
         }
 
         if(mins <= 9){

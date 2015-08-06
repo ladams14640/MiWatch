@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -98,7 +99,18 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
         lvLocations = (ListView) findViewById(R.id.lvLocations);
         updateUI();
+        lvLocations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getTemp(((WeatherLocationAdapter) lvLocations.getAdapter()).getItem(position));
+            }
+        });
 
+        // check if we got any in the DB if so update them
+        List<WeatherLocation> weatherLocs = dbHelper.getAllWeatherLocations();
+        for(WeatherLocation weatherLoc : weatherLocs){
+            new JSONWeatherTask(this, mSettingsManager, mGoogleApiClient, weatherLoc,false).execute();
+        }
     }
 
     private void addToDatabase(WeatherLocation weatherLocation) {
@@ -122,7 +134,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
 
     private void getTemp(WeatherLocation weatherLocation) {
-        JSONWeatherTask task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation);
+        JSONWeatherTask task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true);
         task.execute();
 
     }

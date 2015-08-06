@@ -16,6 +16,7 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.miproducts.miwatch.Database.WeatherLocationDbHelper;
 import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
 import com.miproducts.miwatch.Weather.openweather.JSONWeatherTask;
 import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
@@ -34,6 +35,7 @@ public class ConfigListenerService extends WearableListenerService
     private static final String TAG = "DigitalListenerService";
     private GoogleApiClient mGoogleApi;
     private SettingsManager mSettingsManager;
+    private WeatherLocationDbHelper dbHelper;
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -56,6 +58,9 @@ public class ConfigListenerService extends WearableListenerService
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         log("onDataChanged");
         mSettingsManager = new SettingsManager(getApplicationContext());
+        dbHelper = new WeatherLocationDbHelper(getApplicationContext());
+
+
         mGoogleApi = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
                 .build();
