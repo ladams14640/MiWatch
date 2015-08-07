@@ -23,8 +23,6 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -32,29 +30,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.format.Time;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.SurfaceHolder;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
@@ -68,6 +51,11 @@ import com.miproducts.miwatch.utilities.SettingsManager;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+//TODO begin to work back on customizing application. start with setting boolean for when we are in the new activity and when we are in the old.
+// it will continue to run in the background and get the data, but it wont post it to the datalayer
+// so if we just send it through a message maybe then it will actually send it and our watchface then can receive it.
+//http://android-wear-docs.readthedocs.org/en/latest/sync.html
 
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
@@ -84,7 +72,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
     // whether we are on a round device or not for positions. (matters for the mods it seems)
     private boolean isRound = false;
-
+    Engine engine;
     @Override
     public Engine onCreateEngine() {
         return new Engine();
@@ -92,7 +80,8 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
 
 
-    public class Engine extends CanvasWatchFaceService.Engine implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    public class Engine extends CanvasWatchFaceService.Engine{
         static final int MSG_UPDATE_TIME = 0;
 
         @Override
@@ -139,11 +128,14 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             }
         };
 
+        // It is the MiDigitalWatchFaceConfigListenerService who sends out a broadcast to this, after it
+        // stores the degrees in the @SettingsManager Preference.
         final BroadcastReceiver brDegreeRefresh = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (isHudDisplaying && !isPeakCardPeaking) {
                     log("refreshing Degrees from MiDigitalWatchfaceBroadcast");
+                    // this will eventually tell Degree to grab its degrees from the Preference (@SettingsManager)
                     mHudView.resetTemp();
                 }
             }
@@ -184,6 +176,7 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
         // Date
         DateMod mDateMod;
 
+        SettingsManager settingsManager;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -218,8 +211,23 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
 
 
             mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle bundle) {
+
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int i) {
+
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult connectionResult) {
+
+                        }
+                    })
                     .addApi(Wearable.API)
                     .build();
 
@@ -228,6 +236,9 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
             displayWidth = mWindowManager.getDefaultDisplay().getWidth();
             displayHeight = mWindowManager.getDefaultDisplay().getHeight();
+
+            settingsManager = new SettingsManager(mContext);
+
 
             setPositionForWatchfaceObjects();
             setPaintForWatchFaceObjects(resources);
@@ -332,14 +343,19 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
                 // Update time zone in case it changed while we weren't visible.
                 setCalendar();
                 // reset DateMod so its fresh.
-                mDateMod = null;
                 addHudView();
                 if (mHudView.isEventModActive()) {
                     mHudView.initEventSyncTask();
                 }
+                //retrieveSettingsManagerColor();
+
+                /**
+                 *  determine if we need to remove hud (if we are viewing {@Link MiDigitalWatchFaceConfiguration} Screen)
+                 */
+                retrieveSettingsManagerHud();
             } else {
                 if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-                    mGoogleApiClient.disconnect();
+                    //mGoogleApiClient.disconnect();
                 }
                 unregisterReceiver();
                 removeHudView();
@@ -348,6 +364,18 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             // Whether the timer should be running depends on whether we're visible (as well as
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
+        }
+
+        // only time this will be false is if the MiDigitalWatchFaceConfiguration has been called, to reverse we will need to
+        // provoke a onVisibilityChange
+        public void retrieveSettingsManagerHud() {
+            if(settingsManager.getHudRemove()){
+                removeHudView();
+            }
+        }
+
+        private void retrieveSettingsManagerColor() {
+            log("color going to be " + settingsManager.getMainColor());
         }
 
         public void removeHudView() {
@@ -459,8 +487,11 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             canvas.drawText(ConverterUtil.normalizeHour(hour) + ":" + ConverterUtil.normalizeMinute(minute), xPositionForTime, yPositionForTime, mDigitalPaint);
 
             if(mDateMod == null){
+                // make new object
                 mDateMod = new DateMod(mContext, MiDigitalWatchFace.this, dayOfMonth, dayOfWeek);
             }else {
+                // just pump new values here, incase they changed.
+                mDateMod.updateDate(dayOfMonth, dayOfWeek);
                 mDateMod.draw(canvas);
             }
 
@@ -511,30 +542,18 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
          */
         //TODO read desc and maybe we change that phone requirement.
         public void refreshDegrees(DataMap dataMap) {
-            log("sending to Thread now ");
+            log("sending to Thread now " );
             //Requires a new thread to avoid blocking the UI
             new SendToDataLayerThread(Consts.WEARABLE_TO_PHONE_PATH, dataMap).start();
         }
 
-        @Override
-        public void onConnected(Bundle bundle) {
-            log("onConnected " + bundle);
-        }
 
-        @Override
-        public void onConnectionSuspended(int i) {
-            log("onConnectionSuspended");
-        }
-
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            log("onConnectionFailed");
-        }
 
 
         class SendToDataLayerThread extends Thread {
             String path;
             DataMap dataMap;
+            String testmsg = "degree";
 
             // Constructor for sending data objects to the data layer
             SendToDataLayerThread(String p, DataMap data) {
@@ -543,21 +562,14 @@ public class MiDigitalWatchFace extends CanvasWatchFaceService {
             }
 
             public void run() {
-                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-                for (Node node : nodes.getNodes()) {
-
                     // Construct a DataRequest and send over the data layer
                     PutDataMapRequest putDMR = PutDataMapRequest.create(path);
                     putDMR.getDataMap().putAll(dataMap);
                     PutDataRequest request = putDMR.asPutDataRequest();
-                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApiClient,request).await();
-                    if (result.getStatus().isSuccess()) {
-                        Log.d("MiDigitalWatchFace", "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
-                    } else {
-                        // Log an error
-                        Log.d("MiDigitalWatchFace", "ERROR: failed to send DataMap");
-                    }
-                }
+                    Wearable.DataApi.putDataItem(mGoogleApiClient,request).await();
+
+
+
             }
         }
 

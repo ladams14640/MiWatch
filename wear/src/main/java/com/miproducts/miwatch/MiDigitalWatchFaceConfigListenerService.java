@@ -9,7 +9,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.WearableListenerService;
@@ -30,6 +29,7 @@ private static final String TAG = "DigitalListenerService";
 
     }
 
+
     @Override
     public void onConnectionSuspended(int cause) {
         Log.d(TAG, "onConnectionSuspended: " + cause);
@@ -48,15 +48,13 @@ private static final String TAG = "DigitalListenerService";
         SettingsManager sm = new SettingsManager(getApplicationContext());
 
         DataMap dataMap;
-        for (DataEvent event : dataEventBuffer) {
-            // Check the data type
-            if (event.getType() == DataEvent.TYPE_CHANGED) {
-                // Check the data path
-                String path = event.getDataItem().getUri().getPath();
-                if (path.equals(Consts.PHONE_TO_WEARABLE_PATH)) {}
+
+        try{
+            for (DataEvent event : dataEventBuffer) {
                 dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+
                 Log.d("Grab for Watch", "DataMap received on watch: " + dataMap);
-                //TODO WILL CAUSE ISSUES IF TEMP IS 0 I am sure. - actualyl will just fill in 0
+
                 if(dataMap.getInt(Consts.KEY_BROADCAST_DEGREE,0) != 0){
                     log("value was not 0");
                     // save the new temperature
@@ -70,10 +68,14 @@ private static final String TAG = "DigitalListenerService";
                 }else {
                     log("value came back as 0");
                 }
-            }
 
+
+            }
+        }finally {
+            dataEventBuffer.close();
         }
-        }
+
+    }
 
 
     private void updateCount(int y) {

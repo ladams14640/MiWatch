@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:layout_gravity="center"
+    android:layout_margin="30dp"
+    android:background="@color/color_item_circle_border_color">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Biddeford"
+        android:id="@+id/tvCity"
+        android:layout_marginLeft="40dp"
+        android:gravity="center"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="72"
+        android:id="@+id/tvDegree"
+        android:layout_marginLeft="20dp"
+        android:textColor="#ff87fff0"
+        android:gravity="center"
+        android:layout_marginRight="40dp"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:layout_marginEnd="38dp"
+        android:layout_below="@+id/ivWeather"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="04072"
+        android:id="@+id/tvZipCode"
+        android:layout_alignBottom="@+id/tvDegree"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:id="@+id/tvCurrentlySelected"
+        android:layout_below="@+id/tvCity"
+        android:layout_alignStart="@+id/tvCity"
+        android:textSize="14dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ivWeather"
+        android:src="@drawable/ic_ic_action_rain_sun"
+        android:scaleType="center"
+        android:layout_alignStart="@+id/tvDegree"
+        android:layout_alignEnd="@+id/tvDegree"
+        android:layout_alignBottom="@+id/tvCurrentlySelected" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="7:49PM"
+        android:id="@+id/tvTimeStamp"
+        android:layout_alignBottom="@+id/tvZipCode"
+        android:layout_alignStart="@+id/tvCurrentlySelected" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="desac"
+        android:id="@+id/tvDesc"
+        android:layout_alignTop="@+id/tvDegree"
+        android:layout_alignStart="@+id/tvCurrentlySelected" />
+
+
+</RelativeLayout>

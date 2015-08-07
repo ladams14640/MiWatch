@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+
+import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.hud.HudView;
 import com.miproducts.miwatch.utilities.ConverterUtil;
 import com.miproducts.miwatch.utilities.LoadMeetingTask;
@@ -23,7 +25,7 @@ import java.util.List;
  */
 public class EventMod extends View {
 
-    private final int EVENT_FORWARD_THRESHOLD = -50;
+    private final int EVENT_FORWARD_THRESHOLD = -20;
     private int EVENT_BACKWARD_THRESHOLD;
 
     private int mIndex;
@@ -34,6 +36,8 @@ public class EventMod extends View {
     private Context mContext;
     // Paint for the text
     private Paint mPaint;
+    private Paint mPaintInfo;
+
     // Rectangle of the view so we can tell if touches are within it's perimeter.
     private Rect locationRect;
 
@@ -88,19 +92,19 @@ public class EventMod extends View {
 
     private void initPositions() {
         // we always animate to this position, might as well save it.
+        //TODO shouldnt be capitalized.
         X_ORIGINAL_POSITION = mContext.getWallpaperDesiredMinimumWidth()/10;
-        Y_ORIGINAL_POSITION = (int)mHudView.getTopOfHud()+10;
+        Y_ORIGINAL_POSITION = (int)mHudView.getTopOfHud()+25;
 
         // set width
         width = mContext.getWallpaperDesiredMinimumWidth()-50;
-
         RECT_LENGTH = X_ORIGINAL_POSITION+width;
         RECT_WIDTH = Y_ORIGINAL_POSITION+height;
         locationRect = new Rect(X_ORIGINAL_POSITION, Y_ORIGINAL_POSITION, RECT_LENGTH, RECT_WIDTH);
         xText = X_ORIGINAL_POSITION;
 
         // set threshold
-        EVENT_BACKWARD_THRESHOLD  = (int) mHudView.getSurfaceWidth()/2;
+        EVENT_BACKWARD_THRESHOLD  = (int) (mContext.getWallpaperDesiredMinimumWidth() * .1); // 1/20
     }
 
     private void initPaint() {
@@ -111,6 +115,14 @@ public class EventMod extends View {
         mPaint.setAntiAlias(true);
         mPaint.setDither(false);
         mPaint.setTextAlign(Paint.Align.LEFT);
+
+        mPaintInfo = new Paint();
+        mPaintInfo.setColor(getResources().getColor(R.color.digital_time_blue));
+        mPaintInfo.setTextSize(textSize);
+        mPaintInfo.setTypeface(Typeface.DEFAULT);
+        mPaintInfo.setAntiAlias(true);
+        mPaintInfo.setDither(false);
+        mPaintInfo.setTextAlign(Paint.Align.LEFT);
     }
 
 
@@ -134,7 +146,7 @@ public class EventMod extends View {
                     //log("down");
                     // no need to move view if animating.
                     if(!isAnimating)
-                        xDown = event.getX();
+                        xDown = event.getX() + RECT_LENGTH/2;
 
                     return true;
 
@@ -142,7 +154,7 @@ public class EventMod extends View {
                     // no adjustments if we are animating
                     if(!isAnimating) {
                         //log("moving");
-                        xMove = event.getX();
+                        xMove = event.getX() + RECT_LENGTH/2;
                         xOffsetTouch = xMove - xDown;
                         isDragging = true;
                         xText = (int) xOffsetTouch;
@@ -340,7 +352,7 @@ public class EventMod extends View {
         super.draw(canvas);
         //canvas.drawRect(locationRect, mPaint);
         canvas.drawText(mEventInfo, xText, Y_ORIGINAL_POSITION + textSize, mPaint);
-        canvas.drawText(mEventTitle, xText, Y_ORIGINAL_POSITION + (textSize * 2), mPaint);
+        canvas.drawText(mEventTitle, xText, Y_ORIGINAL_POSITION + (textSize * 2), mPaintInfo);
     //        canvas.drawText(mEventDesc, xText, y + (textSize * 3), mPaint);
         }
 

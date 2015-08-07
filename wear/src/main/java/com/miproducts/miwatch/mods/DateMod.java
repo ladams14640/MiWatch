@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.miproducts.miwatch.MiDigitalWatchFace;
@@ -35,8 +34,6 @@ public class DateMod extends View implements CustomizedMods{
     private Context mContext;
 
     private int x, y;
-    private String dateOfWeek = "Sun";
-    private String dateOfMonth = "05";
 
     private Paint pDateOfWeek;
     private Paint pDateOfMonth;
@@ -110,8 +107,8 @@ public class DateMod extends View implements CustomizedMods{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawText(dateOfWeek, x, y-textSize, pDateOfWeek);
-        canvas.drawText(dateOfMonth, x, y, pDateOfMonth);
+        canvas.drawText(dayOfWeek, x, y - textSize, pDateOfWeek);
+        canvas.drawText(dayOfMonth, x, y, pDateOfMonth);
         // canvas.drawRect(mSelectRect, pRect);
 
 
@@ -169,5 +166,9 @@ public class DateMod extends View implements CustomizedMods{
 
     public boolean getViewsVisibility() {
         return isVisible;
+    }
+    public void updateDate(String dayOfMonth, String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+        this.dayOfMonth = dayOfMonth;
     }
 }

@@ -5,15 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
-import com.miproducts.miwatch.MiDigitalWatchFace;
 import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.utilities.Consts;
-import com.miproducts.miwatch.utilities.SettingsManager;
 
 /**
  * Used by PickingMod - it is a special Mod and handles everything like the border n such.
@@ -23,11 +18,11 @@ public class DigitalTimer extends View {
     private static final int ID = Consts.DIGITAL_TIMER;
     private Paint rectPaint;
     private Paint timePaint;
-    private int rightBorder, leftBorder, topBorder, botBorder;
+    private float rightBorder, leftBorder, topBorder, botBorder;
     private Rect rectBorder;
 
 
-    public DigitalTimer(Context context, WatchFaceSurfaceViewConfig svView, int leftBorder, int topBorder) {
+    public DigitalTimer(Context context, WatchFaceSurfaceViewConfig svView, float leftBorder, float topBorder) {
         super(context);
         this.leftBorder = leftBorder;
         this.topBorder = topBorder;
