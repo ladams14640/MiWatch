@@ -161,7 +161,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 Toast.makeText(mContext, "Not proper zipcode!", Toast.LENGTH_LONG).show();
 
                 return;
-            }else if(result.equals("ONLINE_ISSUE")){
+            }else if(result.equals(ERROR_ONLINE)){
                 Toast.makeText(mContext, "Not online!", Toast.LENGTH_LONG).show();
 
             }
@@ -272,6 +272,8 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
     }
 
     private boolean resultIsValid(String result) {
+        if(result == null)
+            return false;
         log("check validity " + !result.contains("Not found city"));
         //TODO check validity
         // we will get not found city if this was not a accurate zipcode.

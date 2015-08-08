@@ -25,8 +25,8 @@ import java.util.List;
  */
 public class EventMod extends View {
 
-    private final int EVENT_FORWARD_THRESHOLD = -20;
-    private int EVENT_BACKWARD_THRESHOLD;
+    private final int EVENT_FORWARD_THRESHOLD = -10;
+    private int EVENT_BACKWARD_THRESHOLD = 10;
 
     private int mIndex;
     private int mEventIndex;
@@ -146,7 +146,7 @@ public class EventMod extends View {
                     //log("down");
                     // no need to move view if animating.
                     if(!isAnimating)
-                        xDown = event.getX() + RECT_LENGTH/2;
+                        xDown = event.getX() + X_ORIGINAL_POSITION;
 
                     return true;
 
@@ -154,15 +154,15 @@ public class EventMod extends View {
                     // no adjustments if we are animating
                     if(!isAnimating) {
                         //log("moving");
-                        xMove = event.getX() + RECT_LENGTH/2;
+                        xMove = event.getX() + X_ORIGINAL_POSITION;
                         xOffsetTouch = xMove - xDown;
                         isDragging = true;
                         xText = (int) xOffsetTouch;
                         //log("position of xText == " + xText);
                         mHudView.invalidate();
                         // if finger has dragged forward or backwards enough to instigate a "EventChange"
-                        if(xText < EVENT_FORWARD_THRESHOLD
-                                || xText > EVENT_BACKWARD_THRESHOLD){
+                        if(xText > EVENT_FORWARD_THRESHOLD + X_ORIGINAL_POSITION
+                                || xText < EVENT_BACKWARD_THRESHOLD - X_ORIGINAL_POSITION){
                             isAnimating = true;
                             fingerOff();
                         }
@@ -198,14 +198,14 @@ public class EventMod extends View {
         if(isDragging){
             isDragging = false;
             // View was dragged far enough to animate into the next Event.
-            if(xText < EVENT_FORWARD_THRESHOLD ){
+            if(xText < EVENT_BACKWARD_THRESHOLD - X_ORIGINAL_POSITION ){
                 //log("next Event forward");
                 animateChangeInEvent(true);
                 return;
 
             }
             // finger went far enough to go backwards
-            else if(xText > EVENT_BACKWARD_THRESHOLD){
+            else if(xText > EVENT_FORWARD_THRESHOLD + X_ORIGINAL_POSITION){
                 log("next Event backwards.");
                 animateChangeInEvent(false);
                 return;

@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
@@ -48,7 +49,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private WeatherLocationAdapter mWeatherLocationAdapter;
 
     private WeatherLocationDbHelper dbHelper;
-
+    private ImageButton FAB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +81,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
         if(!mSettingsManager.getZipCode().equals(SettingsManager.NOTHING_SAVED))
             etZipCode.setText(mSettingsManager.getZipCode());
-
+/*
         //TODO handle done according, close keyboard - handle bAddWeather to close keyboard as well.
         bAddWeatherLocation = (ImageButton) findViewById(R.id.bAddWeatherLocation);
         bAddWeatherLocation.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +96,22 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
                 getTemp(weatherLocation);
             }
         });
+        */
 
+        FAB = (ImageButton) findViewById(R.id.imageButton);
+        FAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Hello Worl", Toast.LENGTH_SHORT).show();
+                WeatherLocation weatherLocation = new WeatherLocation();
+                weatherLocation.setZipcode(etZipCode.getText().toString());
+                getTemp(weatherLocation);
+
+
+            }
+        });
 
         lvLocations = (ListView) findViewById(R.id.lvLocations);
         updateUI();
@@ -105,12 +121,13 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
                 getTemp(((WeatherLocationAdapter) lvLocations.getAdapter()).getItem(position));
             }
         });
-
+        //TODO make sure no issue if user doesnt already have weatherLocations saved/
+        /*
         // check if we got any in the DB if so update them
         List<WeatherLocation> weatherLocs = dbHelper.getAllWeatherLocations();
         for(WeatherLocation weatherLoc : weatherLocs){
             new JSONWeatherTask(this, mSettingsManager, mGoogleApiClient, weatherLoc,false).execute();
-        }
+        }*/
     }
 
     private void addToDatabase(WeatherLocation weatherLocation) {

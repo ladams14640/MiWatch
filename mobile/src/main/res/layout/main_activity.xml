@@ -26,19 +26,29 @@
                 android:ems="11"
                 android:text=""
                 android:id="@+id/etZipcode" />
-
+<!--
         <ImageButton
             android:src="@android:drawable/ic_menu_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/bAddWeatherLocation" />
+            android:id="@+id/bAddWeatherLocation" /> -->
     </LinearLayout>
-
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@android:color/transparent"
         android:dividerHeight="10.0sp"
-        android:id="@+id/lvLocations" />
-
+        android:id="@+id/lvLocations"  />
+    <ImageButton
+        android:layout_margin="15dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@drawable/circle"
+        android:id="@+id/imageButton"
+        android:layout_gravity="right|bottom" />
+    </FrameLayout>
 </LinearLayout>
