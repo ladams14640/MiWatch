@@ -43,8 +43,8 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private SettingsManager mSettingsManager;
 
     private ListView lvLocations;
-    private ImageButton bAddWeatherLocation;
-    private EditText etZipCode;
+    //private ImageButton bAddWeatherLocation;
+    //private EditText etZipCode;
 
     private WeatherLocationAdapter mWeatherLocationAdapter;
 
@@ -77,10 +77,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
             }
         };
 
-        etZipCode = (EditText) findViewById(R.id.etZipcode);
-
-        if(!mSettingsManager.getZipCode().equals(SettingsManager.NOTHING_SAVED))
-            etZipCode.setText(mSettingsManager.getZipCode());
+        //etZipCode = (EditText) findViewById(R.id.etZipcode);
 /*
         //TODO handle done according, close keyboard - handle bAddWeather to close keyboard as well.
         bAddWeatherLocation = (ImageButton) findViewById(R.id.bAddWeatherLocation);
@@ -103,18 +100,21 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-
+                /* We had this but now lets launch the new Activity
                 Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Hello Worl", Toast.LENGTH_SHORT).show();
                 WeatherLocation weatherLocation = new WeatherLocation();
                 weatherLocation.setZipcode(etZipCode.getText().toString());
-                getTemp(weatherLocation);
+                getTemp(weatherLocation);*/
+                // lets go to the new Activity.
+                Intent intentToAddWeatherLocation = new Intent(MiDigitalWatchFaceCompanionConfigActivity.this,AddWeatherLocation.class);
+                startActivity(intentToAddWeatherLocation);
 
 
             }
         });
 
         lvLocations = (ListView) findViewById(R.id.lvLocations);
-        updateUI();
+        //TODO do this in start might not need it here anymore updateUI();
         lvLocations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -153,13 +153,13 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private void getTemp(WeatherLocation weatherLocation) {
         JSONWeatherTask task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true);
         task.execute();
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         initReceivers();
+        updateUI();
     }
 
 
