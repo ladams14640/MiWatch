@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Biddeford"
-        android:id="@+id/tvCity"
+        android:id="@+id/tvCitylv"
         android:layout_marginLeft="40dp"
         android:gravity="center"
         android:textSize="24dp"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="72"
-        android:id="@+id/tvDegree"
+        android:id="@+id/tvDegreelv"
         android:layout_marginLeft="20dp"
         android:textColor="#ff87fff0"
         android:gravity="center"
@@ -33,7 +33,7 @@
         android:textSize="50dp"
         android:textStyle="bold"
         android:layout_marginEnd="38dp"
-        android:layout_below="@+id/ivWeather"
+        android:layout_below="@+id/ivWeatherlv"
         android:layout_alignParentEnd="true" />
 
     <TextView
@@ -41,8 +41,8 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="04072"
-        android:id="@+id/tvZipCode"
-        android:layout_alignBottom="@+id/tvDegree"
+        android:id="@+id/tvZipCodelv"
+        android:layout_alignBottom="@+id/tvDegreelv"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -50,38 +50,38 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text=""
-        android:id="@+id/tvCurrentlySelected"
-        android:layout_below="@+id/tvCity"
-        android:layout_alignStart="@+id/tvCity"
+        android:id="@+id/tvCurrentlySelectedlv"
+        android:layout_below="@+id/tvCitylv"
+        android:layout_alignStart="@+id/tvCitylv"
         android:textSize="14dp" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/ivWeather"
+        android:id="@+id/ivWeatherlv"
         android:src="@drawable/ic_ic_action_rain_sun"
         android:scaleType="center"
-        android:layout_alignStart="@+id/tvDegree"
-        android:layout_alignEnd="@+id/tvDegree"
-        android:layout_alignBottom="@+id/tvCurrentlySelected" />
+        android:layout_alignStart="@+id/tvDegreelv"
+        android:layout_alignEnd="@+id/tvDegreelv"
+        android:layout_alignBottom="@+id/tvCurrentlySelectedlv" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="7:49PM"
-        android:id="@+id/tvTimeStamp"
-        android:layout_alignBottom="@+id/tvZipCode"
-        android:layout_alignStart="@+id/tvCurrentlySelected" />
+        android:id="@+id/tvTimeStamplv"
+        android:layout_alignBottom="@+id/tvZipCodelv"
+        android:layout_alignStart="@+id/tvCurrentlySelectedlv" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="desac"
-        android:id="@+id/tvDesc"
-        android:layout_alignTop="@+id/tvDegree"
-        android:layout_alignStart="@+id/tvCurrentlySelected" />
+        android:id="@+id/tvDesclv"
+        android:layout_alignTop="@+id/tvDegreelv"
+        android:layout_alignStart="@+id/tvCurrentlySelectedlv" />
 
 
 </RelativeLayout>

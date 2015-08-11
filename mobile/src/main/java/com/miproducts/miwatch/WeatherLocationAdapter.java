@@ -68,15 +68,15 @@ public class WeatherLocationAdapter extends BaseAdapter{
             View rowView = inflater.inflate(rowForLocationToInflate, parent, false);
 
             // Link up
-            TextView tvZipcode = (TextView) rowView.findViewById(R.id.tvZipCode);
-            TextView tvCity = (TextView) rowView.findViewById(R.id.tvCity);
-            TextView tvTemp = (TextView) rowView.findViewById(R.id.tvDegree);
+            TextView tvZipcode = (TextView) rowView.findViewById(R.id.tvZipCodelv);
+            TextView tvCity = (TextView) rowView.findViewById(R.id.tvCitylv);
+            TextView tvTemp = (TextView) rowView.findViewById(R.id.tvDegreelv);
 
             // we will do logic here to pick the image
-            TextView tvDesc = (TextView) rowView.findViewById(R.id.tvDesc);
-            TextView tvTime = (TextView) rowView.findViewById(R.id.tvTimeStamp);
-            ImageView ivWeather  =  (ImageView) rowView.findViewById(R.id.ivWeather);
-            TextView tvSelected = (TextView) rowView.findViewById(R.id.tvCurrentlySelected);
+            TextView tvDesc = (TextView) rowView.findViewById(R.id.tvDesclv);
+            TextView tvTime = (TextView) rowView.findViewById(R.id.tvTimeStamplv);
+            ImageView ivWeather  =  (ImageView) rowView.findViewById(R.id.ivWeatherlv);
+            TextView tvSelected = (TextView) rowView.findViewById(R.id.tvCurrentlySelectedlv);
 
             tvZipcode.setText(mLocations.get(position).getZipcode());
             tvCity.setText(mLocations.get(position).getCity());
@@ -96,6 +96,8 @@ public class WeatherLocationAdapter extends BaseAdapter{
 
             // Decide what image to display - based off the description we got back.
             String desc = mLocations.get(position).getDesc();
+        //TODO issues here now that I have added in townAndState in the JSON fetching - prob cuz im not doing something there right.
+        if(desc != null){
             if(desc.equals("sky is clear")){
                 ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_sun));
             }
@@ -114,6 +116,8 @@ public class WeatherLocationAdapter extends BaseAdapter{
             else if(desc.equals("light intensity shower rain")){
                 ivWeather.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_action_rain));
             }
+
+        }
 
 
 

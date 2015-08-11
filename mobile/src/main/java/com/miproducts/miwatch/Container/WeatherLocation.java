@@ -12,6 +12,10 @@ public class WeatherLocation {
     private String zipcode;
     private String city;
     private String desc;
+
+
+
+    private String state;
     private long time_stamp;
 
 
@@ -73,9 +77,10 @@ public class WeatherLocation {
         this.city = city;
     }
 
-
-
-
-
-
+    public String getState() {
+        return state;
+    }
+    public void setState(String state) {
+        this.state = state;
+    }
 }

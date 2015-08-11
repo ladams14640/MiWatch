@@ -28,6 +28,7 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
 
     //TODO letsm ake sure we update the time stamp and description
     public void addLocation(WeatherLocation wLocation){
+        log("addLocation");
         // grab a copy of the database.
         SQLiteDatabase database = this.getWritableDatabase();
 
@@ -65,6 +66,7 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
+
                 WeatherLocation weatherLocation = new WeatherLocation();
                 // weather
                 weatherLocation.setTemperature(Integer.parseInt(cursor.getString(0)));
@@ -188,4 +190,8 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
         cursor.close();
 
     }
+
+
+
+
 }

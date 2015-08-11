@@ -2,23 +2,24 @@ package com.miproducts.miwatch;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.SimpleAdapter;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Wearable;
+import com.miproducts.miwatch.AutoComplete.CustomAutoCompleteTextView;
 import com.miproducts.miwatch.Container.WeatherLocation;
 import com.miproducts.miwatch.Weather.openweather.JSONWeatherTask;
-import com.miproducts.miwatch.utilities.CSVReader;
+import com.miproducts.miwatch.AutoComplete.CSVReader;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class AddWeatherLocation extends Activity{
     /* Link to the View objects */
     private ImageButton ibBack;
     private ImageButton ibCurrentLocation;
-    private EditText etSearchPlaces;
+    private AutoCompleteTextView etSearchPlaces;
     private SettingsManager mSettingsManager;
     private GoogleApiClient mGoogleApiClient;
     List<String[]> list;
@@ -46,7 +47,7 @@ public class AddWeatherLocation extends Activity{
                 .build();
 
         initViewObjects();
-        parseCityAndStateCSV();
+       // parseCityAndStateCSV();
     }
 
     private void parseCityAndStateCSV() {
@@ -58,7 +59,6 @@ public class AddWeatherLocation extends Activity{
             while(true) {
                 next = reader.readNext();
                 if(next != null) {
-
                     list.add(next);
                 } else {
                     break;
@@ -66,18 +66,48 @@ public class AddWeatherLocation extends Activity{
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            for(int i = 0; i < list.size(); i++){
+                Log.d(TAG, list.get(i)[2].toString());
+            }
+
+            List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+
+            for(int i = 0; i < list.size(); i++){
+                HashMap<String, String> townState = new HashMap<String, String>();
+                townState.put(list.get(i)[2],list.get(i)[1]);
+                aList.add(townState);
+            }
+
+            CustomAutoCompleteTextView customTextView = (CustomAutoCompleteTextView) findViewById(R.id.atSearchPlaces);
+
+            String[] from = {"town", "state"};
+            int[] to = {R.id.tvTown, R.id.tvState};
+
+            SimpleAdapter adapter = new SimpleAdapter(this, aList, R.layout.auto_complete_text_view, from, to);
+
+            //etSearchPlaces.addTextChangedListener(new );
+            customTextView.setAdapter(adapter);
+
         }
 
-        for(int i = 0; i < list.size(); i++){
-            Log.d(TAG, list.get(i)[2].toString());
-        }
+
+
+
+
+
+
     }
+
+
+
+
 
     /* Initialize View Objects */
     private void initViewObjects() {
         ibBack = (ImageButton) findViewById(R.id.ibBack);
         ibCurrentLocation = (ImageButton) findViewById(R.id.ibCurrentLocation);
-        etSearchPlaces = (EditText) findViewById(R.id.etSearchPlaces);
+        etSearchPlaces = (AutoCompleteTextView) findViewById(R.id.atSearchPlaces);
         attachClickHandlers();
     }
     /* Attach Handlers to View Objects */
@@ -98,17 +128,37 @@ public class AddWeatherLocation extends Activity{
                 // TODO 2. add it to our db.
                 //TODO 3. when done go back to last activity.
 
-                WeatherLocation weatherLocation = new WeatherLocation();
-                weatherLocation.setZipcode(etSearchPlaces.getText().toString());
-                JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient);
-                task.execute();
+                // CHECK IF IT HAS DIGITS
+                if (etSearchPlaces.getText().toString().contains("0")) {
+                    WeatherLocation weatherLocation = new WeatherLocation();
+                    weatherLocation.setZipcode(etSearchPlaces.getText().toString());
+                    JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient);
+                    task.execute();
+
+                }
+                // came from town and state
+                else {
+                    WeatherLocation weatherLocation = new WeatherLocation();
+                    int comma = etSearchPlaces.getText().toString().indexOf(",");
+                    String town = etSearchPlaces.getText().toString().substring(0, comma);
+                    String state = etSearchPlaces.getText().toString().substring(comma+1, etSearchPlaces.length());
+                    weatherLocation.setZipcode(etSearchPlaces.getText().toString());
+                    weatherLocation.setCity(town);
+                    weatherLocation.setState(state);
+                    log("town = " + town);
+                    log("state = " + state);
+                    // false = make sure we let em know we didnt come from an Activity that needs a UI updated, true = make sure we came from townAndState
+                    JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient, weatherLocation, false, true);
+                    task.execute();
+                }
             }
         });
-
+/*
         etSearchPlaces.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 Log.d(TAG, "onKey");
+
                 //TODO this is probably too much work and will kill app!
                 // dont want to fetch it if we are doing something else here.
                 if (event.getAction() != KeyEvent.KEYCODE_DEL || event.getAction() != KeyEvent.KEYCODE_ENTER) {
@@ -122,7 +172,11 @@ public class AddWeatherLocation extends Activity{
                 return false;
             }
         });
+ */
+    }
 
+    private void log(String s) {
+        Log.d(TAG, s);
     }
 
 
