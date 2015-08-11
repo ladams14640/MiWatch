@@ -127,7 +127,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         this.fromActivity = true;
 
         this.changeSelected = changeSelected;
-        this.fromTownAndState = fromTownAndState;
+        this.fromTownAndState = true;
 
     }
 
@@ -136,21 +136,27 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
     @Override
     protected String doInBackground(String... params) {
         Log.d(TAG, "BackGround");
-        String zipcode = SettingsManager.NOTHING_SAVED;
+        String zipcode = null;
 
         if(fromActivity){
-            // fresh zipcode, not one from the preferences.
-            zipcode = locationToFill.getZipcode();
+            if(!fromTownAndState) {
+                // fresh zipcode, not one from the preferences.
+                zipcode = locationToFill.getZipcode();
+            }
+            // means we came by other means
+            else {
+
+            }
         }
         else {
             //TODO this is getting gross
-            if(!fromTownAndState){
+
                 zipcode = mSettingsManager.getZipCode();
                 locationToFill = new WeatherLocation();
                 locationToFill.setZipcode(zipcode);
 
             }
-        }
+
 
         // store data
         String returnedData;
@@ -161,7 +167,8 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         //TODO we need to clean this up
         // if we came from zipcode inputed
 
-            log("not from town");    if(!fromTownAndState){
+            log("not from town");
+        if(!fromTownAndState){
             // check to see if this is the user's first time in the app
             if(!zipcode.equals(SettingsManager.NOTHING_SAVED))
             {
@@ -226,7 +233,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         if(fromActivity){
             // tell
         //TODO turned off because now i am from an activity but not from that activity -- got to fix.n t//o update it's UI
-            ((MiDigitalWatchFaceCompanionConfigActivity)mContext).updateUI();
+            //((MiDigitalWatchFaceCompanionConfigActivity)mContext).updateUI();
         }
         Log.d(TAG, "onPostExecute");
     }
@@ -254,6 +261,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 String town = resultObject.getString("name");
 
                 //TODO reformat here
+                locationToFill.setZipcode();
                 locationToFill.setCity(town);
                 locationToFill.setTemperature(tempInFah);
                 locationToFill.setDesc(description.getString("description").replace("proximity", ""));

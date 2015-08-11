@@ -148,7 +148,7 @@ public class AddWeatherLocation extends Activity{
                     log("town = " + town);
                     log("state = " + state);
                     // false = make sure we let em know we didnt come from an Activity that needs a UI updated, true = make sure we came from townAndState
-                    JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient, weatherLocation, false, true);
+                    JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient, weatherLocation, true, true);
                     task.execute();
                 }
             }
