@@ -5,18 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
+import com.miproducts.miwatch.utilities.CSVReader;
 import com.miproducts.miwatch.Database.WeatherLocationDbHelper;
 import com.miproducts.miwatch.Weather.openweather.JSONWeatherTask;
 import com.miproducts.miwatch.Container.WeatherLocation;
@@ -25,6 +23,9 @@ import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 /**
  * 1. We will allow user to input the zipcode of the area he wants weather.
@@ -77,34 +78,11 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
             }
         };
 
-        //etZipCode = (EditText) findViewById(R.id.etZipcode);
-/*
-        //TODO handle done according, close keyboard - handle bAddWeather to close keyboard as well.
-        bAddWeatherLocation = (ImageButton) findViewById(R.id.bAddWeatherLocation);
-        bAddWeatherLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // save this zipcode as the one we want to fetch for for the phone - the most active one.
-
-                //TODO have preferences save whether or not this view is currently selected.
-
-                WeatherLocation weatherLocation = new WeatherLocation();
-                weatherLocation.setZipcode(etZipCode.getText().toString());
-                getTemp(weatherLocation);
-            }
-        });
-        */
 
         FAB = (ImageButton) findViewById(R.id.imageButton);
         FAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /* We had this but now lets launch the new Activity
-                Toast.makeText(MiDigitalWatchFaceCompanionConfigActivity.this, "Hello Worl", Toast.LENGTH_SHORT).show();
-                WeatherLocation weatherLocation = new WeatherLocation();
-                weatherLocation.setZipcode(etZipCode.getText().toString());
-                getTemp(weatherLocation);*/
                 // lets go to the new Activity.
                 Intent intentToAddWeatherLocation = new Intent(MiDigitalWatchFaceCompanionConfigActivity.this,AddWeatherLocation.class);
                 startActivity(intentToAddWeatherLocation);
@@ -128,6 +106,39 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         for(WeatherLocation weatherLoc : weatherLocs){
             new JSONWeatherTask(this, mSettingsManager, mGoogleApiClient, weatherLoc,false).execute();
         }*/
+
+        checkIfFirstTimeRunning();
+    }
+
+    private void checkIfFirstTimeRunning() {
+        boolean firstTime = mSettingsManager.getIsUsersFirstTimeRunningApp();
+        //TODO always be true for a while.
+
+        if(!firstTime) return;
+
+        log("firstTime checking if We should load up db");
+        String next[] = {};
+        List<String[]> list = new ArrayList<String[]>();
+
+        try {
+            CSVReader reader = new CSVReader(new InputStreamReader(getAssets().open("citiesstateszipcodes.csv")));
+            while(true) {
+                next = reader.readNext();
+                if(next != null) {
+                    list.add(next);
+                } else {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            Log.d(TAG, list.get(0)[2]);
+
+        }
+
+
+
     }
 
     private void addToDatabase(WeatherLocation weatherLocation) {
@@ -139,7 +150,7 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
     public void updateUI() {
         List<WeatherLocation> savedList = dbHelper.getAllWeatherLocations();
-        savedList.add(new WeatherLocation(72, "04005", "Biddeford"));
+        // TESTING PURPOSES - savedList.add(new WeatherLocation(72, "04005", "Biddeford"));
         if(savedList.size() > 0){
             mWeatherLocationAdapter = new WeatherLocationAdapter(savedList, this, R.layout.view_weather_location);
             lvLocations.setAdapter(mWeatherLocationAdapter);
@@ -151,7 +162,16 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
 
 
     private void getTemp(WeatherLocation weatherLocation) {
-        JSONWeatherTask task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true);
+        JSONWeatherTask task;
+        // there was no zipcode so we instruct to handle like its from town and state
+        if(weatherLocation.getZipcode().equals(SettingsManager.NOTHING_SAVED)){
+            task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true, true);
+        }
+        // there was zipcode
+        else {
+            task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true, false);
+
+        }
         task.execute();
     }
 

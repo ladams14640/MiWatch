@@ -1,19 +1,21 @@
 package com.miproducts.miwatch;
 
 import android.app.Activity;
+import android.media.audiofx.BassBoost;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Wearable;
 import com.miproducts.miwatch.AutoComplete.CustomAutoCompleteTextView;
 import com.miproducts.miwatch.Container.WeatherLocation;
 import com.miproducts.miwatch.Weather.openweather.JSONWeatherTask;
-import com.miproducts.miwatch.AutoComplete.CSVReader;
+import com.miproducts.miwatch.utilities.CSVReader;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.io.IOException;
@@ -91,16 +93,7 @@ public class AddWeatherLocation extends Activity{
 
         }
 
-
-
-
-
-
-
     }
-
-
-
 
 
     /* Initialize View Objects */
@@ -128,31 +121,56 @@ public class AddWeatherLocation extends Activity{
                 // TODO 2. add it to our db.
                 //TODO 3. when done go back to last activity.
 
+                //TODO need a better check for whether this is an Integer or String.
                 // CHECK IF IT HAS DIGITS
                 if (etSearchPlaces.getText().toString().contains("0")) {
                     WeatherLocation weatherLocation = new WeatherLocation();
                     weatherLocation.setZipcode(etSearchPlaces.getText().toString());
-                    JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient);
+
+                    // Nothing for these 2, because we are fetching with zipcode.
+                    weatherLocation.setState(SettingsManager.NOTHING_SAVED);
+                    weatherLocation.setCity((SettingsManager.NOTHING_SAVED));
+
+                    JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient,weatherLocation,true,false);
                     task.execute();
 
                 }
+                //TODO key no matter what is we are saving the NOTHING_SAVED if we dont have a value to put in there.
                 // came from town and state
                 else {
                     WeatherLocation weatherLocation = new WeatherLocation();
                     int comma = etSearchPlaces.getText().toString().indexOf(",");
+                    // make sure user actually inputs town,state format
+                    if(comma == -1)
+                    {
+                        Toast.makeText(getApplication(), "Please 'town,state' format", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    // isolate the town and state.
                     String town = etSearchPlaces.getText().toString().substring(0, comma);
-                    String state = etSearchPlaces.getText().toString().substring(comma+1, etSearchPlaces.length());
-                    weatherLocation.setZipcode(etSearchPlaces.getText().toString());
+                    String state = etSearchPlaces.getText().toString().substring(comma + 1, etSearchPlaces.length());
+
+                    // northing saved for zipcode
+                    weatherLocation.setZipcode(SettingsManager.NOTHING_SAVED);
+
                     weatherLocation.setCity(town);
                     weatherLocation.setState(state);
+
                     log("town = " + town);
                     log("state = " + state);
-                    // false = make sure we let em know we didnt come from an Activity that needs a UI updated, true = make sure we came from townAndState
                     JSONWeatherTask task = new JSONWeatherTask(getApplicationContext(), mSettingsManager, mGoogleApiClient, weatherLocation, true, true);
                     task.execute();
                 }
             }
         });
+    }
+
+    private void log(String s) {
+        Log.d(TAG, s);
+    }
+
+
+}
 /*
         etSearchPlaces.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -173,11 +191,3 @@ public class AddWeatherLocation extends Activity{
             }
         });
  */
-    }
-
-    private void log(String s) {
-        Log.d(TAG, s);
-    }
-
-
-}

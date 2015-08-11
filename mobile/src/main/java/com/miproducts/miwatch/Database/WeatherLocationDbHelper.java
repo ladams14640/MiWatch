@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.miproducts.miwatch.Container.WeatherLocation;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
+import java.security.Policy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +28,8 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
        super(context, DATABASE_NAME , null, DATABASE_VERSION);
    }
 
-    //TODO letsm ake sure we update the time stamp and description
-    public void addLocation(WeatherLocation wLocation){
+//TODO lets try nothing, i mean we are already setting to nothing up further in the chain, lets just save it such.
+   public void addLocation(WeatherLocation wLocation){
         log("addLocation");
         // grab a copy of the database.
         SQLiteDatabase database = this.getWritableDatabase();
@@ -44,6 +46,9 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
         insertableRow.put(DbContractor.WeatherLoc.COLUMN_DESC, wLocation.getDesc());
         // TIME_STAMP
         insertableRow.put(DbContractor.WeatherLoc.COLUMN_TIME, wLocation.getTime_stamp());
+        // STATE
+        insertableRow.put(DbContractor.WeatherLoc.COLUMN_STATE, wLocation.getState());
+        log("addLocation state = " + wLocation.getState());
 
         float id = database.insert(DbContractor.WeatherLoc.TABLE_NAME, null, insertableRow);
         Log.d("DBHelper", "id of added item = " + id);
@@ -70,35 +75,53 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
                 WeatherLocation weatherLocation = new WeatherLocation();
                 // weather
                 weatherLocation.setTemperature(Integer.parseInt(cursor.getString(0)));
-                log("temp " + cursor.getString(2));
+                log("temp " + cursor.getString(0));
                 // city
                 weatherLocation.setCity(cursor.getString(1));
                 log("city " + cursor.getString(1));
                 // zipcode
                 weatherLocation.setZipcode(cursor.getString(2));
-                log("zipcode " + cursor.getString(0));
-
-                //todo desc
+                log("zipcode " + cursor.getString(2));
+                // desc
                 weatherLocation.setDesc(cursor.getString(3));
-                //todo time_stamp
+                log("desc " + cursor.getString(3));
+                // time_stamp
                 weatherLocation.setTime_stamp(cursor.getLong(4));
+                log("milliseconds " + cursor.getLong(4));
 
+                // state
+                weatherLocation.setState(cursor.getString(5));
+                log("state2 " + cursor.getString(5));
 
 
                 // Adding Weather Location to list
                 weatherLocations.add(weatherLocation);
             } while (cursor.moveToNext());
         }
-
+        log("done with getAllWeatherLocations");
         // return contact list
         return weatherLocations;
     }
 
 
     public boolean doesLocationExist(WeatherLocation wLocation){
+        log("doesLocationExist");
         List<WeatherLocation> allLocations = getAllWeatherLocations();
         for(int i = 0; i < allLocations.size(); i++){
-            if(wLocation.getZipcode().equals(allLocations.get(i).getZipcode())){
+            // already have that zipcode
+            if(wLocation.getZipcode().equals(allLocations.get(i).getZipcode()) &&
+                    // Dont want to bother if they have the NOTHING flag.
+                    !wLocation.getZipcode().equals(SettingsManager.NOTHING_SAVED)){
+                log("zipcode = " + wLocation.getZipcode() + " = " + allLocations.get(i).getZipcode());
+                log("already have that city and state = " + wLocation.getState() + " " + wLocation.getCity());
+                log("already have that city and state = " + allLocations.get(i).getState() + " " + allLocations.get(i).getCity());
+                return true;
+            }
+            // already have that city and town
+            else if(wLocation.getState().equals(allLocations.get(i).getState()) &&
+                    wLocation.getCity().equals(allLocations.get(i).getCity())){
+                log("already have that city and state = " + wLocation.getState() + " " + wLocation.getCity());
+                log("already have that city and state = " + allLocations.get(i).getState() + " " + allLocations.get(i).getCity());
                 return true;
             }
         }
@@ -122,9 +145,14 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
     }
 
 
-
     //TODO letsm ake sure we update the time stamp and description
-    public void updateTemperatureAndTime(WeatherLocation locationToFill) {
+
+    /**
+     *
+     * @param locationToFill - location should be stuffed with what it needs.
+     * @param isTown - whether we came from town or zipcode
+     */
+    public void updateTemperatureAndTime(WeatherLocation locationToFill, boolean isTown) {
         log("updateTemperature");
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -140,18 +168,34 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
                 WeatherLocation weatherLocation = new WeatherLocation();
                 // weather
                 weatherLocation.setTemperature(Integer.parseInt(cursor.getString(0)));
-                log("temp " + cursor.getString(2));
+                log("temp " + cursor.getString(0));
                 // city
                 weatherLocation.setCity(cursor.getString(1));
                 log("city " + cursor.getString(1));
-                // zipcode
-                weatherLocation.setZipcode(cursor.getString(2));
-                //todo desc
-                weatherLocation.setDesc(cursor.getString(3));
-                //todo time_stamp
-                weatherLocation.setTime_stamp(cursor.getLong(4));
 
-                log("zipcode " + cursor.getString(0));
+                // from zipcode
+                if(!isTown){
+                    // zipcode
+                    weatherLocation.setZipcode(cursor.getString(2));
+                    log("zipcode " + cursor.getString(2));
+                    // desc
+                    weatherLocation.setDesc(cursor.getString(3));
+                    // time_stamp
+                    weatherLocation.setTime_stamp(cursor.getLong(4));
+
+                }
+                // from town and state not zipcode
+                else {
+                    // desc
+                    weatherLocation.setDesc(cursor.getString(3));
+                    // time_stamp
+                    weatherLocation.setTime_stamp(cursor.getLong(4));
+
+                    //state
+                    weatherLocation.setState(cursor.getString(5));
+                    log("state3 " + cursor.getString(5));
+                }
+
                 // Adding Weather Location to list
                 weatherLocations.add(weatherLocation);
             } while (cursor.moveToNext());
@@ -159,32 +203,62 @@ public class WeatherLocationDbHelper  extends SQLiteOpenHelper{
 
         //TODO lets not iterate over this seperately when we are done.
         if(weatherLocations != null && weatherLocations.size() > 0){
-            for(WeatherLocation loc : weatherLocations){
+            for(WeatherLocation loc : weatherLocations) {
                 // we set this location - when we instantiated this dbHelper.
+                if (!isTown) {
+                    log("isFromTown = " + isTown);
+                    if (loc.getZipcode().equals(locationToFill.getZipcode())) {
+                        log("got a match");
+                        // build up new value
+                        ContentValues cv = new ContentValues();
+                        // save temp
+                        cv.put(DbContractor.WeatherLoc.COLUMN_TEMPERATURE,
+                                locationToFill.getTemperature());
+                        // save time
+                        cv.put(DbContractor.WeatherLoc.COLUMN_TIME, locationToFill.getTime_stamp());
+                        // save desc
+                        cv.put(DbContractor.WeatherLoc.COLUMN_DESC, locationToFill.getDesc());
 
-                if(loc.getZipcode().equals(locationToFill.getZipcode())){
-                    // build up new value
-                    ContentValues cv = new ContentValues();
-                    // save temp
-                    cv.put(DbContractor.WeatherLoc.COLUMN_TEMPERATURE,
-                            locationToFill.getTemperature());
-                    // save time
-                    cv.put(DbContractor.WeatherLoc.COLUMN_TIME, locationToFill.getTime_stamp());
-                    // save desc
-                    cv.put(DbContractor.WeatherLoc.COLUMN_DESC, locationToFill.getDesc());
+                        //String sql = "UPDATE "+ DbContractor.WeatherLoc.TABLE_NAME + " SET " + DbContractor.WeatherLoc.COLUMN_TEMPERATURE + " = '" + locationToFill.getTemperature() + " WHERE " + DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = " + locationToFill.getZipcode();
 
-                    // TODO save time stamp too.
-                    //String sql = "UPDATE "+ DbContractor.WeatherLoc.TABLE_NAME + " SET " + DbContractor.WeatherLoc.COLUMN_TEMPERATURE + " = '" + locationToFill.getTemperature() + " WHERE " + DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = " + locationToFill.getZipcode();
+                        int result = db.update(DbContractor.WeatherLoc.TABLE_NAME,
+                                cv,
+                                DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = ?",
+                                new String[]{locationToFill.getZipcode()});
 
-                    int result = db.update(DbContractor.WeatherLoc.TABLE_NAME,
-                            cv,
-                            DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = ?",
-                            new String[] {locationToFill.getZipcode()});
+                        log("updated db, # rows effected = " + result);
 
-                    log("updated db, # rows effected = " + result);
+                    }
+                }
+                //TODO duplicate code - lets DRY it out
+                // from town and state
+                else {
+                    log("isFromTown = " + isTown);
+                    // we already had it.
+                    if(loc.getCity().equals(locationToFill.getCity()) && loc.getState().equals(locationToFill.getState())){
+                        log("got a match");
+                        // build up new value
+                        ContentValues cv = new ContentValues();
+                        // save temp
+                        cv.put(DbContractor.WeatherLoc.COLUMN_TEMPERATURE,
+                                locationToFill.getTemperature());
+                        // save time
+                        cv.put(DbContractor.WeatherLoc.COLUMN_TIME, locationToFill.getTime_stamp());
+                        // save desc
+                        cv.put(DbContractor.WeatherLoc.COLUMN_DESC, locationToFill.getDesc());
 
+                        //String sql = "UPDATE "+ DbContractor.WeatherLoc.TABLE_NAME + " SET " + DbContractor.WeatherLoc.COLUMN_TEMPERATURE + " = '" + locationToFill.getTemperature() + " WHERE " + DbContractor.WeatherLoc.COLUMN_ZIPCODE + " = " + locationToFill.getZipcode();
+                        //TODO need to test.
+                        int result = db.update(DbContractor.WeatherLoc.TABLE_NAME,
+                                cv,
+                                DbContractor.WeatherLoc.COLUMN_STATE + " = ? AND " + DbContractor.WeatherLoc.COLUMN_CITY + " = ?",
+                                new String[]{locationToFill.getState(), locationToFill.getCity()});
+
+                        log("updated db, # rows effected = " + result);
+                    }
                 }
             }
+
         }
         db.close();
         cursor.close();

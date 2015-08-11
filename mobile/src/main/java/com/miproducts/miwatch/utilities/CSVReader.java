@@ -1,4 +1,4 @@
-package com.miproducts.miwatch.AutoComplete;
+package com.miproducts.miwatch.utilities;
 
 /**
  Copyright 2005 Bytecode Pty Ltd.

@@ -8,20 +8,16 @@ import android.os.AsyncTask;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 import com.miproducts.miwatch.Database.WeatherLocationDbHelper;
-import com.miproducts.miwatch.MiDigitalWatchFaceCompanionConfigActivity;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SendToDataLayerThread;
 import com.miproducts.miwatch.utilities.SettingsManager;
 import com.miproducts.miwatch.Container.WeatherLocation;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 //TODO check over the work when requested by the watch
 //TODO update weather if we do currently have the zipcode in the database.
@@ -73,8 +69,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
     /**
      * /**
      * The Weather Location indicates this came from the Activity not the ConfigListenerService and
-     * that the Activity will eventually need it's UI updated - because it will have a new item in it's
-     * listview.
+     * and
      * @param mContext
      * @param mSettingsManager
      * @param mGoogleApiClient
@@ -109,7 +104,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
      * @param mGoogleApiClient
      * @param locationToFill - WeatherLocation
      * @param changeSelected - Should we change what is saved as the default zipcode? true if we want to refresh and just clicked on an item in the ListView, false if we just onCreated and want to update all of the weathers.
-     * @param fromTownAndState - this is if the user was searching with state and town instead of zipcode
+     * @param fromTownAndState - user came from zipcode input or town and state input.
      */
     //TODO really need to polish this boolean, we now have 3 booleans determining how we want to handle the search - not good.!
     public JSONWeatherTask(Context mContext, SettingsManager mSettingsManager,
@@ -127,7 +122,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         this.fromActivity = true;
 
         this.changeSelected = changeSelected;
-        this.fromTownAndState = true;
+        this.fromTownAndState = fromTownAndState;
 
     }
 
@@ -136,27 +131,33 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
     @Override
     protected String doInBackground(String... params) {
         Log.d(TAG, "BackGround");
-        String zipcode = null;
+        String zipcode = mSettingsManager.getZipCode(); // will be NOTHING_SAVED if nothing was saved.
 
-        if(fromActivity){
-            if(!fromTownAndState) {
-                // fresh zipcode, not one from the preferences.
-                zipcode = locationToFill.getZipcode();
-            }
-            // means we came by other means
-            else {
 
-            }
+
+        // From an Activity.class
+        if(fromActivity) {
+            log("from activity");
+            zipcode = locationToFill.getZipcode();
+
         }
+        // from ConfigListener.Service - we grab zipcode from SettingsManager
         else {
-            //TODO this is getting gross
-
+            log("not from activity");
+            if(!fromTownAndState){
+                log("not from town and state");
                 zipcode = mSettingsManager.getZipCode();
                 locationToFill = new WeatherLocation();
                 locationToFill.setZipcode(zipcode);
-
+            }else {
+                log("from town and state");
+                String town = mSettingsManager.getTown();
+                String state = mSettingsManager.getState();
+                locationToFill.setCity(town);
+                locationToFill.setState(state);
             }
 
+        }
 
         // store data
         String returnedData;
@@ -164,10 +165,8 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         // check if we are even online
         if(!isOnline())
             return ERROR_ONLINE;
-        //TODO we need to clean this up
-        // if we came from zipcode inputed
 
-            log("not from town");
+        // if we came from zipcode inputed
         if(!fromTownAndState){
             // check to see if this is the user's first time in the app
             if(!zipcode.equals(SettingsManager.NOTHING_SAVED))
@@ -176,18 +175,18 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 if(zipcode.length() >= MAX_INTEGER_LENGTH)
                     return ERROR_ZIP;
                 returnedData = String.valueOf(sendHttpRequest(Integer.valueOf(zipcode)));
-            }
-            else {
-                Log.d(TAG, "NONE - must be first time was set so lets grab Biddeford.");
-                // lets save biddos since first time
-                mSettingsManager.saveZipcode("04005");
-                returnedData = String.valueOf(sendHttpRequest(04005));
+            }else {
+                // lets try with the location
+                returnedData = String.valueOf(sendHttpRequest(locationToFill));
+                log("not from town and zipcode equals NOTHING use to generate a zipcode here - TESTING");
+
             }
             // onlt send out the temperature if the result back was not an error
             if(Integer.valueOf(returnedData) != (ERROR_URL)){
                 // send to watch
                 sendHandledTemperatureToWatch(returnedData);
             }else {
+                log("Error with sendingHttpRequest in JSON");
                 return ERROR_ZIP;
             }
 
@@ -196,6 +195,10 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
          // we came from tow
             log("from town");
             returnedData = String.valueOf(sendHttpRequest(locationToFill));
+
+            if(!returnedData.equals(ERROR_URL)){
+                sendHandledTemperatureToWatch(returnedData);
+            }
         }
 
         return null;
@@ -237,13 +240,15 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
         }
         Log.d(TAG, "onPostExecute");
     }
+
+
     //TODO clean up
     private int sendHttpRequest(WeatherLocation locationToFill) {
+        log("city = " + locationToFill.getCity() + " state= " + locationToFill.getState());
         // get the JSON GEOLOCATION TEMP DETAILS
         String result = httpClient.getWeatherData(locationToFill.getCity(), locationToFill.getState());
 
         if(resultIsValid(result)){
-
             //TODO refactor and grab this with the JSON OBJECT -
             //TODO prob no reason to keep them split now. Because
             int tempInFah = parseTemp(result);
@@ -261,44 +266,39 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 String town = resultObject.getString("name");
 
                 //TODO reformat here
-                locationToFill.setZipcode();
+                //TODO this is where we would setZipcode locationToFill.setZipcode();
                 locationToFill.setCity(town);
+                log("weather pulled out town " + town);
                 locationToFill.setTemperature(tempInFah);
+                log("weather pulled out temp " + tempInFah);
                 locationToFill.setDesc(description.getString("description").replace("proximity", ""));
+                log("weather pulled out " + description.getString("description"));
                 locationToFill.setTime_stamp(System.currentTimeMillis());
 
-                log("weather pulled out " + description.getString("description"));
 
                 //log("name of place with jsonArray = " + town);
             }catch(JSONException e){
                 log("issue with json = " + e.getMessage());
             }
 
-
-            // we want to return more than just a temp
             if(fromActivity){
-                // make sure we don't already have a copy of this location - compare zipcodes.
-                if(!dbHelper.doesLocationExist(locationToFill))
+                // make sure we don't already have a copy of this location - compare zipcodes and town/state.
+                if(!dbHelper.doesLocationExist(locationToFill)){
+                    log("add location of + " + locationToFill.getCity());
                     dbHelper.addLocation(locationToFill);// Store into the Database
+
+                }
                     // update the database because we already have this zipcode
-                else {dbHelper.updateTemperatureAndTime(locationToFill);}
+                else {
+                    log("update location of + " + locationToFill.getCity());
+
+                    dbHelper.updateTemperatureAndTime(locationToFill, fromTownAndState);}
                 // save the new zipcode.
-                if(changeSelected)
+                // make sure we are saving the current selection!
+                if(changeSelected){
                     mSettingsManager.saveZipcode(locationToFill.getZipcode());
-                try{
-                    //  json result
-                    JSONObject resultObject = new JSONObject(result);
-                    JSONArray jsonArrayWeather = resultObject.getJSONArray("weather");
-
-                    // description from JSONObject
-                    JSONObject description = jsonArrayWeather.getJSONObject(0);
-                    // get Name of town from JSONObject
-                    String town = resultObject.getString("name");
-
-                    log("weather pulled out " + description.getString("description"));
-                    log("name of place with jsonArray = " + town);
-                }catch(JSONException e){
-                    log("issue with json = " + e.getMessage());
+                    mSettingsManager.saveState(locationToFill.getState());
+                    mSettingsManager.saveTown(locationToFill.getCity());
                 }
             }
             // we caem from Config
@@ -311,7 +311,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap, mGoogleApiClient).start();
 
                 // update the database because we already have this zipcode
-                dbHelper.updateTemperatureAndTime(locationToFill);
+                dbHelper.updateTemperatureAndTime(locationToFill,fromTownAndState);
 
 
 
@@ -364,17 +364,21 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 log("issue with json = " + e.getMessage());
             }
 
-
             // we want to return more than just a temp
             if(fromActivity){
                 // make sure we don't already have a copy of this location - compare zipcodes.
                 if(!dbHelper.doesLocationExist(locationToFill))
                     dbHelper.addLocation(locationToFill);// Store into the Database
                 // update the database because we already have this zipcode
-                else {dbHelper.updateTemperatureAndTime(locationToFill);}
-                // save the new zipcode.
-                if(changeSelected)
+                else {dbHelper.updateTemperatureAndTime(locationToFill, fromTownAndState);}
+
+                // make sure we are saving the current selection!
+                if(changeSelected){
                     mSettingsManager.saveZipcode(locationToFill.getZipcode());
+                    mSettingsManager.saveState(locationToFill.getState());
+                    mSettingsManager.saveTown(locationToFill.getCity());
+                }
+
                 try{
                     //  json result
                     JSONObject resultObject = new JSONObject(result);
@@ -385,6 +389,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                     // get Name of town from JSONObject
                     String town = resultObject.getString("name");
 
+                    // Ill never get State here, user adds state.
                     log("weather pulled out " + description.getString("description"));
                     log("name of place with jsonArray = " + town);
                 }catch(JSONException e){
@@ -401,9 +406,7 @@ public class JSONWeatherTask extends AsyncTask<String,Void,String> {
                 new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap, mGoogleApiClient).start();
 
                 // update the database because we already have this zipcode
-                dbHelper.updateTemperatureAndTime(locationToFill);
-
-
+                dbHelper.updateTemperatureAndTime(locationToFill, fromTownAndState);
 
                 // send this to the MainCompanionActivity to send it off to wearable. -
                 Intent sendDegreesIntent = new Intent(Consts.BROADCAST_DEGREE);
