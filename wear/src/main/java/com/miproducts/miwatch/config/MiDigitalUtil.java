@@ -1,7 +1,5 @@
 package com.miproducts.miwatch.config;
 
-import android.graphics.Color;
-import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -9,13 +7,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
-import com.miproducts.miwatch.utilities.Consts;
-import com.miproducts.miwatch.utilities.DigitalWatchFaceUtil;
 
 /**
  * MiDigitalUtil is a class we are using to send data from MiDigitalWatchFaceConfiguration

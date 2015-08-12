@@ -1,6 +1,12 @@
 package com.miproducts.miwatch.Weather.openweather;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
+
+import com.miproducts.miwatch.Container.WeatherLocation;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -16,14 +22,31 @@ import java.net.URL;
 public class WeatherHttpClient {
 
     private static final String TAG = "WeatherHTTPCLient";
-    private static String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?zip=";
-   // String test= "http://openweathermap.org/city/4958141";
+    private static String BASE_URL_ZIP = "http://api.openweathermap.org/data/2.5/weather?zip=";
+    private static String BASE_TOWN_STATE = "http://api.openweathermap.org/data/2.5/weather?q=";
 
-    public String getWeatherData(int location) {
-        Log.d(TAG, "get Temperature for: " + location);
+    /**
+     *
+     * @param weatherLocation stuff a weatherLocation with either a zipcode or a city/state.
+     * @return
+     */
+    public String getWeatherData(WeatherLocation weatherLocation) {
+        Log.d(TAG, "get Temperature for: " + weatherLocation.getCity() + ", " + weatherLocation.getState() + ", " + weatherLocation.getZipcode());
+
+        // url we will be GET requesting
+        String url;
+
+        // no zipcode
+        if(weatherLocation.getZipcode().equals(SettingsManager.NOTHING_SAVED)){
+            String town = weatherLocation.getCity();
+            String state = weatherLocation.getState();
+            url = BASE_TOWN_STATE + town + "," + state + ",us";
+        }else {
+            url = BASE_URL_ZIP + weatherLocation.getZipcode();
+        }
+
         HttpURLConnection con = null ;
         InputStream is = null;
-        String url = BASE_URL + location+",us";
         try {
             con = (HttpURLConnection) ( new URL(url)).openConnection();
             con.setRequestMethod("GET");
@@ -55,4 +78,6 @@ public class WeatherHttpClient {
         return null;
 
     }
+
+
 }
