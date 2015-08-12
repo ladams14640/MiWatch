@@ -22,6 +22,4 @@
     <color name="color_item_circle_border_color">#424242</color>
     <color name="digital_time_blue">#79a2be</color>
     <color name="blackish">#030303</color>
-    <color name="ColorPrimary">#FF5722</color>
-    <color name="ColorPrimaryDark">#E64A19</color>
 </resources>

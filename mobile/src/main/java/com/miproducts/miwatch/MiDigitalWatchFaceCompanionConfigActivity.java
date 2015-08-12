@@ -1,63 +1,66 @@
 package com.miproducts.miwatch;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Point;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.widget.ListView;
+import android.support.wearable.companion.WatchFaceCompanion;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
-import com.miproducts.miwatch.utilities.CSVReader;
-import com.miproducts.miwatch.Database.WeatherLocationDbHelper;
-import com.miproducts.miwatch.Weather.openweather.JSONWeatherTask;
-import com.miproducts.miwatch.Container.WeatherLocation;
-import com.miproducts.miwatch.utilities.SendToDataLayerThread;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+import com.miproducts.miwatch.Weather.openweather.ConverterUtil;
+import com.miproducts.miwatch.Weather.openweather.WeatherHttpClient;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.SettingsManager;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+
 /**
- * 1. We will allow user to input the zipcode of the area he wants weather.
- * 2. If we get back a result, else tell him not valid address, we will Build a View and put it into the ListView. - maybe refresh
- * 3. Display City, State, Zipcode, and last updated weather. - save in MySQL
- * 4. allow user to select one of those views in listview and update the weather/set it as default for
- * wearable.
- * 5.
  * Created by larry on 7/2/15.
  */
 public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
     private static final String TAG = "ConfigActivity";
 
     private GoogleApiClient mGoogleApiClient;
+    private WatchFaceSurfaceView svView;
+    private WatchFaceMenu svMenu;
     private BroadcastReceiver brDegree;
     private SettingsManager mSettingsManager;
 
-    private ListView lvLocations;
-    //private ImageButton bAddWeatherLocation;
-    //private EditText etZipCode;
 
-    private WeatherLocationAdapter mWeatherLocationAdapter;
-
-    private WeatherLocationDbHelper dbHelper;
-    private ImageButton FAB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
         mSettingsManager = new SettingsManager(this);
-        dbHelper = new WeatherLocationDbHelper(this);
+
+        initLayout();
 
        mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -68,118 +71,153 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 log("brDegree - Temperature is = " + intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0));
-                int temp = intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0); //TODO constants these
+                int temp = intent.getIntExtra(Consts.KEY_BROADCAST_DEGREE, 0);
                 DataMap dataMap = new DataMap();
                 // going to continue using the broadcast KEY, it is unique after in DataApi.
                 dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, temp);
                 // send off to wearable - listener over there will be listening.
-                //svMenu.sendOutDataToWearable(dataMap);
-                new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap, mGoogleApiClient).start();
+                svMenu.sendOutDataToWearable(dataMap);
             }
         };
 
-
-        FAB = (ImageButton) findViewById(R.id.imageButton);
-        FAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // lets go to the new Activity.
-                Intent intentToAddWeatherLocation = new Intent(MiDigitalWatchFaceCompanionConfigActivity.this,AddWeatherLocation.class);
-                startActivity(intentToAddWeatherLocation);
-
-
-            }
-        });
-
-        lvLocations = (ListView) findViewById(R.id.lvLocations);
-        //TODO do this in start might not need it here anymore updateUI();
-        lvLocations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                getTemp(((WeatherLocationAdapter) lvLocations.getAdapter()).getItem(position));
-            }
-        });
-        //TODO make sure no issue if user doesnt already have weatherLocations saved/
-        /*
-        // check if we got any in the DB if so update them
-        List<WeatherLocation> weatherLocs = dbHelper.getAllWeatherLocations();
-        for(WeatherLocation weatherLoc : weatherLocs){
-            new JSONWeatherTask(this, mSettingsManager, mGoogleApiClient, weatherLoc,false).execute();
-        }*/
-
-        checkIfFirstTimeRunning();
-    }
-
-    private void checkIfFirstTimeRunning() {
-        boolean firstTime = mSettingsManager.getIsUsersFirstTimeRunningApp();
-        //TODO always be true for a while.
-
-        if(!firstTime) return;
-
-        log("firstTime checking if We should load up db");
-        String next[] = {};
-        List<String[]> list = new ArrayList<String[]>();
-
-        try {
-            CSVReader reader = new CSVReader(new InputStreamReader(getAssets().open("citiesstateszipcodes.csv")));
-            while(true) {
-                next = reader.readNext();
-                if(next != null) {
-                    list.add(next);
-                } else {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            Log.d(TAG, list.get(0)[2]);
-
-        }
-
-
+        // lets get the current temperature and send it to wearable
+       // getTemp();
 
     }
 
-    private void addToDatabase(WeatherLocation weatherLocation) {
-        dbHelper.addLocation(weatherLocation);
-        updateUI();
-
+    private void initLayout() {
+        svView = (WatchFaceSurfaceView) findViewById(R.id.surfaceView);
+        svMenu = new WatchFaceMenu(this);
     }
 
 
-    public void updateUI() {
-        List<WeatherLocation> savedList = dbHelper.getAllWeatherLocations();
-        // TESTING PURPOSES - savedList.add(new WeatherLocation(72, "04005", "Biddeford"));
-        if(savedList.size() > 0){
-            mWeatherLocationAdapter = new WeatherLocationAdapter(savedList, this, R.layout.view_weather_location);
-            lvLocations.setAdapter(mWeatherLocationAdapter);
-        }
-    }
+    // #################### TEMPERATURE STARTS
 
-
-
-
-
-    private void getTemp(WeatherLocation weatherLocation) {
-        JSONWeatherTask task;
-        // there was no zipcode so we instruct to handle like its from town and state
-        if(weatherLocation.getZipcode().equals(SettingsManager.NOTHING_SAVED)){
-            task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true, true);
-        }
-        // there was zipcode
-        else {
-            task = new JSONWeatherTask(this,mSettingsManager,mGoogleApiClient, weatherLocation,true, false);
-
-        }
+    private void getTemp() {
+        JSONWeatherTask task = new JSONWeatherTask();
         task.execute();
     }
+
+
+    int tempInFah;
+
+
+    public class JSONWeatherTask extends AsyncTask<String,Void,String> {
+        WeatherHttpClient httpClient;
+        public JSONWeatherTask(){
+            httpClient = new WeatherHttpClient();
+            Log.d(TAG, "Made");
+        }
+
+        private static final String TAG = "JSONWeatherTask";
+
+        @Override
+        protected String doInBackground(String... params) {
+            Log.d(TAG, "BackGround");
+            int zipcode = mSettingsManager.getZipCode();
+            String returnedData;
+            if(zipcode != 0){
+                returnedData = String.valueOf(sendHttpRequest(zipcode));
+            }
+            else {
+                returnedData = String.valueOf(sendHttpRequest(04005));
+            }
+            return returnedData;
+        }
+
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(getApplicationContext(), "Temperature " + tempInFah, Toast.LENGTH_SHORT).show();
+
+
+            Log.d(TAG, "onPostExecute");
+        }
+        private int sendHttpRequest(int zipcode) {
+
+            // get the JSON GEOLOCATION TEMP DETAILS
+            String result = httpClient.getWeatherData(zipcode);
+            // parse the temp value
+            int indexInt = result.indexOf("temp");
+            int begOfTempValue = indexInt+6;
+            int endOfTempValue = result.indexOf(",", begOfTempValue);
+            // Kelvin version
+            String temperatureInCelsius = result.substring(begOfTempValue, endOfTempValue);
+            // Celsius version
+            int tempInCels = (int) ConverterUtil.convertKelvinToCelsius(Double.parseDouble(temperatureInCelsius));
+            // Fernheit
+            tempInFah = ConverterUtil.convertCelsiusToFahrenheit(tempInCels);
+
+            // send out to the dataLayer
+            DataMap dataMap = new DataMap();
+            // going to continue using the broadcast KEY, it is unique after in DataApi.
+            dataMap.putInt(Consts.KEY_BROADCAST_DEGREE, tempInFah);
+            // send off to wearable - listener over there will be listening.
+            new SendToDataLayerThread(Consts.PHONE_TO_WEARABLE_PATH, dataMap).start();
+            return tempInFah;
+        }
+
+    }
+
+
+
+    class SendToDataLayerThread extends Thread {
+        String path;
+        DataMap dataMap;
+
+        // Constructor for sending data objects to the data layer
+        SendToDataLayerThread(String p, DataMap data) {
+            path = p;
+            dataMap = data;
+
+        }
+
+        public void run() {
+            if (mGoogleApiClient != null) {
+                log("mGoogle != null!");
+                mGoogleApiClient.blockingConnect(5, TimeUnit.SECONDS);
+
+                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
+                for (Node node : nodes.getNodes()) {
+
+                    // Construct a DataRequest and send over the data layer
+                    PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+                    putDMR.getDataMap().putAll(dataMap);
+                    PutDataRequest request = putDMR.asPutDataRequest();
+                    DataApi.DataItemResult result = Wearable.DataApi.putDataItem(mGoogleApiClient, request).await();
+                    if (result.getStatus().isSuccess()) {
+                        Log.d(TAG, "DataMap: " + dataMap + " sent to: " + node.getDisplayName());
+                    } else {
+                        // Log an error
+                        Log.d(TAG, "ERROR: failed to send DataMap");
+                    }
+                }
+            }else {
+                log("mGoogle == null!");
+            }
+        }
+    }
+
+
+
+// #################### TEMPERATURE ENDS
+
+
+
+
+
+
+
+
+
 
     @Override
     protected void onStart() {
         super.onStart();
+
         initReceivers();
-        updateUI();
+        svView.threadRun(true);
     }
 
 
@@ -193,8 +231,105 @@ public class MiDigitalWatchFaceCompanionConfigActivity extends Activity {
         unregisterReceiver(brDegree);
     }
 
+    @Override
+    protected void onPause() {
+        svView.threadRun(false);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public Point getViewsPosition(int selectedView){
+        return svView.getPositionOfView(selectedView);
+    }
+
+
+
+    /**
+     * Called by WatchFaceSurfaceView, when an individual View tells the Surface View it has been
+     * selected. It notifies the Activity that a new choice has gone through and to let the menu know.
+     * @param none
+     */
+    public void setMenuSelection(int none) {
+        svMenu.setSelectedView(none);
+    }
+
+    /**
+     * called by WatchFaceMenu, when the user chooses a view, the menu needs to know the view's
+     * properties
+     * @param viewNumber - COnstant representing the view.
+     * @return return the size of the view.
+     */
+    public float getSizeOfView(int viewNumber) {
+        return svView.getSizeOfView(viewNumber);
+
+    }
+
+    /**
+     * Change the size of the View to the new size, we must call a method in the surfaceView
+     * @param newSize - the new size of the view
+     * @param selectedView - the view that is being manipulated, ex Consts.EVENTS
+     */
+    public void ChangeViewSize(int newSize, int selectedView) {
+        log("changeViewSize new size = " + newSize);
+        log("new selected View = " + selectedView);
+        svView.changeViewSize(newSize,selectedView);
+    }
+
+    /**
+     * Called by the WatchFaceMenu, when the user chooses a view, the menu needs to know the view's
+     * properties.
+     * @param selectedView - COnstant representing the view.
+     * @return - returns the color of the view.
+     */
+    public int getSelectedViewsColor(int selectedView){
+        return svView.getColorOfView(selectedView);
+    }
+
+    /**
+     * Called by WatchFaceMenu
+     * @param selectedView - Constant rep of view
+     * @return
+     */
+    public boolean getViewsVisibility(int selectedView) {
+        return svView.getVisibilityOfView(selectedView);
+    }
+
+    /**
+     * Called by WatchFaceMenu
+     * @param selectedView - Constant reference to the view
+     * @return
+     */
+    public int getViewsSize(int selectedView) {
+        return (int) svView.getSizeOfView(selectedView);
+    }
+    public void setViewsVisible(int selectedView, boolean isChecked) {
+        svView.setViewsVisibility(selectedView, isChecked);
+    }
+
+
+
+
+
+
     private void log(String s) {
         Log.d(TAG, s);
-
+        //init();
     }
 }

@@ -13,14 +13,6 @@ public class SettingsManager {
     private SharedPreferences.Editor mEditor;
 
     private static final String KEY_ZIPCODE = "KEY_ZIPCODE";
-    public static final String NOTHING_SAVED = "NONE";
-
-    private static final String KEY_TOWN = "KEY_TOWN";
-    private static final String KEY_STATE = "KEY_STATE";
-
-    //TODO not sure if i am even going to do that one.
-    // keep track if we have started the app before - determine to load the db with the JSON
-    private static final String KEY_FIRST_TIME_RUNNING_APP = "KEY_FIRST_TIME_RUNNING_APP";
 
 
     public SettingsManager(Context applicationContext) {
@@ -36,57 +28,41 @@ public class SettingsManager {
         mEditor.commit();
     }
 
+    public void writeToPreferences(String key, String value){
+        mEditor.putString(key, value);
+        mEditor.apply();
+        mEditor.commit();
+    }
+
+    public void writeToPreferences(String key, boolean value){
+        mEditor.putBoolean(key, value);
+        mEditor.apply();
+        mEditor.commit();
+    }
 
     public int getIntFromPreferences(String key){
         return mPrefs.getInt(key, 0);
     }
 
+    public String getStringFromPreferences(String key){
+        return mPrefs.getString(key, "null");
+    }
+
+    public boolean getBoolFromPreferences(String key){
+        return mPrefs.getBoolean(key, false);
+    }
 
 
 
-    public void saveZipcode(String zipcode){
-        mEditor.putString(KEY_ZIPCODE, zipcode);
+    public void saveZipcode(int zipcode){
+        mEditor.putInt(KEY_ZIPCODE, zipcode);
         mEditor.apply();
         mEditor.commit();
     }
-    public String getZipCode(){
-        return mPrefs.getString(KEY_ZIPCODE, NOTHING_SAVED);
+    public int getZipCode(){
+        return mPrefs.getInt(KEY_ZIPCODE, 0);
     }
 
-    public void saveState(String state){
-        mEditor.putString(KEY_STATE, state);
-        mEditor.apply();
-        mEditor.commit();
-    }
-    public String getState(){
-        return mPrefs.getString(KEY_STATE, NOTHING_SAVED);
-    }
-
-    public void saveTown(String town){
-        mEditor.putString(KEY_TOWN, town);
-        mEditor.apply();
-        mEditor.commit();
-    }
-    public String getTown(){
-        return mPrefs.getString(KEY_TOWN, NOTHING_SAVED);
-    }
-
-
-
-
-
-
-
-
-
-    /* Keep track if this is the users first time running app*/
-    public Boolean getIsUsersFirstTimeRunningApp() {
-        return mPrefs.getBoolean(KEY_FIRST_TIME_RUNNING_APP, true);
-    }
-    public void setIsUsersFirstTimeRunningApp(boolean isSet){
-        mEditor.putBoolean(KEY_FIRST_TIME_RUNNING_APP, isSet);
-        mEditor.apply();
-        mEditor.commit();
-    }
-
+    public static final String DIGITAL_TIME_X = "DIGITAL_TIME_X";
+    // public
 }

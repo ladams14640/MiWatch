@@ -8,12 +8,15 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.hud.HudView;
 import com.miproducts.miwatch.utilities.BitmapConverter;
+import com.miproducts.miwatch.utilities.ConverterUtil;
 
 /**
  * Created by larry on 6/29/15.

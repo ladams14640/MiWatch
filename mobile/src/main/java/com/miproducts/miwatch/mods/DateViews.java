@@ -10,19 +10,14 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.miproducts.miwatch.MiDigitalWatchFace;
 import com.miproducts.miwatch.R;
-import com.miproducts.miwatch.config.CustomizedMods;
-
+import com.miproducts.miwatch.WatchFaceSurfaceView;
 import com.miproducts.miwatch.utilities.Consts;
-import com.miproducts.miwatch.utilities.ModPositionFunctions;
 
 /**
- * Created by ladam_000 on 7/19/2015.
+ * Created by ladam_000 on 7/5/2015.
  */
-public class DateMod extends View implements CustomizedMods{
-
-
+public class DateViews extends Mods implements CustomizedMods{
     private static final int ID = Consts.DATE;
     @Override
     public int getId() {
@@ -31,16 +26,18 @@ public class DateMod extends View implements CustomizedMods{
 
     private static final String TAG = "DateViews";
 
-    private MiDigitalWatchFace svView;
+    private WatchFaceSurfaceView svView;
     private Context mContext;
 
     private int x, y;
+    private String dateOfWeek = "Sun";
+    private String dateOfMonth = "05";
 
     private Paint pDateOfWeek;
     private Paint pDateOfMonth;
     private Paint pRect;
 
-    private int textSize = 25;
+    private int textSize = 50;
 
     private int width = textSize * 2;
     private int height = textSize * 2;
@@ -49,28 +46,23 @@ public class DateMod extends View implements CustomizedMods{
     private int currentColor;
     private boolean isVisible = true;
 
-    private String dayOfMonth, dayOfWeek;
 
     public int getSize(){
         return textSize;
     }
 
-    public DateMod(Context context, MiDigitalWatchFace svView, String dayOfMonth, String dayOfWeek) {
-        super(context);
+    public DateViews(Context context, WatchFaceSurfaceView svView) {
+        super(context, svView);
         this.svView = svView;
         this.mContext = context;
         initPositions();
-        this.dayOfMonth = dayOfMonth;
-        this.dayOfWeek = dayOfWeek;
         initPaint();
         setRectangle();
     }
 
     private void initPositions() {
-        x = mContext.getWallpaperDesiredMinimumWidth() / 5;
-        y = ModPositionFunctions.getTopTimerPosition(mContext.getWallpaperDesiredMinimumWidth());
-
-
+        x = Consts.xDatePosition;
+        y = Consts.yDatePositions;
     }
 
     private void setRectangle(){
@@ -79,6 +71,57 @@ public class DateMod extends View implements CustomizedMods{
                 y - (height/2),
                 x + (width/2),
                 y+ (height/2));
+    }
+
+
+    // finger location while moving.
+    float xMove, yMove;
+    boolean isDragging = false;
+
+    public boolean touchInside(MotionEvent event){
+        // if we are dragging no need to check if we are within the square, just drag it.
+        if(!isDragging) {
+            if (!mSelectRect.contains((int) event.getX(), (int) event.getY())){
+                isDragging = false;
+                return false;
+            } else {
+                isDragging = true;
+            }
+        }
+
+        // we are now dragging and lets move this shit.
+        switch(event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                svView.setSelection(Consts.DATE, true);
+                svView.viewIsDragging(true);
+                selectPaint();
+                setRectangle();
+
+                return true;
+
+            case MotionEvent.ACTION_MOVE:
+                 x = (int)(event.getX()-(width/2));
+                // make sure we do not go over the hud - 6 is a heuristic number I came to.
+                if((int) (event.getY()-(height/6)) < Consts.yHudPosition){
+                    y = (int) (event.getY()-(height/2));
+                }
+                setRectangle();
+                return true;
+
+            // no need to call finger off if we are aniamting, animating, because of ACTION_MOVE
+            case MotionEvent.ACTION_UP:
+                isDragging = false;
+                svView.viewIsDragging(false);
+
+                log("xPosition = " + x);
+                log("yPosition = " + y);
+                yMove = 0;
+                xMove = 0;
+                return true;
+
+        }
+        return true;
+
     }
 
 
@@ -108,9 +151,9 @@ public class DateMod extends View implements CustomizedMods{
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        canvas.drawText(dayOfWeek, x, y - textSize, pDateOfWeek);
-        canvas.drawText(dayOfMonth, x, y, pDateOfMonth);
-        // canvas.drawRect(mSelectRect, pRect);
+        canvas.drawText(dateOfWeek, x, y, pDateOfWeek);
+        canvas.drawText(dateOfMonth, x, y + textSize, pDateOfMonth);
+       // canvas.drawRect(mSelectRect, pRect);
 
 
 
@@ -120,18 +163,25 @@ public class DateMod extends View implements CustomizedMods{
         Log.d(TAG, s);
     }
 
-    public DateMod(Context context, AttributeSet attrs) {
+    public DateViews(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public DateMod(Context context, AttributeSet attrs, int defStyleAttr) {
+    public DateViews(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
+    public DateViews(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+    }
     private void selectPaint() {
         pRect.setColor(getResources().getColor(android.R.color.holo_orange_dark));
     }
+    @Override
+    public void unSelectPaint() {
+        pRect.setColor(getResources().getColor(R.color.digital_time_blue));
 
+    }
     public void changeSize(int newSize) {
         log("changed Size to " + newSize);
         textSize = newSize;
@@ -167,9 +217,5 @@ public class DateMod extends View implements CustomizedMods{
 
     public boolean getViewsVisibility() {
         return isVisible;
-    }
-    public void updateDate(String dayOfMonth, String dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-        this.dayOfMonth = dayOfMonth;
     }
 }

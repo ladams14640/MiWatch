@@ -5,10 +5,15 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
+import com.miproducts.miwatch.MiDigitalWatchFace;
 import com.miproducts.miwatch.R;
 import com.miproducts.miwatch.utilities.Consts;
+import com.miproducts.miwatch.utilities.SettingsManager;
 
 /**
  * Used by PickingMod - it is a special Mod and handles everything like the border n such.

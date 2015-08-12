@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 
 import com.miproducts.miwatch.R;
+import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.utilities.Consts;
     //TODO July 31 2015 - Continue with the last 3 mods, 
 /**

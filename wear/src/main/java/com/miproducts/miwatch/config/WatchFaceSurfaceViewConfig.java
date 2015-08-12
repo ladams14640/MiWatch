@@ -3,11 +3,17 @@ package com.miproducts.miwatch.config;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
+import com.miproducts.miwatch.mods.*;
+import com.miproducts.miwatch.mods.DegreeMod;
+import com.miproducts.miwatch.mods.FitnessMod;
 import com.miproducts.miwatch.utilities.Consts;
 import com.miproducts.miwatch.utilities.ModPositionFunctions;
 

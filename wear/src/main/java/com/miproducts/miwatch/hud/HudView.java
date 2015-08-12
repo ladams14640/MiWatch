@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.wearable.DataMap;
 import com.miproducts.miwatch.MiDigitalWatchFace;
@@ -23,6 +24,7 @@ import com.miproducts.miwatch.mods.DegreeMod;
 import com.miproducts.miwatch.mods.EventMod;
 import com.miproducts.miwatch.mods.FitnessMod;
 import com.miproducts.miwatch.mods.TimerMod;
+import com.miproducts.miwatch.utilities.Consts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ public class HudView extends ViewGroup implements View.OnTouchListener{
 
     private Context mContext;
     private WindowManager.LayoutParams params;
-    private float x= 0,y = 100,w = 200,h=200;
+    private float x= 0,y = 125,w = 200,h=200;
     Rect mRect;
     MiDigitalWatchFace.Engine mEngine;
     /* All the booleans for the mods */
